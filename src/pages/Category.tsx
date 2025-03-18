@@ -35,7 +35,7 @@ const Category = () => {
     
     // Filter by gender
     if (filters.gender !== "all") {
-      filtered = filtered.filter(name => name.gender === filters.gender);
+      filtered = filtered.filter(name => name.gender === filters.gender as "boy" | "girl" | "unisex");
     }
     
     // Filter by length

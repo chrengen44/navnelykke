@@ -38,7 +38,8 @@ const PopularNames = () => {
     
     // Filter by gender
     if (filters.gender !== "all") {
-      filtered = filtered.filter(name => name.gender === filters.gender);
+      // Type assertion to inform TypeScript that filters.gender is one of the valid gender types
+      filtered = filtered.filter(name => name.gender === filters.gender as "boy" | "girl" | "unisex");
       
       // Update URL parameter for gender
       if (filters.gender !== "all") {

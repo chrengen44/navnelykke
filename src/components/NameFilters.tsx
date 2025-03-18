@@ -41,7 +41,16 @@ const NameFilters = ({
   const [isOpen, setIsOpen] = useState(false);
 
   const handleChange = (key: keyof FilterState, value: string) => {
-    const newFilters = { ...filters, [key]: value };
+    const newFilters = { ...filters } as FilterState;
+    
+    if (key === "gender") {
+      newFilters.gender = value as "all" | "boy" | "girl" | "unisex";
+    } else if (key === "length") {
+      newFilters.length = value as "all" | "short" | "medium" | "long";
+    } else if (key === "letter" || key === "search") {
+      newFilters[key] = value;
+    }
+    
     setFilters(newFilters);
     onFilter(newFilters);
   };
@@ -51,7 +60,7 @@ const NameFilters = ({
   };
 
   const resetFilters = () => {
-    const newFilters = {
+    const newFilters: FilterState = {
       gender: "all",
       length: "all",
       letter: "",

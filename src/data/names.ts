@@ -1881,6 +1881,336 @@ export const babyNames: BabyName[] = [
     length: "short",
     categories: ["nordisk", "naturnavn", "unik"],
     firstLetter: "V"
+  },
+  {
+    id: 171,
+    name: "Aagot",
+    gender: "girl",
+    origin: "Norrønt",
+    meaning: "Variant av Åsgot, som betyr Guds gave",
+    popularity: 5,
+    length: "medium",
+    categories: ["nordisk", "klassisk", "vikingnavn"],
+    firstLetter: "A"
+  },
+  {
+    id: 172,
+    name: "Aase",
+    gender: "girl",
+    origin: "Norrønt",
+    meaning: "Gud, åsene",
+    popularity: 15,
+    length: "short",
+    categories: ["nordisk", "klassisk"],
+    firstLetter: "A"
+  },
+  {
+    id: 173,
+    name: "Aashild",
+    gender: "girl",
+    origin: "Norrønt",
+    meaning: "Gudekrig, kvinnelig kriger",
+    popularity: 7,
+    length: "medium",
+    categories: ["nordisk", "vikingnavn", "unik"],
+    firstLetter: "A"
+  },
+  {
+    id: 174,
+    name: "Abigail",
+    gender: "girl",
+    origin: "Hebraisk",
+    meaning: "Min far fryder seg",
+    popularity: 25,
+    length: "medium",
+    categories: ["bibelsk", "internasjonal"],
+    firstLetter: "A"
+  },
+  {
+    id: 175,
+    name: "Adele",
+    gender: "girl",
+    origin: "Germansk",
+    meaning: "Edel, nobel",
+    popularity: 35,
+    length: "medium",
+    categories: ["klassisk", "internasjonal"],
+    firstLetter: "A"
+  },
+  {
+    id: 176,
+    name: "Adelen",
+    gender: "girl",
+    origin: "Germansk",
+    meaning: "Variasjon av Adele, edel",
+    popularity: 18,
+    length: "medium",
+    categories: ["moderne", "internasjonal"],
+    firstLetter: "A"
+  },
+  {
+    id: 177,
+    name: "Adelina",
+    gender: "girl",
+    origin: "Germansk",
+    meaning: "Den edle, lille adelige",
+    popularity: 22,
+    length: "medium",
+    categories: ["internasjonal", "klassisk"],
+    firstLetter: "A"
+  },
+  {
+    id: 178,
+    name: "Adriana",
+    gender: "girl",
+    origin: "Latin",
+    meaning: "Fra Adria",
+    popularity: 28,
+    length: "medium",
+    categories: ["internasjonal", "klassisk"],
+    firstLetter: "A"
+  },
+  {
+    id: 179,
+    name: "Agata",
+    gender: "girl",
+    origin: "Gresk",
+    meaning: "Den gode",
+    popularity: 20,
+    length: "medium",
+    categories: ["internasjonal", "klassisk"],
+    firstLetter: "A"
+  },
+  {
+    id: 180,
+    name: "Agathe",
+    gender: "girl",
+    origin: "Gresk",
+    meaning: "Den gode",
+    popularity: 34,
+    length: "medium",
+    categories: ["klassisk", "internasjonal"],
+    firstLetter: "A"
+  },
+  {
+    id: 181,
+    name: "Agnes",
+    gender: "girl",
+    origin: "Gresk",
+    meaning: "Ren, kysk",
+    popularity: 42,
+    length: "medium",
+    categories: ["klassisk", "internasjonal"],
+    firstLetter: "A"
+  },
+  {
+    id: 182,
+    name: "Agnete",
+    gender: "girl",
+    origin: "Gresk",
+    meaning: "Den rene, variasjon av Agnes",
+    popularity: 30,
+    length: "medium",
+    categories: ["nordisk", "klassisk"],
+    firstLetter: "A"
+  },
+  {
+    id: 183,
+    name: "Aileen",
+    gender: "girl",
+    origin: "Gælisk",
+    meaning: "Lys, strålende",
+    popularity: 12,
+    length: "medium",
+    categories: ["internasjonal", "moderne"],
+    firstLetter: "A"
+  },
+  {
+    id: 184,
+    name: "Aisha",
+    gender: "girl",
+    origin: "Arabisk",
+    meaning: "Levende, i live, velstående",
+    popularity: 36,
+    length: "medium",
+    categories: ["internasjonal", "moderne"],
+    firstLetter: "A"
+  },
+  {
+    id: 185,
+    name: "Alba",
+    gender: "girl",
+    origin: "Latin",
+    meaning: "Hvit, daggry",
+    popularity: 28,
+    length: "short",
+    categories: ["internasjonal", "moderne", "naturnavn"],
+    firstLetter: "A"
+  },
+  {
+    id: 186,
+    name: "Aleksandra",
+    gender: "girl",
+    origin: "Gresk",
+    meaning: "Beskytter av mennesker",
+    popularity: 32,
+    length: "long",
+    categories: ["internasjonal", "klassisk"],
+    firstLetter: "A"
+  },
+  {
+    id: 187,
+    name: "Alexandra",
+    gender: "girl",
+    origin: "Gresk",
+    meaning: "Beskytter av mennesker",
+    popularity: 38,
+    length: "long",
+    categories: ["internasjonal", "klassisk"],
+    firstLetter: "A"
+  },
+  {
+    id: 188,
+    name: "Alice",
+    gender: "girl",
+    origin: "Germansk",
+    meaning: "Av edel type",
+    popularity: 56,
+    length: "medium",
+    categories: ["internasjonal", "klassisk"],
+    firstLetter: "A"
+  },
+  {
+    id: 189,
+    name: "Alicia",
+    gender: "girl",
+    origin: "Germansk",
+    meaning: "Av edel type, variant av Alice",
+    popularity: 30,
+    length: "medium",
+    categories: ["internasjonal", "moderne"],
+    firstLetter: "A"
+  },
+  {
+    id: 190,
+    name: "Alina",
+    gender: "girl",
+    origin: "Gresk/Slavisk",
+    meaning: "Lys, strålende",
+    popularity: 40,
+    length: "medium",
+    categories: ["internasjonal", "moderne"],
+    firstLetter: "A"
+  },
+  {
+    id: 191,
+    name: "Alise",
+    gender: "girl",
+    origin: "Germansk",
+    meaning: "Av edel type, variant av Alice",
+    popularity: 25,
+    length: "medium",
+    categories: ["internasjonal", "moderne"],
+    firstLetter: "A"
+  },
+  {
+    id: 192,
+    name: "Amalia",
+    gender: "girl",
+    origin: "Germansk",
+    meaning: "Arbeid, aktivitet",
+    popularity: 43,
+    length: "medium",
+    categories: ["klassisk", "internasjonal"],
+    firstLetter: "A"
+  },
+  {
+    id: 193,
+    name: "Amelia",
+    gender: "girl",
+    origin: "Germansk",
+    meaning: "Arbeid, strev",
+    popularity: 58,
+    length: "medium",
+    categories: ["internasjonal", "populær"],
+    firstLetter: "A"
+  },
+  {
+    id: 194,
+    name: "Amelie",
+    gender: "girl",
+    origin: "Fransk variant av Amelia",
+    meaning: "Arbeid, strev",
+    popularity: 46,
+    length: "medium",
+    categories: ["internasjonal", "moderne"],
+    firstLetter: "A"
+  },
+  {
+    id: 195,
+    name: "Amina",
+    gender: "girl",
+    origin: "Arabisk",
+    meaning: "Pålitelig, trofast",
+    popularity: 44,
+    length: "medium",
+    categories: ["internasjonal", "moderne"],
+    firstLetter: "A"
+  },
+  {
+    id: 196,
+    name: "Amira",
+    gender: "girl",
+    origin: "Arabisk",
+    meaning: "Prinsesse, leder",
+    popularity: 32,
+    length: "medium",
+    categories: ["internasjonal", "moderne"],
+    firstLetter: "A"
+  },
+  {
+    id: 197,
+    name: "Anastasia",
+    gender: "girl",
+    origin: "Gresk",
+    meaning: "Oppstandelse",
+    popularity: 35,
+    length: "medium",
+    categories: ["internasjonal", "klassisk"],
+    firstLetter: "A"
+  },
+  {
+    id: 198,
+    name: "Andrea",
+    gender: "girl",
+    origin: "Gresk",
+    meaning: "Modig, sterk (kvinnelig form av Andreas)",
+    popularity: 65,
+    length: "medium",
+    categories: ["internasjonal", "populær"],
+    firstLetter: "A"
+  },
+  {
+    id: 199,
+    name: "Andrine",
+    gender: "girl",
+    origin: "Gresk",
+    meaning: "Modig, mannlig (kvinnelig form av Andreas)",
+    popularity: 45,
+    length: "medium",
+    categories: ["nordisk", "moderne"],
+    firstLetter: "A"
+  },
+  {
+    id: 200,
+    name: "Ane",
+    gender: "girl",
+    origin: "Hebraisk",
+    meaning: "Nåde, ynde",
+    popularity: 38,
+    length: "short",
+    categories: ["nordisk", "klassisk"],
+    firstLetter: "A"
   }
 ];
 
@@ -1943,4 +2273,3 @@ export const searchNames = (query: string) => {
     name.origin.toLowerCase().includes(lowercaseQuery)
   );
 };
-

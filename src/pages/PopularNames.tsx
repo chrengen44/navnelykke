@@ -50,6 +50,10 @@ const PopularNames = () => {
     setNames(filteredNames);
   }, [filters]);
 
+  const handleFilter = (newFilters) => {
+    setFilters(newFilters);
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -62,9 +66,9 @@ const PopularNames = () => {
           </p>
           
           <NameFilters 
-            filters={filters} 
-            setFilters={setFilters} 
-            showCategoryFilter={false}
+            onFilter={handleFilter}
+            initialFilters={filters}
+            showSearch={true}
           />
           
           <div className="mt-8">

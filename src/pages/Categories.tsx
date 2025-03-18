@@ -1,7 +1,7 @@
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { nameCategories } from "@/data/names";
+import { nameCategories } from "@/data";
 import CategoryCard from "@/components/CategoryCard";
 import AdSpace from "@/components/AdSpace";
 

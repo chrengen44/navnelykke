@@ -2,7 +2,7 @@
 import { useParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { babyNames } from "@/data/names";
+import { babyNames } from "@/data";
 import RelatedNames from "@/components/RelatedNames";
 import AdSpace from "@/components/AdSpace";
 import { Badge } from "@/components/ui/badge";

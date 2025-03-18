@@ -3,7 +3,7 @@ import React from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
-import { nameCategories, getPopularNames, getNamesByCategory } from "@/data/names";
+import { nameCategories, getPopularNames, getNamesByCategory } from "@/data";
 import FeaturedSection from "@/components/FeaturedSection";
 import CategoryCard from "@/components/CategoryCard";
 import AdSpace from "@/components/AdSpace";

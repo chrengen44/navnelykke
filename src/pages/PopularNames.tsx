@@ -5,14 +5,14 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import NameGrid from '@/components/NameGrid';
 import NameFilters from '@/components/NameFilters';
-import { getPopularNames, BabyName } from '@/data/names';
+import { getPopularNames, BabyName } from '@/data';
 
 const PopularNames = () => {
   const [searchParams] = useSearchParams();
   const [names, setNames] = useState<BabyName[]>([]);
   const [filters, setFilters] = useState({
-    gender: searchParams.get('gender') || 'all',
-    length: searchParams.get('length') || 'all',
+    gender: (searchParams.get('gender') || 'all') as "boy" | "girl" | "unisex" | "all",
+    length: (searchParams.get('length') || 'all') as "short" | "medium" | "long" | "all",
     letter: searchParams.get('letter') || 'all',
     search: searchParams.get('search') || '',
   });

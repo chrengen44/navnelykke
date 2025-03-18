@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { searchNames, BabyName } from "@/data/names";
+import { searchNames, BabyName } from "@/data";
 import NameGrid from "@/components/NameGrid";
 import NameFilters, { FilterState } from "@/components/NameFilters";
 import AdSpace from "@/components/AdSpace";

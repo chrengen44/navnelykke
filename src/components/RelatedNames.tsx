@@ -1,5 +1,5 @@
 
-import { BabyName, babyNames } from "@/data/names";
+import { BabyName, babyNames } from "@/data";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 

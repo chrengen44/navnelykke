@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Heart, LogOut, User } from "lucide-react";
+import { Heart, LogOut, User, Settings } from "lucide-react";
 
 const UserMenu = () => {
   const { user, signOut } = useAuth();
@@ -56,6 +56,12 @@ const UserMenu = () => {
           <Link to="/favoritter" className="flex items-center">
             <Heart className="mr-2 h-4 w-4" />
             <span>Mine favoritter</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/admin" className="flex items-center">
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Admin</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

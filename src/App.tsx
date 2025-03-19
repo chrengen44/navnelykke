@@ -17,6 +17,7 @@ import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Favorites from "./pages/Favorites";
 import SuggestName from "./pages/SuggestName";
+import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/profil" element={<Profile />} />
             <Route path="/favoritter" element={<Favorites />} />
             <Route path="/foresla-navn" element={<SuggestName />} />
+            <Route path="/admin" element={<Admin />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

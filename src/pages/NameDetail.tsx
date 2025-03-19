@@ -1,25 +1,29 @@
 
 import { useParams } from "react-router-dom";
+import { useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { babyNames } from "@/data";
 import RelatedNames from "@/components/RelatedNames";
 import AdSpace from "@/components/AdSpace";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Share2 } from "lucide-react";
+import { Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { Link } from "react-router-dom";
+import FavoriteButton from "@/components/FavoritesButton";
+import { trackNameVisit } from "@/integrations/supabase/client";
 
 const NameDetail = () => {
   const { nameId } = useParams<{ nameId: string }>();
-  const [isFavorite, setIsFavorite] = useState(false);
   
   const name = babyNames.find(n => n.id === Number(nameId));
   
-  const toggleFavorite = () => {
-    setIsFavorite(!isFavorite);
-  };
+  useEffect(() => {
+    // Track name visit for analytics
+    if (name) {
+      trackNameVisit(name.id);
+    }
+  }, [name]);
   
   const getGenderColorClass = () => {
     if (!name) return "bg-gray-100";
@@ -80,16 +84,7 @@ const NameDetail = () => {
                   <p className="text-xl text-gray-700">{name.meaning}</p>
                 </div>
                 <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className={`rounded-full bg-white/70 backdrop-blur-sm ${
-                      isFavorite ? "text-pink-500" : "text-gray-500"
-                    }`}
-                    onClick={toggleFavorite}
-                  >
-                    <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
-                  </Button>
+                  <FavoriteButton nameId={name.id} />
                   <Button
                     variant="outline"
                     size="icon"

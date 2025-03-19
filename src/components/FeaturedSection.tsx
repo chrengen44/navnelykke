@@ -1,5 +1,5 @@
 
-import { BabyName, getPopularNames } from "@/data/names";
+import { BabyName, getPopularNames } from "@/data";
 import NameCard from "./NameCard";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";

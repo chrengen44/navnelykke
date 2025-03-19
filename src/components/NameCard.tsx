@@ -1,6 +1,6 @@
 
 import { Heart } from "lucide-react";
-import { BabyName } from "@/data/names";
+import { BabyName } from "@/data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import NameGrid from '@/components/NameGrid';
 import NameFilters from '@/components/NameFilters';
 import { getPopularNames, BabyName } from '@/data';
+import { babyNames } from '@/data/namesData'; // Import the hardcoded names directly
 
 const PopularNames = () => {
   const [searchParams] = useSearchParams();
@@ -23,6 +24,12 @@ const PopularNames = () => {
       setLoading(true);
       try {
         let popularNames = await getPopularNames(undefined, 100);
+        
+        // If no names returned from database, use hardcoded names
+        if (!popularNames || popularNames.length === 0) {
+          console.log('No names returned from database, using hardcoded names');
+          popularNames = [...babyNames]; // Use hardcoded names as fallback
+        }
         
         // Apply filters
         let filteredNames = [...popularNames];
@@ -54,6 +61,34 @@ const PopularNames = () => {
         setNames(filteredNames);
       } catch (error) {
         console.error("Error fetching popular names:", error);
+        // On error, use hardcoded names as fallback
+        let filteredNames = [...babyNames];
+        
+        // Apply the same filters to hardcoded names
+        if (filters.gender !== 'all') {
+          filteredNames = filteredNames.filter(name => name.gender === (filters.gender as "boy" | "girl" | "unisex"));
+        }
+        
+        if (filters.length !== 'all') {
+          filteredNames = filteredNames.filter(name => name.length === filters.length);
+        }
+        
+        if (filters.letter !== '' && filters.letter !== 'all') {
+          filteredNames = filteredNames.filter(name => 
+            name.firstLetter.toLowerCase() === filters.letter.toLowerCase()
+          );
+        }
+        
+        if (filters.search) {
+          const searchLower = filters.search.toLowerCase();
+          filteredNames = filteredNames.filter(name => 
+            name.name.toLowerCase().includes(searchLower) ||
+            name.meaning.toLowerCase().includes(searchLower) ||
+            name.origin.toLowerCase().includes(searchLower)
+          );
+        }
+        
+        setNames(filteredNames);
       } finally {
         setLoading(false);
       }

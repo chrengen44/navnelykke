@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/toast';
+import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';

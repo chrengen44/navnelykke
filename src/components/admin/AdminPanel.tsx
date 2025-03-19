@@ -64,8 +64,10 @@ export const AdminPanel = () => {
         return {
           ...name,
           categories: nameCategories,
-          firstLetter: name.first_letter
-        };
+          firstLetter: name.first_letter,
+          // Type cast gender to meet BabyName interface requirements
+          gender: name.gender as 'boy' | 'girl' | 'unisex'
+        } as BabyName;
       }));
       
       setNames(namesWithCategories);
@@ -450,3 +452,4 @@ export const AdminPanel = () => {
     </div>
   );
 };
+

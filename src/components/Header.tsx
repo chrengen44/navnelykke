@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Baby, Heart, Menu, Search, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import UserMenu from "@/components/UserMenu";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -47,19 +48,22 @@ const Header = () => {
           </Link>
         </nav>
 
-        {/* Desktop Search */}
-        <form onSubmit={handleSearch} className="hidden md:flex gap-2">
-          <Input
-            type="text"
-            placeholder="Søk etter navn..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-48 lg:w-64"
-          />
-          <Button type="submit" variant="outline" size="icon">
-            <Search className="h-4 w-4" />
-          </Button>
-        </form>
+        {/* Desktop Search and User Menu */}
+        <div className="hidden md:flex items-center gap-4">
+          <form onSubmit={handleSearch} className="flex gap-2">
+            <Input
+              type="text"
+              placeholder="Søk etter navn..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-48 lg:w-64"
+            />
+            <Button type="submit" variant="outline" size="icon">
+              <Search className="h-4 w-4" />
+            </Button>
+          </form>
+          <UserMenu />
+        </div>
 
         {/* Mobile Menu Button */}
         <Button
@@ -113,6 +117,11 @@ const Header = () => {
                 Inspirasjon
               </Link>
             </nav>
+            
+            {/* Add UserMenu to mobile view as well */}
+            <div className="py-2">
+              <UserMenu />
+            </div>
           </div>
         </div>
       )}

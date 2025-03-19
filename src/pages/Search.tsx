@@ -14,13 +14,30 @@ const Search = () => {
   
   const [allResults, setAllResults] = useState<BabyName[]>([]);
   const [filteredResults, setFilteredResults] = useState<BabyName[]>([]);
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    if (query) {
-      const results = searchNames(query);
-      setAllResults(results);
-      setFilteredResults(results);
-    }
+    const fetchSearchResults = async () => {
+      if (!query) {
+        setAllResults([]);
+        setFilteredResults([]);
+        setLoading(false);
+        return;
+      }
+      
+      setLoading(true);
+      try {
+        const results = await searchNames(query);
+        setAllResults(results);
+        setFilteredResults(results);
+      } catch (error) {
+        console.error("Error searching names:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchSearchResults();
   }, [query]);
   
   const handleFilter = (filters: FilterState) => {
@@ -69,15 +86,21 @@ const Search = () => {
             
             <div className="mb-6">
               <p className="text-gray-600">
-                Fant {filteredResults.length} {filteredResults.length === 1 ? "resultat" : "resultater"} for søket ditt.
+                {loading ? "Søker..." : `Fant ${filteredResults.length} ${filteredResults.length === 1 ? "resultat" : "resultater"} for søket ditt.`}
               </p>
             </div>
             
-            <NameGrid 
-              names={filteredResults} 
-              showDetails={true}
-              emptyMessage={query ? `Ingen navn funnet for "${query}". Prøv et annet søkeord.` : "Skriv inn et søkeord for å finne babynavn."}
-            />
+            {loading ? (
+              <div className="flex justify-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
+              </div>
+            ) : (
+              <NameGrid 
+                names={filteredResults} 
+                showDetails={true}
+                emptyMessage={query ? `Ingen navn funnet for "${query}". Prøv et annet søkeord.` : "Skriv inn et søkeord for å finne babynavn."}
+              />
+            )}
             
             <div className="mt-8">
               <AdSpace type="horizontal" />

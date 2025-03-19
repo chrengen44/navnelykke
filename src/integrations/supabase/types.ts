@@ -9,6 +9,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      baby_names: {
+        Row: {
+          created_at: string
+          first_letter: string
+          gender: string
+          id: number
+          length: string
+          meaning: string
+          name: string
+          origin: string
+          popularity: number
+        }
+        Insert: {
+          created_at?: string
+          first_letter: string
+          gender: string
+          id?: number
+          length: string
+          meaning: string
+          name: string
+          origin: string
+          popularity: number
+        }
+        Update: {
+          created_at?: string
+          first_letter?: string
+          gender?: string
+          id?: number
+          length?: string
+          meaning?: string
+          name?: string
+          origin?: string
+          popularity?: number
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           created_at: string
@@ -34,6 +70,66 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      name_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: number
+          name: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: number
+          name: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: number
+          name?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      name_category_mappings: {
+        Row: {
+          category_id: number
+          id: number
+          name_id: number
+        }
+        Insert: {
+          category_id: number
+          id?: number
+          name_id: number
+        }
+        Update: {
+          category_id?: number
+          id?: number
+          name_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "name_category_mappings_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "name_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "name_category_mappings_name_id_fkey"
+            columns: ["name_id"]
+            isOneToOne: false
+            referencedRelation: "baby_names"
             referencedColumns: ["id"]
           },
         ]

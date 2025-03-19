@@ -10,44 +10,56 @@ import { getPopularNames, BabyName } from '@/data';
 const PopularNames = () => {
   const [searchParams] = useSearchParams();
   const [names, setNames] = useState<BabyName[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     gender: (searchParams.get('gender') || 'all') as "boy" | "girl" | "unisex" | "all",
     length: (searchParams.get('length') || 'all') as "short" | "medium" | "long" | "all",
-    letter: searchParams.get('letter') || 'all',
+    letter: searchParams.get('letter') || '',
     search: searchParams.get('search') || '',
   });
 
   useEffect(() => {
-    let popularNames = getPopularNames(undefined, 100);
-    
-    // Apply filters
-    let filteredNames = [...popularNames];
-    
-    if (filters.gender !== 'all') {
-      // Use type assertion to handle the "all" case that doesn't overlap with BabyName gender types
-      filteredNames = filteredNames.filter(name => name.gender === (filters.gender as "boy" | "girl" | "unisex"));
-    }
-    
-    if (filters.length !== 'all') {
-      filteredNames = filteredNames.filter(name => name.length === filters.length);
-    }
-    
-    if (filters.letter !== 'all') {
-      filteredNames = filteredNames.filter(name => 
-        name.firstLetter.toLowerCase() === filters.letter.toLowerCase()
-      );
-    }
-    
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
-      filteredNames = filteredNames.filter(name => 
-        name.name.toLowerCase().includes(searchLower) ||
-        name.meaning.toLowerCase().includes(searchLower) ||
-        name.origin.toLowerCase().includes(searchLower)
-      );
-    }
-    
-    setNames(filteredNames);
+    const fetchNames = async () => {
+      setLoading(true);
+      try {
+        let popularNames = await getPopularNames(undefined, 100);
+        
+        // Apply filters
+        let filteredNames = [...popularNames];
+        
+        if (filters.gender !== 'all') {
+          // Use type assertion to handle the "all" case that doesn't overlap with BabyName gender types
+          filteredNames = filteredNames.filter(name => name.gender === (filters.gender as "boy" | "girl" | "unisex"));
+        }
+        
+        if (filters.length !== 'all') {
+          filteredNames = filteredNames.filter(name => name.length === filters.length);
+        }
+        
+        if (filters.letter !== '' && filters.letter !== 'all') {
+          filteredNames = filteredNames.filter(name => 
+            name.firstLetter.toLowerCase() === filters.letter.toLowerCase()
+          );
+        }
+        
+        if (filters.search) {
+          const searchLower = filters.search.toLowerCase();
+          filteredNames = filteredNames.filter(name => 
+            name.name.toLowerCase().includes(searchLower) ||
+            name.meaning.toLowerCase().includes(searchLower) ||
+            name.origin.toLowerCase().includes(searchLower)
+          );
+        }
+        
+        setNames(filteredNames);
+      } catch (error) {
+        console.error("Error fetching popular names:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNames();
   }, [filters]);
 
   const handleFilter = (newFilters) => {
@@ -71,13 +83,19 @@ const PopularNames = () => {
             showSearch={true}
           />
           
-          <div className="mt-8">
-            <NameGrid 
-              names={names} 
-              emptyMessage="Ingen navn funnet med disse filtrene. Prøv å justere filtrene for å se flere resultater."
-              showDetails={true}
-            />
-          </div>
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
+            </div>
+          ) : (
+            <div className="mt-8">
+              <NameGrid 
+                names={names} 
+                emptyMessage="Ingen navn funnet med disse filtrene. Prøv å justere filtrene for å se flere resultater."
+                showDetails={true}
+              />
+            </div>
+          )}
         </div>
       </main>
       <Footer />

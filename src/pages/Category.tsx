@@ -18,49 +18,76 @@ import {
   Flower,
   LucideIcon
 } from "lucide-react";
+import { BabyName } from "@/data/types";
 
 const Category = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
-  const [filteredNames, setFilteredNames] = useState(getNamesByCategory(categoryId || ""));
+  const [filteredNames, setFilteredNames] = useState<BabyName[]>([]);
+  const [loading, setLoading] = useState(true);
   
   const category = nameCategories.find(c => c.id === categoryId);
   
   useEffect(() => {
     // Update names when category changes
-    setFilteredNames(getNamesByCategory(categoryId || ""));
+    const fetchNames = async () => {
+      setLoading(true);
+      try {
+        const names = await getNamesByCategory(categoryId || "");
+        setFilteredNames(names);
+      } catch (error) {
+        console.error("Error fetching names for category:", error);
+        setFilteredNames([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNames();
   }, [categoryId]);
   
   const handleFilter = (filters: FilterState) => {
-    let filtered = getNamesByCategory(categoryId || "");
-    
-    // Filter by gender
-    if (filters.gender !== "all") {
-      filtered = filtered.filter(name => name.gender === filters.gender as "boy" | "girl" | "unisex");
-    }
-    
-    // Filter by length
-    if (filters.length !== "all") {
-      filtered = filtered.filter(name => name.length === filters.length);
-    }
-    
-    // Filter by first letter
-    if (filters.letter) {
-      filtered = filtered.filter(name => 
-        name.firstLetter.toLowerCase() === filters.letter.toLowerCase()
-      );
-    }
-    
-    // Filter by search query
-    if (filters.search) {
-      const query = filters.search.toLowerCase();
-      filtered = filtered.filter(name => 
-        name.name.toLowerCase().includes(query) ||
-        name.meaning.toLowerCase().includes(query) ||
-        name.origin.toLowerCase().includes(query)
-      );
-    }
-    
-    setFilteredNames(filtered);
+    const fetchAndFilterNames = async () => {
+      setLoading(true);
+      try {
+        // Get all names in this category
+        let filtered = await getNamesByCategory(categoryId || "");
+        
+        // Filter by gender
+        if (filters.gender !== "all") {
+          filtered = filtered.filter(name => name.gender === filters.gender as "boy" | "girl" | "unisex");
+        }
+        
+        // Filter by length
+        if (filters.length !== "all") {
+          filtered = filtered.filter(name => name.length === filters.length);
+        }
+        
+        // Filter by first letter
+        if (filters.letter) {
+          filtered = filtered.filter(name => 
+            name.firstLetter.toLowerCase() === filters.letter.toLowerCase()
+          );
+        }
+        
+        // Filter by search query
+        if (filters.search) {
+          const query = filters.search.toLowerCase();
+          filtered = filtered.filter(name => 
+            name.name.toLowerCase().includes(query) ||
+            name.meaning.toLowerCase().includes(query) ||
+            name.origin.toLowerCase().includes(query)
+          );
+        }
+        
+        setFilteredNames(filtered);
+      } catch (error) {
+        console.error("Error filtering names:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAndFilterNames();
   };
   
   const getIcon = (): LucideIcon => {
@@ -127,11 +154,17 @@ const Category = () => {
           <div className="container mx-auto px-4">
             <NameFilters onFilter={handleFilter} />
             
-            <NameGrid 
-              names={filteredNames} 
-              showDetails={true}
-              emptyMessage="Ingen navn funnet med disse filtrene. Prøv å justere søkekriteriene."
-            />
+            {loading ? (
+              <div className="flex justify-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
+              </div>
+            ) : (
+              <NameGrid 
+                names={filteredNames} 
+                showDetails={true}
+                emptyMessage="Ingen navn funnet med disse filtrene. Prøv å justere søkekriteriene."
+              />
+            )}
             
             <div className="mt-8">
               <AdSpace type="horizontal" />

@@ -1,9 +1,9 @@
 
 import { useParams } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { babyNames } from "@/data";
+import { BabyName } from "@/data/types";
 import RelatedNames from "@/components/RelatedNames";
 import AdSpace from "@/components/AdSpace";
 import { Badge } from "@/components/ui/badge";
@@ -11,19 +11,35 @@ import { Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import FavoriteButton from "@/components/FavoritesButton";
-import { trackNameVisit } from "@/integrations/supabase/client";
+import { trackNameVisit, fetchNameById } from "@/integrations/supabase/client";
 
 const NameDetail = () => {
   const { nameId } = useParams<{ nameId: string }>();
-  
-  const name = babyNames.find(n => n.id === Number(nameId));
+  const [name, setName] = useState<BabyName | null>(null);
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    // Track name visit for analytics
-    if (name) {
-      trackNameVisit(name.id);
-    }
-  }, [name]);
+    const getNameDetails = async () => {
+      setLoading(true);
+      try {
+        if (!nameId) return;
+        
+        const nameData = await fetchNameById(Number(nameId));
+        setName(nameData);
+        
+        // Track name visit for analytics
+        if (nameData) {
+          trackNameVisit(nameData.id);
+        }
+      } catch (error) {
+        console.error("Error fetching name details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    getNameDetails();
+  }, [nameId]);
   
   const getGenderColorClass = () => {
     if (!name) return "bg-gray-100";
@@ -54,6 +70,18 @@ const NameDetail = () => {
         return "";
     }
   };
+  
+  if (loading) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <main className="flex-grow container mx-auto px-4 py-12 flex justify-center items-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
   
   if (!name) {
     return (

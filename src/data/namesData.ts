@@ -1,3 +1,4 @@
+
 import { BabyName } from './types';
 
 // Sample data - expanded with Norwegian names from SSB
@@ -1042,4 +1043,9 @@ export const babyNames: BabyName[] = [
     gender: "girl",
     origin: "Gresk",
     meaning: "Lys, skinnende",
-    popularity: 13
+    popularity: 13,
+    length: "medium",
+    categories: ["klassisk", "nordisk"],
+    firstLetter: "E"
+  }
+];

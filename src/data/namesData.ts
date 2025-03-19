@@ -1,4 +1,3 @@
-
 import { BabyName } from './types';
 
 // Sample data - expanded with Norwegian names from SSB
@@ -1047,5 +1046,16 @@ export const babyNames: BabyName[] = [
     length: "medium",
     categories: ["klassisk", "nordisk"],
     firstLetter: "E"
+  },
+  {
+    id: 96,
+    name: "Bjørn",
+    gender: "boy",
+    origin: "Norrønt",
+    meaning: "Bjørn, symboliserer styrke og mot",
+    popularity: 68,
+    length: "short",
+    categories: ["klassisk", "nordisk", "vikingnavn", "naturnavn"],
+    firstLetter: "B"
   }
 ];

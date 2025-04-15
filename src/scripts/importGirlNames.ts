@@ -31,8 +31,8 @@ const importGirlNames = async () => {
       firstLetter: name.firstLetter
     }));
 
-    // Fix: Use proper typing for RPC calls with generic params
-    const { data, error } = await supabase.rpc<any, {p_names: NameWithCategories[]}>(
+    // Fix: Use proper typing for RPC calls
+    const { data, error } = await supabase.rpc(
       'bulk_upsert_names_with_categories',
       { p_names: namesWithCategories }
     );

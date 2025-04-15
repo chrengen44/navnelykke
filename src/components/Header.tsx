@@ -1,8 +1,8 @@
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useProfile } from '@/contexts/ProfileContext';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useAuth } from '@/hooks/useAuth';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,32 +10,31 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { useToast } from "@/components/ui/use-toast"
-import { LogOut } from 'lucide-react';
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { LogOut, User, Heart, Settings } from 'lucide-react';
 import MobileMenu from './MobileMenu';
 
 const Header = () => {
-  const { isLoggedIn, logout } = useAuth();
-  const { profile } = useProfile();
+  const { user, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { toast } = useToast()
+  const { toast } = useToast();
 
   const handleLogout = async () => {
     try {
-      await logout();
+      await signOut();
       toast({
         title: "Logget ut!",
         description: "Du er nå logget ut av kontoen din.",
-      })
+      });
     } catch (error) {
       console.error("Logout failed:", error);
       toast({
         variant: "destructive",
         title: "Beklager!",
         description: "Det oppstod en feil under utlogging.",
-      })
+      });
     }
   };
 
@@ -57,13 +56,14 @@ const Header = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          {isLoggedIn ? (
+          {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={profile?.avatarUrl} />
-                    <AvatarFallback>{profile?.firstName?.charAt(0)}{profile?.lastName?.charAt(0)}</AvatarFallback>
+                    <AvatarFallback>
+                      {user.email?.substring(0, 2).toUpperCase()}
+                    </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
@@ -71,18 +71,26 @@ const Header = () => {
                 <DropdownMenuLabel>Min konto</DropdownMenuLabel>
                 <DropdownMenuItem asChild>
                   <Link to="/profil">
-                    Profil
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profil</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/favoritter">
-                    Favoritter
+                    <Heart className="mr-2 h-4 w-4" />
+                    <span>Favoritter</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/admin">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Admin</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="cursor-pointer" onSelect={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
-                  Logg ut
+                  <span>Logg ut</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

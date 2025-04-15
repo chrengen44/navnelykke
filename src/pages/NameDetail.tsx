@@ -10,7 +10,7 @@ import { Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import FavoriteButton from "@/components/FavoritesButton";
-import { trackNameVisit, fetchNameById } from "@/integrations/supabase/client";
+import { supabase, trackNameVisit } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const NameDetail = () => {

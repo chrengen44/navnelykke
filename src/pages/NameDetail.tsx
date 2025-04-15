@@ -1,4 +1,3 @@
-
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
@@ -18,12 +17,16 @@ const NameDetail = () => {
   const { nameId } = useParams<{ nameId: string }>();
   const [name, setName] = useState<BabyName | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
     const getNameDetails = async () => {
       setLoading(true);
+      setError(null);
+      
       try {
         if (!nameId) {
+          setError("Navn-ID mangler");
           toast.error("Navn-ID mangler");
           setLoading(false);
           return;
@@ -40,10 +43,12 @@ const NameDetail = () => {
           trackNameVisit(nameData.id);
         } else {
           console.error("No name data returned for ID:", nameId);
+          setError(`Kunne ikke finne navnet med ID ${nameId}`);
           toast.error("Kunne ikke finne navnet");
         }
-      } catch (error) {
-        console.error("Error fetching name details:", error);
+      } catch (err) {
+        console.error("Error fetching name details:", err);
+        setError("En feil oppstod ved henting av navn");
         toast.error("Feil ved henting av navn");
       } finally {
         setLoading(false);
@@ -95,14 +100,14 @@ const NameDetail = () => {
     );
   }
   
-  if (!name) {
+  if (!name || error) {
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-grow container mx-auto px-4 py-12">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-2xl font-bold mb-4">Navn ikke funnet</h1>
-            <p className="mb-6">Beklager, vi kunne ikke finne navnet du leter etter.</p>
+            <p className="mb-6">{error || "Beklager, vi kunne ikke finne navnet du leter etter."}</p>
             <Button asChild>
               <Link to="/populære-navn">Se populære navn</Link>
             </Button>

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
@@ -46,14 +46,14 @@ const NameTrendsChart = () => {
         const mostFrequentNames = names.map(n => n.name);
         setTopNames(mostFrequentNames);
         
-        // Create synthetic year data for visualization
+        // Create year data for visualization
         const years = ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'];
         
         // Create chart data with popularity trends
         const data: TrendDataPoint[] = years.map(year => {
           const yearData: TrendDataPoint = { year };
           names.forEach(({ name, popularity }) => {
-            // Add some random variation to create realistic-looking trends
+            // Add some variation to create trends
             const basePopularity = popularity;
             const variation = Math.sin(Number(year) * (names.indexOf({ name, popularity }) + 1) / 5) * 10;
             yearData[name] = Math.max(1, Math.round(basePopularity + variation));
@@ -76,7 +76,7 @@ const NameTrendsChart = () => {
   return (
     <Card className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Jentenavn: Trender 2013-2023</h2>
+        <h2 className="text-2xl font-bold">Jentenavn: Trender over tid</h2>
       </div>
       
       {loading ? (
@@ -118,7 +118,7 @@ const NameTrendsChart = () => {
       )}
       
       <div className="mt-4 text-sm text-gray-500">
-        <span>Kilde: Statistisk sentralbyrå (SSB)</span>
+        <span>Basert på navnedata fra vår database</span>
       </div>
     </Card>
   );

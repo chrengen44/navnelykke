@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import FavoriteButton from "@/components/FavoritesButton";
 import { trackNameVisit, fetchNameById } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const NameDetail = () => {
   const { nameId } = useParams<{ nameId: string }>();
@@ -22,17 +23,28 @@ const NameDetail = () => {
     const getNameDetails = async () => {
       setLoading(true);
       try {
-        if (!nameId) return;
+        if (!nameId) {
+          toast.error("Navn-ID mangler");
+          setLoading(false);
+          return;
+        }
         
+        console.log("Fetching name with ID:", nameId);
         const nameData = await fetchNameById(Number(nameId));
-        setName(nameData);
         
-        // Track name visit for analytics
         if (nameData) {
+          console.log("Name data retrieved:", nameData);
+          setName(nameData);
+          
+          // Track name visit for analytics
           trackNameVisit(nameData.id);
+        } else {
+          console.error("No name data returned for ID:", nameId);
+          toast.error("Kunne ikke finne navnet");
         }
       } catch (error) {
         console.error("Error fetching name details:", error);
+        toast.error("Feil ved henting av navn");
       } finally {
         setLoading(false);
       }
@@ -88,8 +100,13 @@ const NameDetail = () => {
       <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-grow container mx-auto px-4 py-12">
-          <h1 className="text-2xl font-bold mb-4">Navn ikke funnet</h1>
-          <p>Beklager, vi kunne ikke finne navnet du leter etter.</p>
+          <div className="max-w-3xl mx-auto text-center">
+            <h1 className="text-2xl font-bold mb-4">Navn ikke funnet</h1>
+            <p className="mb-6">Beklager, vi kunne ikke finne navnet du leter etter.</p>
+            <Button asChild>
+              <Link to="/populære-navn">Se populære navn</Link>
+            </Button>
+          </div>
         </main>
         <Footer />
       </div>

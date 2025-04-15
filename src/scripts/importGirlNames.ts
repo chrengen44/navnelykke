@@ -31,12 +31,12 @@ const importGirlNames = async () => {
       firstLetter: name.firstLetter
     }));
 
-    // Fix: Use proper typing for RPC calls by removing explicit typing
-    // TypeScript will infer the correct types from the function signature
-    const { data, error } = await supabase.rpc(
-      'bulk_upsert_names_with_categories',
-      { p_names: namesWithCategories }
-    );
+    // Fix: Use the correct typing by calling rpc without specifying generic types
+    // This allows TypeScript to infer the correct types automatically
+    const { data, error } = await supabase
+      .rpc('bulk_upsert_names_with_categories', {
+        p_names: namesWithCategories
+      });
 
     if (error) {
       throw error;

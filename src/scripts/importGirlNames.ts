@@ -2,6 +2,17 @@
 import { supabase } from '@/integrations/supabase/client';
 import { fetchSSBData, processSSBData } from '@/utils/ssbDataFetcher';
 
+interface NameWithCategories {
+  name: string;
+  gender: 'boy' | 'girl' | 'unisex';
+  origin: string;
+  meaning: string;
+  popularity: number;
+  length: 'short' | 'medium' | 'long';
+  categories: string[];
+  firstLetter: string;
+}
+
 const importGirlNames = async () => {
   try {
     console.log('Starting import of girl names from SSB...');
@@ -9,7 +20,7 @@ const importGirlNames = async () => {
     const { enrichedNames } = processSSBData(girlsData, 'girl');
     
     // Prepare the data for bulk import with categories
-    const namesWithCategories = enrichedNames.map(name => ({
+    const namesWithCategories: NameWithCategories[] = enrichedNames.map(name => ({
       name: name.name,
       gender: name.gender,
       origin: name.origin,

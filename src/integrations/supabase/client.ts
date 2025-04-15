@@ -188,6 +188,11 @@ export const fetchNameById = async (id: number): Promise<BabyName | null> => {
   try {
     console.log('Fetching name with ID:', id);
     
+    if (!id || isNaN(id)) {
+      console.error('Invalid name ID:', id);
+      return null;
+    }
+    
     // Fetch the name
     const { data: name, error: nameError } = await supabase
       .from('baby_names')

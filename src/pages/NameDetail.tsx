@@ -32,14 +32,21 @@ const NameDetail = () => {
           return;
         }
         
-        console.log("Fetching name with ID:", nameId);
-        const nameData = await fetchNameById(Number(nameId));
+        const parsedId = parseInt(nameId, 10);
+        if (isNaN(parsedId)) {
+          setError(`Ugyldig navn-ID: ${nameId}`);
+          toast.error("Ugyldig navn-ID");
+          setLoading(false);
+          return;
+        }
+        
+        console.log("Fetching name with ID:", parsedId);
+        const nameData = await fetchNameById(parsedId);
         
         if (nameData) {
           console.log("Name data retrieved:", nameData);
           setName(nameData);
           
-          // Track name visit for analytics
           trackNameVisit(nameData.id);
         } else {
           console.error("No name data returned for ID:", nameId);

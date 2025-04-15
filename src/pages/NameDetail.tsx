@@ -14,7 +14,7 @@ import NameInfo from "@/components/name-detail/NameInfo";
 import NameInspiration from "@/components/name-detail/NameInspiration";
 
 const NameDetail = () => {
-  const { nameId } = useParams<{ nameId: string }>();
+  const { id } = useParams<{ id: string }>();
   const [name, setName] = useState<BabyName | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,16 +25,16 @@ const NameDetail = () => {
       setError(null);
       
       try {
-        if (!nameId) {
+        if (!id) {
           setError("Navn-ID mangler");
           toast.error("Navn-ID mangler");
           setLoading(false);
           return;
         }
         
-        const parsedId = parseInt(nameId, 10);
+        const parsedId = parseInt(id, 10);
         if (isNaN(parsedId)) {
-          setError(`Ugyldig navn-ID: ${nameId}`);
+          setError(`Ugyldig navn-ID: ${id}`);
           toast.error("Ugyldig navn-ID");
           setLoading(false);
           return;
@@ -49,8 +49,8 @@ const NameDetail = () => {
           
           trackNameVisit(nameData.id);
         } else {
-          console.error("No name data returned for ID:", nameId);
-          setError(`Kunne ikke finne navnet med ID ${nameId}`);
+          console.error("No name data returned for ID:", id);
+          setError(`Kunne ikke finne navnet med ID ${id}`);
           toast.error("Kunne ikke finne navnet");
         }
       } catch (err) {
@@ -63,7 +63,7 @@ const NameDetail = () => {
     };
     
     getNameDetails();
-  }, [nameId]);
+  }, [id]);
   
   const getGenderColorClass = () => {
     if (!name) return "bg-gray-100";

@@ -13,7 +13,7 @@ const NameTrends = () => {
           <h1 className="text-3xl font-bold mb-6">Navnetrender i Norge</h1>
           <p className="text-gray-600 mb-8">
             Utforsk hvordan populære navn har endret seg over tid, basert på data fra Statistisk Sentralbyrå.
-            Grafen viser antall barn med hvert navn per år fra 2013 til 2024.
+            Grafen viser antall barn med hvert navn per år fra 2013 til 2024. Bruk knappen øverst til høyre for å veksle mellom jente- og guttenavn.
           </p>
           
           <div className="grid gap-8">

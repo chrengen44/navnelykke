@@ -31,7 +31,7 @@ const importGirlNames = async () => {
       firstLetter: name.firstLetter
     }));
 
-    // Use our new bulk upsert function - we need to call RPC with the correct parameter name
+    // Use our new bulk upsert function - we need to call RPC with the correct parameter structure
     const { data, error } = await supabase.rpc(
       'bulk_upsert_names_with_categories',
       { p_names: namesWithCategories }

@@ -1,0 +1,135 @@
+
+import React, { useState, useEffect } from 'react';
+import { getTopNamesByYear } from '@/utils/ssbDataFetcher';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const COLORS = [
+  "#8884d8", "#82ca9d", "#ffc658", "#ff8042", "#0088FE",
+  "#00C49F", "#FFBB28", "#FF8042", "#a4de6c", "#d0ed57"
+];
+
+interface TrendDataPoint {
+  year: string;
+  [key: string]: string | number;
+}
+
+const NameTrendsChart = () => {
+  const [gender, setGender] = useState<'boy' | 'girl'>('girl');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [chartData, setChartData] = useState<TrendDataPoint[]>([]);
+  const [topNames, setTopNames] = useState<string[]>([]);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const namesByYear = await getTopNamesByYear(gender, 10);
+        
+        // Transform data for the chart
+        const years = Object.keys(namesByYear).sort();
+        const allNames = new Set<string>();
+        
+        // Find all unique names
+        years.forEach(year => {
+          namesByYear[year].forEach(({ name }) => {
+            allNames.add(name);
+          });
+        });
+        
+        // Get the top 10 names that appear most frequently across years
+        const nameFrequency: Record<string, number> = {};
+        allNames.forEach(name => {
+          nameFrequency[name] = years.filter(year => 
+            namesByYear[year].some(n => n.name === name)
+          ).length;
+        });
+        
+        const mostFrequentNames = [...allNames]
+          .sort((a, b) => nameFrequency[b] - nameFrequency[a])
+          .slice(0, 10);
+        
+        setTopNames(mostFrequentNames);
+        
+        // Create chart data
+        const data: TrendDataPoint[] = years.map(year => {
+          const yearData: TrendDataPoint = { year };
+          namesByYear[year].forEach(({ name, count }) => {
+            if (mostFrequentNames.includes(name)) {
+              yearData[name] = count;
+            }
+          });
+          return yearData;
+        });
+        
+        setChartData(data);
+      } catch (error) {
+        console.error('Error fetching chart data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [gender]);
+  
+  const toggleGender = () => {
+    setGender(prev => prev === 'boy' ? 'girl' : 'boy');
+  };
+  
+  return (
+    <Card className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Navnetrender 2013-2024</h2>
+        <Button 
+          onClick={toggleGender}
+          variant="outline"
+          className={gender === 'boy' ? 'bg-blue-100' : 'bg-pink-100'}
+        >
+          Vis {gender === 'boy' ? 'jentenavn' : 'guttenavn'}
+        </Button>
+      </div>
+      
+      {loading ? (
+        <div className="w-full">
+          <Skeleton className="h-[400px] w-full" />
+        </div>
+      ) : (
+        <div className="w-full h-[400px]">
+          <ChartContainer 
+            config={topNames.reduce((acc, name, index) => {
+              acc[name] = { color: COLORS[index % COLORS.length] };
+              return acc;
+            }, {} as Record<string, { color: string }>)}
+          >
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="year" />
+              <YAxis />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Legend />
+              {topNames.map((name, index) => (
+                <Line
+                  key={name}
+                  type="monotone"
+                  dataKey={name}
+                  stroke={COLORS[index % COLORS.length]}
+                  activeDot={{ r: 8 }}
+                />
+              ))}
+            </LineChart>
+          </ChartContainer>
+        </div>
+      )}
+      
+      <div className="mt-4 text-sm text-gray-500">
+        Kilde: Statistisk sentralbyrå (SSB)
+      </div>
+    </Card>
+  );
+};
+
+export default NameTrendsChart;

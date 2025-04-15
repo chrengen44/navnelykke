@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,36 +17,37 @@ import Profile from "./pages/Profile";
 import Favorites from "./pages/Favorites";
 import SuggestName from "./pages/SuggestName";
 import Admin from "./pages/Admin";
+import NameTrends from "./pages/NameTrends";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/kategorier" element={<Categories />} />
-            <Route path="/kategori/:categoryId" element={<Category />} />
-            <Route path="/populaere" element={<PopularNames />} />
-            <Route path="/navn/:nameId" element={<NameDetail />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/inspirasjon" element={<Inspiration />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/profil" element={<Profile />} />
-            <Route path="/favoritter" element={<Favorites />} />
-            <Route path="/foresla-navn" element={<SuggestName />} />
-            <Route path="/admin" element={<Admin />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
-
-export default App;
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/navn/:id" element={<NameDetail />} />
+              <Route path="/populære-navn" element={<PopularNames />} />
+              <Route path="/navnetrender" element={<NameTrends />} />
+              <Route path="/kategorier" element={<Categories />} />
+              <Route path="/kategori/:categoryId" element={<Category />} />
+              <Route path="/favoritter" element={<Favorites />} />
+              <Route path="/inspirasjon" element={<Inspiration />} />
+              <Route path="/søk" element={<Search />} />
+              <Route path="/foreslå-navn" element={<SuggestName />} />
+              <Route path="/profil" element={<Profile />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/auth/:action" element={<Auth />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}

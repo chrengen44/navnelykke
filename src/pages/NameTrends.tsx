@@ -18,7 +18,7 @@ const NameTrends = () => {
       const result = await importSSBDataToDB();
       
       if (result.success) {
-        toast.success(`Import fullført! ${result.boysImported} guttenavn og ${result.girlsImported} jentenavn importert.`);
+        toast.success(`Import fullført! ${result.girlsImported} jentenavn importert.`);
       } else {
         toast.error(`Import feilet: ${result.errors.length} feil oppstod.`);
         console.error('Import errors:', result.errors);
@@ -42,15 +42,15 @@ const NameTrends = () => {
               onClick={handleImportData} 
               disabled={isImporting}
               variant="outline"
-              className="bg-blue-50 hover:bg-blue-100"
+              className="bg-pink-50 hover:bg-pink-100"
             >
-              {isImporting ? 'Importerer...' : 'Importer SSB data'}
+              {isImporting ? 'Importerer...' : 'Importer jentenavn fra SSB'}
             </Button>
           </div>
           
           <p className="text-gray-600 mb-8">
-            Utforsk hvordan populære navn har endret seg over tid, basert på data fra Statistisk Sentralbyrå.
-            Grafen viser antall barn med hvert navn per år fra 2013 til 2024. Bruk knappen øverst til høyre for å veksle mellom jente- og guttenavn.
+            Utforsk hvordan populære jentenavn har endret seg over tid, basert på data fra Statistisk Sentralbyrå.
+            Grafen viser antall jenter med hvert navn per år fra 2013 til 2023. Klikk på "Importer jentenavn fra SSB" for å laste inn den nyeste dataen.
           </p>
           
           <div className="grid gap-8">

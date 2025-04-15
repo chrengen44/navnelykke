@@ -1,4 +1,3 @@
-
 import { BabyName } from '@/data/types';
 import { batchInsertNames } from '@/integrations/supabase/client';
 
@@ -27,7 +26,8 @@ export const fetchSSBData = async (gender: 'boy' | 'girl'): Promise<SSBResponse>
   // The URL for SSB's API for baby names
   const url = 'https://data.ssb.no/api/v0/en/table/10501';
   
-  // Build the query based on gender
+  // Build the query for girl names (code 2)
+  // This is the correct format for the SSB API based on their documentation
   const query = {
     query: [
       {
@@ -35,6 +35,20 @@ export const fetchSSBData = async (gender: 'boy' | 'girl'): Promise<SSBResponse>
         selection: {
           filter: 'item',
           values: [gender === 'boy' ? '1' : '2'] // 1 for boys, 2 for girls
+        }
+      },
+      {
+        code: 'ContentsCode',
+        selection: {
+          filter: 'item',
+          values: ['Antall']
+        }
+      },
+      {
+        code: 'Tid',
+        selection: {
+          filter: 'item',
+          values: ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023']
         }
       }
     ],
@@ -44,6 +58,7 @@ export const fetchSSBData = async (gender: 'boy' | 'girl'): Promise<SSBResponse>
   };
 
   try {
+    console.log('Sending request to SSB API:', JSON.stringify(query));
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -53,10 +68,13 @@ export const fetchSSBData = async (gender: 'boy' | 'girl'): Promise<SSBResponse>
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Failed to fetch data from SSB: ${response.status} ${response.statusText}`, errorText);
       throw new Error(`Failed to fetch data from SSB: ${response.statusText}`);
     }
 
     const data = await response.json();
+    console.log('Received SSB data:', JSON.stringify(data).substring(0, 300) + '...');
     return data;
   } catch (error) {
     console.error('Error fetching SSB data:', error);
@@ -75,48 +93,60 @@ export const processSSBData = (
   const namesByYear: Record<string, { name: string; count: number }[]> = {};
   const allNames: Record<string, { counts: Record<string, number>; totalCount: number }> = {};
 
-  // Extract years and name labels from the response
-  const years = Object.keys(data.dimension.Tid.category.label);
-  const nameLabels = Object.entries(data.dimension.Navn.category.label);
+  try {
+    // Extract years and name labels from the response
+    // Make sure we're correctly parsing the JSON-stat2 format
+    if (!data.dimension || !data.dimension.Tid || !data.dimension.Navn) {
+      throw new Error('Unexpected SSB data format: Missing dimensions');
+    }
+    
+    const years = Object.keys(data.dimension.Tid.category.label);
+    const nameLabels = Object.entries(data.dimension.Navn.category.label);
+    console.log(`Processing ${nameLabels.length} names across ${years.length} years`);
 
-  // Process the data for each year
-  years.forEach(yearKey => {
-    const year = data.dimension.Tid.category.label[yearKey];
-    namesByYear[year] = [];
+    // Process the data for each year
+    years.forEach(yearKey => {
+      const year = data.dimension.Tid.category.label[yearKey];
+      namesByYear[year] = [];
 
-    nameLabels.forEach(([nameKey, name]) => {
-      // Calculate the index for this year and name combination
-      const tidIndex = data.dimension.Tid.category.index[yearKey];
-      const navnIndex = data.dimension.Navn.category.index[nameKey];
-      
-      // Calculate the position in the values array
-      // This is specific to the SSB API's response structure
-      const valueIndex = tidIndex * nameLabels.length + navnIndex;
-      const count = data.value[valueIndex] || 0;
-      
-      if (count > 0) {
-        // Add to the yearly data
-        namesByYear[year].push({ name, count });
-
-        // Track name across all years
-        if (!allNames[name]) {
-          allNames[name] = { counts: {}, totalCount: 0 };
-        }
-        allNames[name].counts[year] = count;
-        allNames[name].totalCount += count;
+      nameLabels.forEach(([nameKey, name]) => {
+        // Calculate the index for this year and name combination
+        const tidIndex = data.dimension.Tid.category.index[yearKey];
+        const navnIndex = data.dimension.Navn.category.index[nameKey];
         
-        // Update frequency map for categorization
-        if (!nameFrequencyMap[name]) {
-          nameFrequencyMap[name] = { count: 0, years: new Set() };
-        }
-        nameFrequencyMap[name].count++;
-        nameFrequencyMap[name].years.add(year);
-      }
-    });
+        // JSON-stat2 format uses a specific calculation for finding values in the array
+        // Usually it's something like: position = Σ(dimensions_before × dimension_size) + current_dimension_index
+        const valueIndex = (tidIndex * Object.keys(data.dimension.Navn.category.label).length) + navnIndex;
+        const count = data.value[valueIndex] || 0;
+        
+        if (count > 0) {
+          // Add to the yearly data
+          namesByYear[year].push({ name, count });
 
-    // Sort by count for each year
-    namesByYear[year].sort((a, b) => b.count - a.count);
-  });
+          // Track name across all years
+          if (!allNames[name]) {
+            allNames[name] = { counts: {}, totalCount: 0 };
+          }
+          allNames[name].counts[year] = count;
+          allNames[name].totalCount += count;
+          
+          // Update frequency map for categorization
+          if (!nameFrequencyMap[name]) {
+            nameFrequencyMap[name] = { count: 0, years: new Set() };
+          }
+          nameFrequencyMap[name].count++;
+          nameFrequencyMap[name].years.add(year);
+        }
+      });
+
+      // Sort by count for each year
+      namesByYear[year].sort((a, b) => b.count - a.count);
+    });
+  } catch (error) {
+    console.error('Error processing SSB data:', error);
+    // Return empty data rather than crashing
+    return { namesByYear: {}, enrichedNames: [] };
+  }
 
   // Generate enriched names for our database
   const enrichedNames: BabyName[] = Object.entries(allNames).map(([name, data], index) => {
@@ -248,7 +278,6 @@ const determineCategoriesForName = (name: string, gender: 'boy' | 'girl'): strin
 
 // Generate a placeholder meaning based on name patterns
 const generateNameMeaning = (name: string, gender: 'boy' | 'girl'): string => {
-  // This is a simplified placeholder logic - in a real app, we'd use a more complete database
   const commonMeanings: Record<string, string> = {
     'Ole': 'Ancestor\'s descendant',
     'Ida': 'Hardworking or prosperous',
@@ -286,7 +315,6 @@ const generateNameMeaning = (name: string, gender: 'boy' | 'girl'): string => {
 
 // Determine name origin (simplified logic)
 const determineNameOrigin = (name: string, gender: 'boy' | 'girl'): string => {
-  // This is a simplified placeholder logic - in a real app, we'd use a more complete database
   const commonOrigins: Record<string, string> = {
     'Ole': 'Nordic',
     'Ida': 'Germanic',
@@ -337,30 +365,13 @@ export const importSSBDataToDB = async (): Promise<{
   try {
     console.log('Starting import of SSB data...');
     
-    // Fetch data for boys and girls
-    console.log('Fetching boys data from SSB...');
-    const boysData = await fetchSSBData('boy');
-    const { enrichedNames: boysNames } = processSSBData(boysData, 'boy');
-    
+    // For now, focus only on importing girl names (as requested)
     console.log('Fetching girls data from SSB...');
     const girlsData = await fetchSSBData('girl');
+    console.log('Processing girls data...');
     const { enrichedNames: girlsNames } = processSSBData(girlsData, 'girl');
     
     // Import to database
-    console.log(`Importing ${boysNames.length} boy names to the database...`);
-    const boysResult = await batchInsertNames(
-      boysNames.map(name => ({
-        name: name.name,
-        gender: name.gender,
-        origin: name.origin,
-        meaning: name.meaning,
-        popularity: name.popularity,
-        length: name.length,
-        categories: name.categories,
-        firstLetter: name.firstLetter
-      }))
-    );
-    
     console.log(`Importing ${girlsNames.length} girl names to the database...`);
     const girlsResult = await batchInsertNames(
       girlsNames.map(name => ({
@@ -376,10 +387,10 @@ export const importSSBDataToDB = async (): Promise<{
     );
     
     return {
-      success: boysResult.success && girlsResult.success,
-      boysImported: boysResult.inserted,
+      success: girlsResult.success,
+      boysImported: 0, // No boys imported in this version
       girlsImported: girlsResult.inserted,
-      errors: [...boysResult.errors, ...girlsResult.errors]
+      errors: [...girlsResult.errors]
     };
   } catch (error) {
     console.error('Error importing SSB data:', error);

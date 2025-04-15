@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { getTopNamesByYear } from '@/utils/ssbDataFetcher';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -19,7 +18,6 @@ interface TrendDataPoint {
 }
 
 const NameTrendsChart = () => {
-  const [gender, setGender] = useState<'boy' | 'girl'>('girl');
   const [loading, setLoading] = useState<boolean>(true);
   const [chartData, setChartData] = useState<TrendDataPoint[]>([]);
   const [topNames, setTopNames] = useState<string[]>([]);
@@ -28,7 +26,8 @@ const NameTrendsChart = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const namesByYear = await getTopNamesByYear(gender, 5); // Limit to top 5 names for better visualization
+        // Always fetch girl names (as requested)
+        const namesByYear = await getTopNamesByYear('girl', 5); // Top 5 names for better visualization
         
         // Check if we got valid data back
         const validData = Object.keys(namesByYear).length > 0;
@@ -85,23 +84,12 @@ const NameTrendsChart = () => {
     };
     
     fetchData();
-  }, [gender]);
-  
-  const toggleGender = () => {
-    setGender(prev => prev === 'boy' ? 'girl' : 'boy');
-  };
+  }, []);
   
   return (
     <Card className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Navnetrender 2013-2024</h2>
-        <Button 
-          onClick={toggleGender}
-          variant="outline"
-          className={gender === 'boy' ? 'bg-blue-100' : 'bg-pink-100'}
-        >
-          Vis {gender === 'boy' ? 'jentenavn' : 'guttenavn'}
-        </Button>
+        <h2 className="text-2xl font-bold">Jentenavn: Trender 2013-2023</h2>
       </div>
       
       {loading ? (
@@ -137,7 +125,7 @@ const NameTrendsChart = () => {
       ) : (
         <div className="flex flex-col items-center justify-center h-[400px] text-center p-6">
           <p className="text-lg text-gray-500 mb-4">
-            Ingen data å vise. Bruk "Importer SSB data" knappen øverst på siden for å importere navnedata.
+            Ingen data å vise. Bruk "Importer jentenavn fra SSB" knappen øverst på siden for å importere navnedata.
           </p>
         </div>
       )}

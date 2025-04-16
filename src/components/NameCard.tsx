@@ -46,7 +46,9 @@ const NameCard = ({ name, showDetails = false }: NameCardProps) => {
               {getGenderLabel()}
             </Badge>
           </div>
-          <FavoriteButton nameId={name.id} />
+          <FavoriteButton 
+            nameId={name.id}
+          />
         </div>
 
         <div className="p-4 flex-1 flex flex-col">

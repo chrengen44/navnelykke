@@ -8,9 +8,10 @@ import { useFavorites } from '@/contexts/FavoritesContext';
 interface FavoriteButtonProps {
   nameId: number;
   className?: string;
+  onClick?: (e: React.MouseEvent) => void;
 }
 
-const FavoriteButton = ({ nameId, className = '' }: FavoriteButtonProps) => {
+const FavoriteButton = ({ nameId, className = '', onClick }: FavoriteButtonProps) => {
   const [loading, setLoading] = useState(false);
   const { isFavorite, addFavorite, removeFavorite } = useFavorites();
   const { toast } = useToast();
@@ -18,29 +19,35 @@ const FavoriteButton = ({ nameId, className = '' }: FavoriteButtonProps) => {
   // Check if this specific nameId is a favorite
   const isFav = isFavorite(nameId);
 
-  const toggleFavorite = async () => {
+  const toggleFavorite = async (e: React.MouseEvent) => {
+    // Prevent the event from bubbling up (important for when inside clickable containers)
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
     // Prevent multiple clicks while processing
     if (loading) return;
     
     setLoading(true);
     
     try {
-      // Store the current nameId in a local variable to ensure we use the correct ID
-      const currentNameId = nameId;
-      
-      if (isFavorite(currentNameId)) {
-        removeFavorite(currentNameId);
+      if (isFav) {
+        removeFavorite(nameId);
         toast({
           title: 'Fjernet fra favoritter',
           description: 'Navnet er fjernet fra dine favoritter.',
         });
       } else {
-        addFavorite(currentNameId);
+        addFavorite(nameId);
         toast({
           title: 'Lagt til i favoritter',
           description: 'Navnet er lagt til i dine favoritter.',
         });
       }
+      
+      // Call any additional onClick handler if provided
+      if (onClick) onClick(e);
     } catch (error: any) {
       toast({
         title: 'Feil',

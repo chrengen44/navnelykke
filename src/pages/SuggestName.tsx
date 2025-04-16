@@ -1,10 +1,9 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { Layout } from "@/components/Layout";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -30,9 +29,15 @@ const SuggestName = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Redirect to login if not authenticated
+  // Use useEffect to handle redirection logic
+  useEffect(() => {
+    if (!user) {
+      navigate("/auth/login");
+    }
+  }, [user, navigate]);
+
+  // If still checking authentication or redirecting, don't render the form yet
   if (!user) {
-    navigate("/auth");
     return null;
   }
 
@@ -89,9 +94,8 @@ const SuggestName = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-grow container mx-auto px-4 py-12">
+    <Layout>
+      <div className="container mx-auto px-4 py-12">
         <div className="max-w-2xl mx-auto">
           <h1 className="text-3xl font-bold mb-2">Foreslå et navn</h1>
           <p className="text-gray-600 mb-8">
@@ -201,9 +205,8 @@ const SuggestName = () => {
             </form>
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </Layout>
   );
 };
 

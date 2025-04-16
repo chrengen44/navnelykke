@@ -11,6 +11,37 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
+// Add new function to get origin counts
+export const getOriginCounts = async (): Promise<{origin: string, name_count: number}[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('baby_names')
+      .select('origin, id')
+      .order('origin');
+    
+    if (error) throw error;
+    if (!data) return [];
+    
+    // Process the results to count names by origin
+    const originCounts: Record<string, number> = {};
+    data.forEach(name => {
+      if (!originCounts[name.origin]) {
+        originCounts[name.origin] = 0;
+      }
+      originCounts[name.origin]++;
+    });
+    
+    // Convert to array format
+    return Object.entries(originCounts).map(([origin, count]) => ({
+      origin,
+      name_count: count
+    }));
+  } catch (error) {
+    console.error('Error fetching origin counts:', error);
+    return [];
+  }
+};
+
 // Track a name visit for analytics
 export const trackNameVisit = async (nameId: number) => {
   try {

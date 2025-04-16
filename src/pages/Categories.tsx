@@ -1,3 +1,4 @@
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { nameCategories } from "@/data";
@@ -5,7 +6,7 @@ import CategoryCard from "@/components/CategoryCard";
 import AdSpace from "@/components/AdSpace";
 import OriginCategoryCard from "@/components/OriginCategoryCard";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, getOriginCounts } from "@/integrations/supabase/client";
 
 interface Origin {
   origin: string;
@@ -16,26 +17,8 @@ const Categories = () => {
   const { data: origins, isLoading } = useQuery({
     queryKey: ['origins'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('baby_names')
-        .select('origin, count(*)', { count: 'exact' })
-        .group('origin')
-        .order('origin');
-
-      if (error) {
-        console.error('Error fetching origins:', error);
-        throw error;
-      }
-      
-      if (!data) return [];
-      
-      const originsWithCount: Origin[] = data.map(item => ({
-        origin: item.origin,
-        name_count: parseInt(item.count as string)
-      }));
-      
+      const originsWithCount = await getOriginCounts();
       console.log('Origins fetched from database:', originsWithCount);
-      
       return originsWithCount;
     }
   });

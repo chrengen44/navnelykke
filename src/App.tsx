@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -40,7 +39,7 @@ export default function App() {
               <Route path="/favoritter" element={<Favorites />} />
               <Route path="/inspirasjon" element={<Inspiration />} />
               <Route path="/søk" element={<Search />} />
-              <Route path="/foreslå-navn" element={<SuggestName />} />
+              <Route path="/foresla-navn" element={<SuggestName />} />
               <Route path="/profil" element={<Profile />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/auth/:action" element={<Auth />} />

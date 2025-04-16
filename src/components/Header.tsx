@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -52,7 +51,7 @@ const Header = () => {
           <Link to="/navnetrender" className="text-gray-600 hover:text-pink-600">Navnetrender</Link>
           <Link to="/kategorier" className="text-gray-600 hover:text-pink-600">Kategorier</Link>
           <Link to="/inspirasjon" className="text-gray-600 hover:text-pink-600">Inspirasjon</Link>
-          <Link to="/foreslå-navn" className="text-gray-600 hover:text-pink-600">Foreslå navn</Link>
+          <Link to="/foresla-navn" className="text-gray-600 hover:text-pink-600">Foreslå navn</Link>
         </div>
 
         <div className="flex items-center gap-4">

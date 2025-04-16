@@ -15,18 +15,27 @@ const FavoriteButton = ({ nameId, className = '' }: FavoriteButtonProps) => {
   const { isFavorite, addFavorite, removeFavorite } = useFavorites();
   const { toast } = useToast();
 
+  // Check if this specific nameId is a favorite
+  const isFav = isFavorite(nameId);
+
   const toggleFavorite = async () => {
+    // Prevent multiple clicks while processing
+    if (loading) return;
+    
     setLoading(true);
     
     try {
-      if (isFavorite(nameId)) {
-        removeFavorite(nameId);
+      // Store the current nameId in a local variable to ensure we use the correct ID
+      const currentNameId = nameId;
+      
+      if (isFavorite(currentNameId)) {
+        removeFavorite(currentNameId);
         toast({
           title: 'Fjernet fra favoritter',
           description: 'Navnet er fjernet fra dine favoritter.',
         });
       } else {
-        addFavorite(nameId);
+        addFavorite(currentNameId);
         toast({
           title: 'Lagt til i favoritter',
           description: 'Navnet er lagt til i dine favoritter.',
@@ -42,8 +51,6 @@ const FavoriteButton = ({ nameId, className = '' }: FavoriteButtonProps) => {
       setLoading(false);
     }
   };
-
-  const isFav = isFavorite(nameId);
 
   return (
     <Button

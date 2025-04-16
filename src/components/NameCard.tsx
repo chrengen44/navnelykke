@@ -1,10 +1,8 @@
 
-import { Heart } from "lucide-react";
 import { BabyName } from "@/data";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+import FavoriteButton from "./FavoritesButton";
 
 interface NameCardProps {
   name: BabyName;
@@ -12,14 +10,6 @@ interface NameCardProps {
 }
 
 const NameCard = ({ name, showDetails = false }: NameCardProps) => {
-  const [isFavorite, setIsFavorite] = useState(false);
-
-  const toggleFavorite = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsFavorite(!isFavorite);
-  };
-
   const getGenderColorClass = () => {
     switch (name.gender) {
       case "boy":
@@ -56,16 +46,7 @@ const NameCard = ({ name, showDetails = false }: NameCardProps) => {
               {getGenderLabel()}
             </Badge>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className={`rounded-full ${
-              isFavorite ? "text-pink-500 hover:text-pink-600" : "text-gray-400 hover:text-pink-400"
-            }`}
-            onClick={toggleFavorite}
-          >
-            <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
-          </Button>
+          <FavoriteButton nameId={name.id} />
         </div>
 
         <div className="p-4 flex-1 flex flex-col">

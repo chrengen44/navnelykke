@@ -21,10 +21,10 @@ const FavoriteButton = ({ nameId, className = '', onClick }: FavoriteButtonProps
 
   const toggleFavorite = async (e: React.MouseEvent) => {
     // Prevent the event from bubbling up (important for when inside clickable containers)
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+    e.preventDefault();
+    e.stopPropagation();
+    
+    console.log(`Toggling favorite for nameId: ${nameId}`);
     
     // Prevent multiple clicks while processing
     if (loading) return;
@@ -32,14 +32,18 @@ const FavoriteButton = ({ nameId, className = '', onClick }: FavoriteButtonProps
     setLoading(true);
     
     try {
+      // Ensure we're using the nameId from props, not from any other context
+      const idToToggle = nameId;
+      console.log(`Using ID to toggle: ${idToToggle}, isFavorite: ${isFav}`);
+      
       if (isFav) {
-        removeFavorite(nameId);
+        removeFavorite(idToToggle);
         toast({
           title: 'Fjernet fra favoritter',
           description: 'Navnet er fjernet fra dine favoritter.',
         });
       } else {
-        addFavorite(nameId);
+        addFavorite(idToToggle);
         toast({
           title: 'Lagt til i favoritter',
           description: 'Navnet er lagt til i dine favoritter.',

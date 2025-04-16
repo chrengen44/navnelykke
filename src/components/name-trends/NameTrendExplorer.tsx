@@ -1,12 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Combobox } from '@/components/ui/combobox';
-import { Button } from '@/components/ui/button';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { Badge } from '@/components/ui/badge';
-import { X } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Sample data structure for name trends
 interface NameTrendData {
@@ -67,10 +65,38 @@ const generateSampleData = (): NameTrendData[] => {
   });
 };
 
+// Generate yearly rank data
+const generateRankData = (data: NameTrendData[]) => {
+  return data.map(yearData => {
+    const yearRanks: any = { year: yearData.year };
+    const names = Object.keys(yearData).filter(key => key !== 'year');
+    const nameValues = names.map(name => ({
+      name,
+      value: Number(yearData[name])
+    }));
+    
+    // Sort by popularity
+    nameValues.sort((a, b) => b.value - a.value);
+    
+    // Take top 10
+    const top10 = nameValues.slice(0, 10);
+    
+    // Add to yearRanks
+    top10.forEach((item, index) => {
+      yearRanks[`#${index + 1}`] = item.name;
+      yearRanks[`${item.name}_value`] = item.value;
+    });
+    
+    return yearRanks;
+  });
+};
+
 const NameTrendExplorer = () => {
-  const [selectedNames, setSelectedNames] = useState<string[]>([]);
   const [chartData, setChartData] = useState<NameTrendData[]>([]);
+  const [rankingData, setRankingData] = useState<any[]>([]);
+  const [selectedYear, setSelectedYear] = useState<string>("2024");
   const [loading, setLoading] = useState<boolean>(true);
+  const [activeTab, setActiveTab] = useState<string>("popularity");
   
   useEffect(() => {
     const fetchData = async () => {
@@ -80,6 +106,7 @@ const NameTrendExplorer = () => {
         // For now, we'll use our sample data generation function
         const data = generateSampleData();
         setChartData(data);
+        setRankingData(generateRankData(data));
       } catch (error) {
         console.error('Error fetching name trend data:', error);
         toast.error('Kunne ikke hente navnedata.');
@@ -90,124 +117,148 @@ const NameTrendExplorer = () => {
     
     fetchData();
   }, []);
+
+  // Find data for selected year
+  const selectedYearData = rankingData.find(item => item.year === selectedYear);
   
-  const handleSelectName = (name: string) => {
-    if (!name || selectedNames.includes(name)) {
-      return; // Name already selected or undefined
-    }
-    
-    if (selectedNames.length >= 5) {
-      toast.warning('Du kan kun sammenligne opptil 5 navn samtidig.');
-      return;
-    }
-    
-    setSelectedNames(prev => [...prev, name]);
-  };
-  
-  const handleRemoveName = (name: string) => {
-    setSelectedNames(selectedNames.filter(n => n !== name));
-  };
-  
-  // Format options for the combobox - ensure we always return a valid array
-  const nameOptions = React.useMemo(() => {
-    // Filter out already selected names
-    return availableNames
-      .filter(name => !selectedNames.includes(name))
-      .map(name => ({
-        value: name,
-        label: name
-      }));
-  }, [selectedNames]);
-  
+  // Extract the top 10 names for the selected year
+  const top10ForSelectedYear = selectedYearData 
+    ? Array.from({length: 10}, (_, i) => ({
+        rank: i + 1,
+        name: selectedYearData[`#${i + 1}`],
+        value: selectedYearData[`${selectedYearData[`#${i + 1}`]}_value`],
+      }))
+    : [];
+
+  const popularityOverTimeData = selectedYearData
+    ? ["Emma", "Nora", "Olivia", "Sofia", "Ella"].map(name => {
+        return {
+          name,
+          data: chartData.map(yearData => ({
+            year: yearData.year,
+            value: yearData[name] as number
+          }))
+        };
+      })
+    : [];
+
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <div className="flex flex-col md:flex-row md:items-center gap-4">
-          <Combobox
-            items={nameOptions}
-            placeholder="Søk etter jentenavn..."
-            onSelect={handleSelectName}
-            className="max-w-[300px]"
-          />
-          
-          <div className="flex flex-wrap gap-2">
-            {selectedNames.map((name, index) => (
-              <Badge 
-                key={name} 
-                style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                className="text-white pl-3 flex items-center gap-1"
-              >
-                {name}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-5 w-5 p-0 text-white hover:bg-transparent hover:text-white/80"
-                  onClick={() => handleRemoveName(name)}
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              </Badge>
-            ))}
-          </div>
-        </div>
+      <Tabs 
+        value={activeTab} 
+        onValueChange={setActiveTab} 
+        className="w-full"
+      >
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="popularity">Popularitetsrangering</TabsTrigger>
+          <TabsTrigger value="timeline">Popularitet over tid</TabsTrigger>
+        </TabsList>
         
-        {selectedNames.length === 0 && (
-          <p className="text-sm text-gray-500">
-            Velg navn fra listen ovenfor for å se trender over tid.
-          </p>
-        )}
-      </div>
-      
-      <div className="h-[400px] w-full">
-        {loading ? (
-          <Skeleton className="h-full w-full" />
-        ) : selectedNames.length > 0 ? (
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              data={chartData}
-              margin={{
-                top: 20,
-                right: 30,
-                left: 20,
-                bottom: 10,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="year" />
-              <YAxis 
-                label={{ 
-                  value: 'Antall per 1000 fødte jenter', 
-                  angle: -90, 
-                  position: 'insideLeft',
-                  style: { textAnchor: 'middle' }
-                }} 
-              />
-              <Tooltip 
-                formatter={(value) => [`${value} per 1000`, '']}
-                labelFormatter={(label) => `År: ${label}`}
-              />
-              <Legend />
-              {selectedNames.map((name, index) => (
-                <Line
-                  key={name}
-                  type="monotone"
-                  dataKey={name}
-                  name={name}
-                  stroke={COLORS[index % COLORS.length]}
-                  activeDot={{ r: 8 }}
-                  strokeWidth={2}
-                />
+        <TabsContent value="popularity" className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-4 items-start sm:items-center">
+            <h3 className="text-lg font-medium">Topp 10 jentenavn i Norge</h3>
+            
+            <div className="flex flex-wrap gap-2">
+              {years.map(year => (
+                <Badge 
+                  key={year} 
+                  variant={year === selectedYear ? "default" : "outline"}
+                  className="cursor-pointer"
+                  onClick={() => setSelectedYear(year)}
+                >
+                  {year}
+                </Badge>
               ))}
-            </LineChart>
-          </ResponsiveContainer>
-        ) : (
-          <div className="h-full w-full flex items-center justify-center border border-dashed rounded-md">
-            <p className="text-gray-400">
-              Velg minst ett navn for å se trenddata
-            </p>
+            </div>
           </div>
-        )}
-      </div>
+          
+          {loading ? (
+            <div className="space-y-4">
+              {Array.from({length: 10}).map((_, i) => (
+                <Skeleton key={i} className="h-12 w-full rounded-md" />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {top10ForSelectedYear.map((item) => (
+                <div 
+                  key={item.name} 
+                  className="flex items-center gap-4 bg-card p-3 rounded-md border"
+                >
+                  <div className="flex items-center justify-center bg-primary/10 w-10 h-10 rounded-full">
+                    <span className="text-lg font-bold text-primary">
+                      {item.rank}
+                    </span>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold">{item.name}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {item.value} per 1000 fødte jenter
+                    </p>
+                  </div>
+                  <div className="hidden sm:flex h-2 bg-muted rounded-full" style={{ width: `${Math.min(200, item.value * 3)}px` }}>
+                    <div className="h-full bg-primary rounded-full" style={{ 
+                      width: `${(item.value / (top10ForSelectedYear[0]?.value || 1)) * 100}%` 
+                    }}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+        
+        <TabsContent value="timeline">
+          <div className="h-[400px] w-full">
+            {loading ? (
+              <Skeleton className="h-full w-full" />
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  margin={{
+                    top: 20,
+                    right: 30,
+                    left: 20,
+                    bottom: 10,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="year" 
+                    allowDuplicatedCategory={false} 
+                  />
+                  <YAxis 
+                    label={{ 
+                      value: 'Antall per 1000 fødte jenter', 
+                      angle: -90, 
+                      position: 'insideLeft',
+                      style: { textAnchor: 'middle' }
+                    }} 
+                  />
+                  <Tooltip 
+                    formatter={(value) => [`${value} per 1000`, '']}
+                    labelFormatter={(label) => `År: ${label}`}
+                  />
+                  <Legend />
+                  {popularityOverTimeData.map((s, index) => (
+                    <Line
+                      key={s.name}
+                      dataKey="value"
+                      data={s.data}
+                      name={s.name}
+                      stroke={COLORS[index % COLORS.length]}
+                      activeDot={{ r: 8 }}
+                      strokeWidth={2}
+                    />
+                  ))}
+                </LineChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+          <div className="mt-4 text-center text-sm text-muted-foreground">
+            <p>Popularitetstrend for topp 5 jentenavn i Norge (2013-2024)</p>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

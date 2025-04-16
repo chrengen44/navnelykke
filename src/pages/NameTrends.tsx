@@ -22,15 +22,15 @@ const NameTrends = () => {
           
           <Tabs defaultValue="explorer" className="space-y-6">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="explorer">Utforsk navn</TabsTrigger>
+              <TabsTrigger value="explorer">Popularitetsrangering</TabsTrigger>
               <TabsTrigger value="insights">Interessante trender</TabsTrigger>
             </TabsList>
             
             <TabsContent value="explorer" className="space-y-6">
               <Card className="p-6">
-                <h2 className="text-2xl font-semibold mb-4">Navnetrendutforsker</h2>
+                <h2 className="text-2xl font-semibold mb-4">Jentenavn i Norge</h2>
                 <p className="text-gray-600 mb-6">
-                  Velg og sammenlign opptil 5 jentenavn for å se hvordan populariteten har utviklet seg fra 2013 til 2024.
+                  Se hvordan jentenavn rangerer i popularitet over tid og sammenlign trender fra 2013 til 2024.
                 </p>
                 <NameTrendExplorer />
               </Card>

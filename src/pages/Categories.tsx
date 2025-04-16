@@ -1,4 +1,3 @@
-
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { nameCategories } from "@/data";
@@ -17,40 +16,27 @@ const Categories = () => {
   const { data: origins, isLoading } = useQuery({
     queryKey: ['origins'],
     queryFn: async () => {
-      // Fetch all distinct origins from baby_names
-      const { data: originsData, error: originsError } = await supabase
+      const { data, error } = await supabase
         .from('baby_names')
-        .select('origin')
+        .select('origin, count(*)', { count: 'exact' })
+        .group('origin')
         .order('origin');
 
-      if (originsError) throw originsError;
-      if (!originsData) return [];
-
-      // Count occurrences of each origin and create Origin objects
-      const originCounts: Record<string, number> = {};
-      for (const row of originsData) {
-        if (row.origin) {
-          if (!originCounts[row.origin]) {
-            originCounts[row.origin] = 0;
-          }
-          originCounts[row.origin]++;
-        }
+      if (error) {
+        console.error('Error fetching origins:', error);
+        throw error;
       }
-
-      // Add some missing origins for demonstration if they don't exist
-      // This is just for UI demonstration purposes - in a real app, these would come from the database
-      const requiredOrigins = ['Norse', 'Scandinavian'];
-      for (const origin of requiredOrigins) {
-        if (!originCounts[origin]) {
-          originCounts[origin] = 0; // Set to 0 to show it exists but has no names yet
-        }
-      }
-
-      // Convert to array of Origin objects
-      return Object.entries(originCounts).map(([origin, count]) => ({
-        origin,
-        name_count: count
+      
+      if (!data) return [];
+      
+      const originsWithCount: Origin[] = data.map(item => ({
+        origin: item.origin,
+        name_count: parseInt(item.count as string)
       }));
+      
+      console.log('Origins fetched from database:', originsWithCount);
+      
+      return originsWithCount;
     }
   });
 

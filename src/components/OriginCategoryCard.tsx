@@ -24,3 +24,6 @@ const OriginCategoryCard = ({ origin, count }: OriginCategoryCardProps) => {
       </Card>
     </Link>
   );
+};
+
+export default OriginCategoryCard;

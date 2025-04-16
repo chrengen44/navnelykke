@@ -84,7 +84,7 @@ const Index: React.FC = () => {
               title="Populære guttenavn"
               description="Utforsk de mest populære guttenavnene i Norge akkurat nå"
               names={popularBoyNames}
-              linkTo="/populaere?gender=boy"
+              linkTo="/populære-navn?gender=boy"
               backgroundClass="bg-babyblue/30"
             />
             
@@ -93,7 +93,7 @@ const Index: React.FC = () => {
               title="Populære jentenavn"
               description="Utforsk de mest populære jentenavnene i Norge akkurat nå"
               names={popularGirlNames}
-              linkTo="/populaere?gender=girl"
+              linkTo="/populære-navn?gender=girl"
               backgroundClass="bg-babypink/30"
             />
             

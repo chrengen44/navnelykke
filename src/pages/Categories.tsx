@@ -17,35 +17,31 @@ const Categories = () => {
   const { data: origins, isLoading } = useQuery({
     queryKey: ['origins'],
     queryFn: async () => {
-      // Fix: Use select() with count() and group by syntax instead of group_by method
-      const { data, error } = await supabase
+      // Fetch all distinct origins from baby_names
+      const { data: originsData, error: originsError } = await supabase
         .from('baby_names')
-        .select('origin, count(*)')
-        .order('origin')
-        .then(result => {
-          // Process the result to get the count by origin
-          if (result.error) throw result.error;
-          
-          // Group by origin and count
-          const originCounts: Record<string, number> = {};
-          for (const row of result.data || []) {
-            if (row.origin) {
-              if (!originCounts[row.origin]) {
-                originCounts[row.origin] = 0;
-              }
-              originCounts[row.origin]++;
-            }
-          }
-          
-          // Convert to array of Origin objects
-          return Object.entries(originCounts).map(([origin, count]) => ({
-            origin,
-            name_count: count
-          })) as Origin[];
-        });
+        .select('origin')
+        .order('origin');
 
-      if (error) throw error;
-      return data;
+      if (originsError) throw originsError;
+      if (!originsData) return [];
+
+      // Count occurrences of each origin and create Origin objects
+      const originCounts: Record<string, number> = {};
+      for (const row of originsData) {
+        if (row.origin) {
+          if (!originCounts[row.origin]) {
+            originCounts[row.origin] = 0;
+          }
+          originCounts[row.origin]++;
+        }
+      }
+
+      // Convert to array of Origin objects
+      return Object.entries(originCounts).map(([origin, count]) => ({
+        origin,
+        name_count: count
+      }));
     }
   });
 

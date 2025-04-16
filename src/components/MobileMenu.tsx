@@ -14,7 +14,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 bg-white z-50 md:hidden">
       <div className="flex justify-between items-center p-4 border-b">
-        <Link to="/" className="text-xl font-bold text-pink-600">BabyName</Link>
+        <Link to="/" className="text-xl font-bold text-pink-600">Navnelykke</Link>
         <button 
           onClick={onClose} 
           className="text-gray-600 hover:text-pink-600"

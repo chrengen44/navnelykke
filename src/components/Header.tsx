@@ -17,7 +17,7 @@ const Header = () => {
       </div>
 
       <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <Link to="/" className="text-xl font-bold text-pink-600">BabyName</Link>
+        <Link to="/" className="text-xl font-bold text-pink-600">Navnelykke</Link>
         
         <div className="hidden md:flex gap-6">
           <Link to="/populære-navn" className="text-gray-600 hover:text-pink-600">Populære navn</Link>

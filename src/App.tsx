@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/hooks/useAuth";
+import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Categories from "./pages/Categories";
@@ -13,7 +13,6 @@ import PopularNames from "./pages/PopularNames";
 import NameDetail from "./pages/NameDetail";
 import Search from "./pages/Search";
 import Inspiration from "./pages/Inspiration";
-import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Favorites from "./pages/Favorites";
 import SuggestName from "./pages/SuggestName";
@@ -26,7 +25,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <AuthProvider>
+        <FavoritesProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
@@ -43,12 +42,10 @@ export default function App() {
               <Route path="/foresla-navn" element={<SuggestName />} />
               <Route path="/profil" element={<Profile />} />
               <Route path="/admin" element={<Admin />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/auth/:action" element={<Auth />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
-        </AuthProvider>
+        </FavoritesProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

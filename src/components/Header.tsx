@@ -1,41 +1,14 @@
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { LogOut, User, Heart, Settings } from 'lucide-react';
 import MobileMenu from './MobileMenu';
+import { Heart } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { useFavorites } from '@/contexts/FavoritesContext';
 
 const Header = () => {
-  const { user, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { toast } = useToast();
-
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      toast({
-        title: "Logget ut!",
-        description: "Du er nå logget ut av kontoen din.",
-      });
-    } catch (error) {
-      console.error("Logout failed:", error);
-      toast({
-        variant: "destructive",
-        title: "Beklager!",
-        description: "Det oppstod en feil under utlogging.",
-      });
-    }
-  };
+  const { favoritesCount } = useFavorites();
 
   return (
     <header className="bg-white shadow-sm">
@@ -55,50 +28,16 @@ const Header = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback>
-                      {user.email?.substring(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel>Min konto</DropdownMenuLabel>
-                <DropdownMenuItem asChild>
-                  <Link to="/profil">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profil</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/favoritter">
-                    <Heart className="mr-2 h-4 w-4" />
-                    <span>Favoritter</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/admin">
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Admin</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer" onSelect={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Logg ut</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <>
-              <Link to="/auth/login" className="text-gray-600 hover:text-pink-600">Logg inn</Link>
-              <Link to="/auth/register" className="bg-pink-500 text-white py-2 px-4 rounded hover:bg-pink-600 transition-colors">Registrer</Link>
-            </>
-          )}
+          <Link to="/favoritter" className="flex items-center gap-2 text-gray-600 hover:text-pink-600">
+            <Heart className={`h-5 w-5 ${favoritesCount > 0 ? 'text-pink-500 fill-pink-500' : ''}`} />
+            <span className="hidden md:inline">Mine favoritter</span>
+            {favoritesCount > 0 && (
+              <span className="inline-flex items-center justify-center w-5 h-5 bg-pink-500 text-white text-xs font-bold rounded-full">
+                {favoritesCount}
+              </span>
+            )}
+          </Link>
+          
           <button
             onClick={() => setMobileMenuOpen(true)}
             className="md:hidden text-gray-600 hover:text-pink-600 focus:outline-none"

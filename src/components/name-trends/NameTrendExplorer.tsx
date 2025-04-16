@@ -109,20 +109,25 @@ const NameTrendExplorer = () => {
   };
   
   // Format options for the combobox - ensure we always return an array even if the filter returns nothing
-  const nameOptions = availableNames
-    .filter(name => !selectedNames.includes(name))
-    .map(name => ({
-      value: name,
-      label: name
-    }));
+  const nameOptions = React.useMemo(() => {
+    return availableNames
+      .filter(name => !selectedNames.includes(name))
+      .map(name => ({
+        value: name,
+        label: name
+      }));
+  }, [selectedNames]);
+  
+  // Initialize with empty array to prevent any race conditions
+  const safeNameOptions = nameOptions || [];
   
   return (
     <div className="space-y-6">
       <div className="space-y-2">
         <div className="flex flex-col md:flex-row md:items-center gap-4">
-          {/* Ensure the Combobox always has a valid array, even if empty */}
+          {/* Ensure the Combobox always has a valid array with proper props */}
           <Combobox
-            items={nameOptions || []}
+            items={safeNameOptions}
             placeholder="Søk etter jentenavn..."
             onSelect={handleSelectName}
             className="max-w-[300px]"

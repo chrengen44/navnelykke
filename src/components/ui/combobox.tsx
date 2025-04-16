@@ -27,13 +27,16 @@ interface ComboboxProps {
 }
 
 export function Combobox({
-  items,
+  items = [], // Provide default empty array
   placeholder = "Velg...",
   onSelect,
   className,
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState("")
+
+  // Ensure items is always an array
+  const safeItems = Array.isArray(items) ? items : [];
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -45,7 +48,7 @@ export function Combobox({
           className={cn("justify-between", className)}
         >
           {value
-            ? items.find((item) => item.value === value)?.label
+            ? safeItems.find((item) => item.value === value)?.label || placeholder
             : placeholder}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -55,7 +58,7 @@ export function Combobox({
           <CommandInput placeholder={`Søk ${placeholder.toLowerCase()}...`} />
           <CommandEmpty>Ingen resultater funnet.</CommandEmpty>
           <CommandGroup>
-            {items.map((item) => (
+            {safeItems.map((item) => (
               <CommandItem
                 key={item.value}
                 value={item.value}

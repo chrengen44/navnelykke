@@ -38,31 +38,6 @@ const Categories = () => {
           </div>
         </div>
         
-        <section className="py-12 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold mb-6">Opprinnelse</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {isLoading ? (
-                <div className="col-span-full text-center py-8">Laster opprinnelser...</div>
-              ) : origins && origins.length > 0 ? (
-                origins.map((origin) => (
-                  <OriginCategoryCard
-                    key={origin.origin}
-                    origin={origin.origin}
-                    count={origin.name_count}
-                  />
-                ))
-              ) : (
-                <div className="col-span-full text-center py-8">Ingen opprinnelser funnet</div>
-              )}
-            </div>
-          </div>
-        </section>
-        
-        <div className="container mx-auto px-4 py-4">
-          <AdSpace type="horizontal" />
-        </div>
-        
         <section className="py-12">
           <div className="container mx-auto px-4">
             <h2 className="text-2xl font-bold mb-6">Kategorier</h2>
@@ -76,6 +51,31 @@ const Categories = () => {
                   icon={category.icon}
                 />
               ))}
+            </div>
+          </div>
+        </section>
+        
+        <div className="container mx-auto px-4 py-4">
+          <AdSpace type="horizontal" />
+        </div>
+        
+        <section className="py-12 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl font-bold mb-6">Opprinnelse</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {isLoading ? (
+                <div className="col-span-full text-center py-8">Laster kategorier...</div>
+              ) : origins && origins.length > 0 ? (
+                origins.map((origin) => (
+                  <OriginCategoryCard
+                    key={origin.origin}
+                    origin={origin.origin}
+                    count={origin.name_count}
+                  />
+                ))
+              ) : (
+                <div className="col-span-full text-center py-8">Ingen opprinnelser funnet</div>
+              )}
             </div>
           </div>
         </section>

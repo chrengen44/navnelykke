@@ -17,13 +17,35 @@ const Categories = () => {
   const { data: origins, isLoading } = useQuery({
     queryKey: ['origins'],
     queryFn: async () => {
+      // Fix: Use select() with count() and group by syntax instead of group_by method
       const { data, error } = await supabase
         .from('baby_names')
         .select('origin, count(*)')
-        .group_by('origin');
+        .order('origin')
+        .then(result => {
+          // Process the result to get the count by origin
+          if (result.error) throw result.error;
+          
+          // Group by origin and count
+          const originCounts: Record<string, number> = {};
+          for (const row of result.data || []) {
+            if (row.origin) {
+              if (!originCounts[row.origin]) {
+                originCounts[row.origin] = 0;
+              }
+              originCounts[row.origin]++;
+            }
+          }
+          
+          // Convert to array of Origin objects
+          return Object.entries(originCounts).map(([origin, count]) => ({
+            origin,
+            name_count: count
+          })) as Origin[];
+        });
 
       if (error) throw error;
-      return data as Origin[];
+      return data;
     }
   });
 

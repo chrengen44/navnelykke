@@ -108,7 +108,7 @@ const NameTrendExplorer = () => {
     setSelectedNames(selectedNames.filter(n => n !== name));
   };
   
-  // Format options for the combobox
+  // Format options for the combobox - ensure we always return an array even if the filter returns nothing
   const nameOptions = availableNames
     .filter(name => !selectedNames.includes(name))
     .map(name => ({
@@ -120,8 +120,9 @@ const NameTrendExplorer = () => {
     <div className="space-y-6">
       <div className="space-y-2">
         <div className="flex flex-col md:flex-row md:items-center gap-4">
+          {/* Ensure the Combobox always has a valid array, even if empty */}
           <Combobox
-            items={nameOptions}
+            items={nameOptions || []}
             placeholder="Søk etter jentenavn..."
             onSelect={handleSelectName}
             className="max-w-[300px]"

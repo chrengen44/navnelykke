@@ -27,7 +27,7 @@ interface ComboboxProps {
 }
 
 export function Combobox({
-  items = [], // Always default to an empty array
+  items = [],
   placeholder = "Velg...",
   onSelect,
   className,
@@ -35,8 +35,7 @@ export function Combobox({
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState("")
 
-  // Ensure items is always defined with an empty array fallback
-  // This is crucial to prevent "undefined is not iterable" errors
+  // Ensure items is always an array (defensive programming)
   const safeItems = React.useMemo(() => {
     return Array.isArray(items) ? items : [];
   }, [items]);

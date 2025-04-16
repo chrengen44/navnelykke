@@ -36,12 +36,6 @@ const NameCard = ({ name, showDetails = false }: NameCardProps) => {
     }
   };
 
-  // Handle favorite button click to prevent navigation
-  const handleFavoriteClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-md h-full flex flex-col">
       <CardContent className="p-0 flex-1 flex flex-col">
@@ -54,7 +48,10 @@ const NameCard = ({ name, showDetails = false }: NameCardProps) => {
           </div>
           <FavoriteButton 
             nameId={name.id}
-            onClick={handleFavoriteClick}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
           />
         </div>
 

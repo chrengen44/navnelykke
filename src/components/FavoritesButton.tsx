@@ -24,7 +24,8 @@ const FavoriteButton = ({ nameId, className = '', onClick }: FavoriteButtonProps
     e.preventDefault();
     e.stopPropagation();
     
-    console.log(`Toggling favorite for nameId: ${nameId}`);
+    // Debugging to verify correct ID is being used
+    console.log(`Toggling favorite button clicked for name with ID: ${nameId}`);
     
     // Prevent multiple clicks while processing
     if (loading) return;
@@ -32,27 +33,24 @@ const FavoriteButton = ({ nameId, className = '', onClick }: FavoriteButtonProps
     setLoading(true);
     
     try {
-      // Ensure we're using the nameId from props, not from any other context
-      const idToToggle = nameId;
-      console.log(`Using ID to toggle: ${idToToggle}, isFavorite: ${isFav}`);
-      
       if (isFav) {
-        removeFavorite(idToToggle);
+        removeFavorite(nameId);
         toast({
           title: 'Fjernet fra favoritter',
-          description: 'Navnet er fjernet fra dine favoritter.',
+          description: `Navnet med ID ${nameId} er fjernet fra dine favoritter.`,
         });
       } else {
-        addFavorite(idToToggle);
+        addFavorite(nameId);
         toast({
           title: 'Lagt til i favoritter',
-          description: 'Navnet er lagt til i dine favoritter.',
+          description: `Navnet med ID ${nameId} er lagt til i dine favoritter.`,
         });
       }
       
       // Call any additional onClick handler if provided
       if (onClick) onClick(e);
     } catch (error: any) {
+      console.error("Error toggling favorite:", error);
       toast({
         title: 'Feil',
         description: error.message,
@@ -72,6 +70,7 @@ const FavoriteButton = ({ nameId, className = '', onClick }: FavoriteButtonProps
       } ${className}`}
       onClick={toggleFavorite}
       disabled={loading}
+      data-nameid={nameId} // Add data attribute for debugging
     >
       <Heart className={`h-5 w-5 ${isFav ? 'fill-current' : ''}`} />
     </Button>

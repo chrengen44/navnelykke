@@ -5,9 +5,9 @@ import { BabyName } from "@/data";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import NameGrid from "@/components/NameGrid";
-import { babyNames } from "@/data";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { babyNames } from "@/data/namesData";
 
 const Favorites = () => {
   const [favoriteNames, setFavoriteNames] = useState<BabyName[]>([]);
@@ -16,7 +16,9 @@ const Favorites = () => {
 
   useEffect(() => {
     // Map favorite IDs to actual baby name objects
+    console.log("Current favorites IDs:", favorites);
     const names = babyNames.filter(name => favorites.includes(name.id));
+    console.log("Mapped favorite names:", names.map(n => ({ id: n.id, name: n.name })));
     setFavoriteNames(names);
   }, [favorites]);
 
@@ -32,6 +34,7 @@ const Favorites = () => {
               names={favoriteNames} 
               showDetails={true}
               emptyMessage="Du har ingen favoritter ennå. Utforsk navn og legg til noen!"
+              linkToDetail={true}
             />
           ) : (
             <div className="text-center py-12 bg-gray-50 rounded-lg">

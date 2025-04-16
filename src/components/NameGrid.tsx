@@ -27,12 +27,17 @@ const NameGrid = ({
           {linkToDetail ? (
             <Link to={`/navn/${name.id}`} className="block h-full">
               <NameCard 
+                key={`namecard-${name.id}`}
                 name={name} 
                 showDetails={showDetails} 
               />
             </Link>
           ) : (
-            <NameCard name={name} showDetails={showDetails} />
+            <NameCard 
+              key={`namecard-${name.id}`} 
+              name={name} 
+              showDetails={showDetails} 
+            />
           )}
         </div>
       ))}

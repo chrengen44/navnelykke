@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 // Sample data structure for name trends
 interface NameTrendData {
@@ -16,10 +17,17 @@ interface NameTrendData {
 const years = ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024'];
 
 // Top popular female names - we'll use these for our demo
-const availableNames = [
+const availableGirlNames = [
   'Emma', 'Nora', 'Olivia', 'Sofia', 'Ella', 'Maja', 'Emilie', 'Sofie',
   'Leah', 'Ingrid', 'Sara', 'Ida', 'Anna', 'Eva', 'Mia', 'Thea', 'Amalie', 'Frida',
   'Julie', 'Linnea', 'Sigrid', 'Mathilde', 'Aurora', 'Astrid', 'Maria', 'Tuva', 'Tiril'
+].sort();
+
+// Top popular boy names - we'll use these for our demo
+const availableBoyNames = [
+  'William', 'Noah', 'Oliver', 'Elias', 'Aksel', 'Emil', 'Theodor', 'Jacob', 
+  'Magnus', 'Filip', 'Henrik', 'Lucas', 'Isak', 'Mathias', 'Olav', 'Oskar',
+  'Tobias', 'Johannes', 'Sander', 'Sebastian', 'Odin', 'Adrian', 'Liam', 'Jonas'
 ].sort();
 
 // Colors for the chart lines
@@ -28,12 +36,12 @@ const COLORS = [
   "#FF9F40", "#8AC926", "#1982C4", "#6A4C93", "#F15BB5"
 ];
 
-// Sample trend dataset
-const generateSampleData = (): NameTrendData[] => {
+// Sample trend dataset for girls
+const generateSampleGirlData = (): NameTrendData[] => {
   return years.map(year => {
     const yearData: NameTrendData = { year };
     
-    availableNames.forEach(name => {
+    availableGirlNames.forEach(name => {
       // Base value with some randomness
       const baseValue = Math.floor(Math.random() * 50) + 10;
       
@@ -55,6 +63,43 @@ const generateSampleData = (): NameTrendData[] => {
       }
       // Some start rising then fall
       else if (['Nora', 'Emilie', 'Sofie'].includes(name)) {
+        trendModifier = yearIndex < 6 ? yearIndex * 3 : (12 - yearIndex) * 3;
+      }
+      
+      yearData[name] = Math.max(1, Math.round(baseValue + trendModifier));
+    });
+    
+    return yearData;
+  });
+};
+
+// Sample trend dataset for boys
+const generateSampleBoyData = (): NameTrendData[] => {
+  return years.map(year => {
+    const yearData: NameTrendData = { year };
+    
+    availableBoyNames.forEach(name => {
+      // Base value with some randomness
+      const baseValue = Math.floor(Math.random() * 50) + 10;
+      
+      // Create some trend patterns
+      const yearIndex = parseInt(year) - 2013;
+      let trendModifier = 0;
+      
+      // Some names get more popular over time
+      if (['Oliver', 'Noah', 'Elias', 'Liam'].includes(name)) {
+        trendModifier = yearIndex * 2;
+      }
+      // Some get less popular
+      else if (['Jacob', 'Mathias', 'Tobias', 'Jonas'].includes(name)) {
+        trendModifier = -yearIndex * 1.5;
+      }
+      // Some have spikes
+      else if (['Odin', 'Filip', 'Sander'].includes(name)) {
+        trendModifier = Math.sin(yearIndex * 0.8) * 15;
+      }
+      // Some start rising then fall
+      else if (['William', 'Emil', 'Aksel'].includes(name)) {
         trendModifier = yearIndex < 6 ? yearIndex * 3 : (12 - yearIndex) * 3;
       }
       
@@ -92,11 +137,14 @@ const generateRankData = (data: NameTrendData[]) => {
 };
 
 const NameTrendExplorer = () => {
-  const [chartData, setChartData] = useState<NameTrendData[]>([]);
-  const [rankingData, setRankingData] = useState<any[]>([]);
+  const [girlChartData, setGirlChartData] = useState<NameTrendData[]>([]);
+  const [boyChartData, setBoyChartData] = useState<NameTrendData[]>([]);
+  const [girlRankingData, setGirlRankingData] = useState<any[]>([]);
+  const [boyRankingData, setBoyRankingData] = useState<any[]>([]);
   const [selectedYear, setSelectedYear] = useState<string>("2024");
   const [loading, setLoading] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<string>("popularity");
+  const [gender, setGender] = useState<string>("girl");
   
   useEffect(() => {
     const fetchData = async () => {
@@ -104,9 +152,13 @@ const NameTrendExplorer = () => {
       try {
         // In a real application, this would be an API call to SSB
         // For now, we'll use our sample data generation function
-        const data = generateSampleData();
-        setChartData(data);
-        setRankingData(generateRankData(data));
+        const girlData = generateSampleGirlData();
+        const boyData = generateSampleBoyData();
+        
+        setGirlChartData(girlData);
+        setBoyChartData(boyData);
+        setGirlRankingData(generateRankData(girlData));
+        setBoyRankingData(generateRankData(boyData));
       } catch (error) {
         console.error('Error fetching name trend data:', error);
         toast.error('Kunne ikke hente navnedata.');
@@ -118,8 +170,10 @@ const NameTrendExplorer = () => {
     fetchData();
   }, []);
 
-  // Find data for selected year
-  const selectedYearData = rankingData.find(item => item.year === selectedYear);
+  // Find data for selected year based on gender
+  const selectedYearData = gender === "girl" 
+    ? girlRankingData.find(item => item.year === selectedYear)
+    : boyRankingData.find(item => item.year === selectedYear);
   
   // Extract the top 10 names for the selected year
   const top10ForSelectedYear = selectedYearData 
@@ -130,20 +184,41 @@ const NameTrendExplorer = () => {
       }))
     : [];
 
-  const popularityOverTimeData = selectedYearData
+  // Select the appropriate data for popularity over time chart
+  const popularityOverTimeData = gender === "girl"
     ? ["Emma", "Nora", "Olivia", "Sofia", "Ella"].map(name => {
         return {
           name,
-          data: chartData.map(yearData => ({
+          data: girlChartData.map(yearData => ({
             year: yearData.year,
             value: yearData[name] as number
           }))
         };
       })
-    : [];
+    : ["William", "Noah", "Oliver", "Elias", "Aksel"].map(name => {
+        return {
+          name,
+          data: boyChartData.map(yearData => ({
+            year: yearData.year,
+            value: yearData[name] as number
+          }))
+        };
+      });
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-medium">Velg kjønn</h3>
+        <ToggleGroup type="single" value={gender} onValueChange={(value) => value && setGender(value)}>
+          <ToggleGroupItem value="girl" aria-label="Jentenavn">
+            Jentenavn
+          </ToggleGroupItem>
+          <ToggleGroupItem value="boy" aria-label="Guttenavn">
+            Guttenavn
+          </ToggleGroupItem>
+        </ToggleGroup>
+      </div>
+      
       <Tabs 
         value={activeTab} 
         onValueChange={setActiveTab} 
@@ -156,7 +231,9 @@ const NameTrendExplorer = () => {
         
         <TabsContent value="popularity" className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:justify-between gap-4 items-start sm:items-center">
-            <h3 className="text-lg font-medium">Topp 10 jentenavn i Norge</h3>
+            <h3 className="text-lg font-medium">
+              {gender === "girl" ? "Topp 10 jentenavn i Norge" : "Topp 10 guttenavn i Norge"}
+            </h3>
             
             <div className="flex flex-wrap gap-2">
               {years.map(year => (
@@ -193,7 +270,7 @@ const NameTrendExplorer = () => {
                   <div className="flex-1">
                     <h4 className="font-semibold">{item.name}</h4>
                     <p className="text-sm text-muted-foreground">
-                      {item.value} per 1000 fødte jenter
+                      {item.value} per 1000 fødte {gender === "girl" ? "jenter" : "gutter"}
                     </p>
                   </div>
                   <div className="hidden sm:flex h-2 bg-muted rounded-full" style={{ width: `${Math.min(200, item.value * 3)}px` }}>
@@ -228,7 +305,7 @@ const NameTrendExplorer = () => {
                   />
                   <YAxis 
                     label={{ 
-                      value: 'Antall per 1000 fødte jenter', 
+                      value: 'Antall per 1000 fødte', 
                       angle: -90, 
                       position: 'insideLeft',
                       style: { textAnchor: 'middle' }
@@ -255,7 +332,7 @@ const NameTrendExplorer = () => {
             )}
           </div>
           <div className="mt-4 text-center text-sm text-muted-foreground">
-            <p>Popularitetstrend for topp 5 jentenavn i Norge (2013-2024)</p>
+            <p>Popularitetstrend for topp 5 {gender === "girl" ? "jentenavn" : "guttenavn"} i Norge (2013-2024)</p>
           </div>
         </TabsContent>
       </Tabs>

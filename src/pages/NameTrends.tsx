@@ -28,9 +28,9 @@ const NameTrends = () => {
             
             <TabsContent value="explorer" className="space-y-6">
               <Card className="p-6">
-                <h2 className="text-2xl font-semibold mb-4">Jentenavn i Norge</h2>
+                <h2 className="text-2xl font-semibold mb-4">Popularitetsrangering for navn i Norge</h2>
                 <p className="text-gray-600 mb-6">
-                  Se hvordan jentenavn rangerer i popularitet over tid og sammenlign trender fra 2013 til 2024.
+                  Se hvordan jente- og guttenavn rangerer i popularitet over tid og sammenlign trender fra 2013 til 2024.
                 </p>
                 <NameTrendExplorer />
               </Card>

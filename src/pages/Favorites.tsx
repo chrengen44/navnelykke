@@ -7,19 +7,71 @@ import Footer from "@/components/Footer";
 import NameGrid from "@/components/NameGrid";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { babyNames } from "@/data/namesData";
+import { supabase } from "@/integrations/supabase/client";
 
 const Favorites = () => {
   const [favoriteNames, setFavoriteNames] = useState<BabyName[]>([]);
+  const [loading, setLoading] = useState(true);
   const { favorites } = useFavorites();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Map favorite IDs to actual baby name objects
-    console.log("Current favorites IDs:", favorites);
-    const names = babyNames.filter(name => favorites.includes(name.id));
-    console.log("Mapped favorite names:", names.map(n => ({ id: n.id, name: n.name })));
-    setFavoriteNames(names);
+    const fetchFavoriteNames = async () => {
+      if (!favorites.length) {
+        setFavoriteNames([]);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        console.log("Fetching names for IDs:", favorites);
+        const { data: names, error } = await supabase
+          .from('baby_names')
+          .select(`
+            id,
+            name,
+            gender,
+            origin,
+            meaning,
+            popularity,
+            length,
+            first_letter,
+            name_category_mappings(
+              name_categories(name)
+            )
+          `)
+          .in('id', favorites);
+
+        if (error) {
+          console.error('Error fetching favorite names:', error);
+          return;
+        }
+
+        // Transform the data to match our BabyName interface
+        const transformedNames: BabyName[] = names.map(name => ({
+          id: name.id,
+          name: name.name,
+          gender: name.gender as 'boy' | 'girl' | 'unisex',
+          origin: name.origin,
+          meaning: name.meaning,
+          popularity: name.popularity,
+          length: name.length as 'short' | 'medium' | 'long',
+          firstLetter: name.first_letter,
+          categories: name.name_category_mappings.map(
+            (mapping: any) => mapping.name_categories.name
+          )
+        }));
+
+        console.log("Fetched and transformed names:", transformedNames);
+        setFavoriteNames(transformedNames);
+      } catch (error) {
+        console.error('Error in fetchFavoriteNames:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFavoriteNames();
   }, [favorites]);
 
   return (
@@ -29,7 +81,11 @@ const Favorites = () => {
         <div className="max-w-6xl mx-auto">
           <h1 className="text-3xl font-bold mb-6">Mine favoritter</h1>
           
-          {favoriteNames.length > 0 ? (
+          {loading ? (
+            <div className="text-center py-12">
+              <p>Laster favoritter...</p>
+            </div>
+          ) : favoriteNames.length > 0 ? (
             <NameGrid 
               names={favoriteNames} 
               showDetails={true}

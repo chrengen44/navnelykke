@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-// Data for top 5 names over the years (2013-2024)
-const topNamesData = [
+// Data for top 5 girl names over the years (2013-2024)
+const topGirlNamesData = [
   { year: '2013', Emma: 62, Nora: 58, Sophie: 52, Ella: 49, Maja: 47 },
   { year: '2014', Emma: 60, Nora: 59, Sophie: 51, Ella: 52, Maja: 46 },
   { year: '2015', Emma: 59, Nora: 63, Sophie: 48, Ella: 53, Maja: 43 },
@@ -18,7 +18,23 @@ const topNamesData = [
   { year: '2024', Emma: 63, Nora: 50, Sophie: 32, Ella: 61, Maja: 32 }
 ];
 
-const COLORS = {
+// Data for top 5 boy names over the years (2013-2024)
+const topBoyNamesData = [
+  { year: '2013', William: 58, Noah: 52, Oliver: 49, Elias: 46, Aksel: 45 },
+  { year: '2014', William: 60, Noah: 54, Oliver: 51, Elias: 48, Aksel: 46 },
+  { year: '2015', William: 59, Noah: 56, Oliver: 53, Elias: 50, Aksel: 44 },
+  { year: '2016', William: 56, Noah: 58, Oliver: 55, Elias: 52, Aksel: 43 },
+  { year: '2017', William: 54, Noah: 60, Oliver: 57, Elias: 53, Aksel: 42 },
+  { year: '2018', William: 52, Noah: 62, Oliver: 59, Elias: 54, Aksel: 41 },
+  { year: '2019', William: 50, Noah: 64, Oliver: 61, Elias: 55, Aksel: 40 },
+  { year: '2020', William: 48, Noah: 65, Oliver: 63, Elias: 56, Aksel: 39 },
+  { year: '2021', William: 46, Noah: 64, Oliver: 65, Elias: 57, Aksel: 38 },
+  { year: '2022', William: 45, Noah: 63, Oliver: 66, Elias: 58, Aksel: 37 },
+  { year: '2023', William: 44, Noah: 62, Oliver: 67, Elias: 59, Aksel: 36 },
+  { year: '2024', William: 43, Noah: 61, Oliver: 68, Elias: 60, Aksel: 35 }
+];
+
+const GIRL_COLORS = {
   Emma: "#FF6384",
   Nora: "#36A2EB",
   Sophie: "#FFCE56", 
@@ -26,12 +42,30 @@ const COLORS = {
   Maja: "#9966FF"
 };
 
-const PopularityTrends = () => {
+const BOY_COLORS = {
+  William: "#FF6384",
+  Noah: "#36A2EB",
+  Oliver: "#FFCE56", 
+  Elias: "#4BC0C0",
+  Aksel: "#9966FF"
+};
+
+interface PopularityTrendsProps {
+  gender: 'girl' | 'boy';
+}
+
+const PopularityTrends = ({ gender = 'girl' }: PopularityTrendsProps) => {
+  const data = gender === 'girl' ? topGirlNamesData : topBoyNamesData;
+  const colors = gender === 'girl' ? GIRL_COLORS : BOY_COLORS;
+  const nameKeys = gender === 'girl' 
+    ? ['Emma', 'Nora', 'Sophie', 'Ella', 'Maja'] 
+    : ['William', 'Noah', 'Oliver', 'Elias', 'Aksel'];
+
   return (
     <div className="h-[350px] w-full">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
-          data={topNamesData}
+          data={data}
           margin={{
             top: 20,
             right: 30,
@@ -47,16 +81,20 @@ const PopularityTrends = () => {
             labelFormatter={(label) => `År: ${label}`}
           />
           <Legend />
-          <Line type="monotone" dataKey="Emma" stroke={COLORS.Emma} strokeWidth={2} />
-          <Line type="monotone" dataKey="Nora" stroke={COLORS.Nora} strokeWidth={2} />
-          <Line type="monotone" dataKey="Sophie" stroke={COLORS.Sophie} strokeWidth={2} />
-          <Line type="monotone" dataKey="Ella" stroke={COLORS.Ella} strokeWidth={2} />
-          <Line type="monotone" dataKey="Maja" stroke={COLORS.Maja} strokeWidth={2} />
+          {nameKeys.map(name => (
+            <Line 
+              key={name}
+              type="monotone" 
+              dataKey={name} 
+              stroke={colors[name as keyof typeof colors]} 
+              strokeWidth={2} 
+            />
+          ))}
         </LineChart>
       </ResponsiveContainer>
       
       <div className="mt-4 text-sm text-gray-500">
-        <p>Antall per 1000 fødte jenter for topp 5 navn</p>
+        <p>Antall per 1000 fødte {gender === 'girl' ? 'jenter' : 'gutter'} for topp 5 navn</p>
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight } from 'lucide-r
 
 interface TrendingNamesCardProps {
   type: 'rising' | 'falling';
+  gender: 'girl' | 'boy';
 }
 
 interface TrendingNameData {
@@ -14,8 +15,8 @@ interface TrendingNameData {
   changePercent: number;
 }
 
-// Sample data for trending names
-const risingNames: TrendingNameData[] = [
+// Sample data for trending girl names
+const risingGirlNames: TrendingNameData[] = [
   { name: 'Olivia', startValue: 23, endValue: 52, changePercent: 126 },
   { name: 'Luna', startValue: 8, endValue: 36, changePercent: 350 },
   { name: 'Frida', startValue: 18, endValue: 41, changePercent: 128 },
@@ -23,7 +24,7 @@ const risingNames: TrendingNameData[] = [
   { name: 'Aurora', startValue: 17, endValue: 38, changePercent: 124 }
 ];
 
-const fallingNames: TrendingNameData[] = [
+const fallingGirlNames: TrendingNameData[] = [
   { name: 'Julie', startValue: 48, endValue: 21, changePercent: -56 },
   { name: 'Ida', startValue: 42, endValue: 19, changePercent: -55 },
   { name: 'Maria', startValue: 39, endValue: 18, changePercent: -54 },
@@ -31,9 +32,32 @@ const fallingNames: TrendingNameData[] = [
   { name: 'Eva', startValue: 26, endValue: 14, changePercent: -46 }
 ];
 
-const TrendingNamesCard: React.FC<TrendingNamesCardProps> = ({ type }) => {
+// Sample data for trending boy names
+const risingBoyNames: TrendingNameData[] = [
+  { name: 'Theo', startValue: 19, endValue: 48, changePercent: 153 },
+  { name: 'Liam', startValue: 10, endValue: 39, changePercent: 290 },
+  { name: 'Filip', startValue: 16, endValue: 37, changePercent: 131 },
+  { name: 'Aksel', startValue: 14, endValue: 35, changePercent: 150 },
+  { name: 'Lucas', startValue: 15, endValue: 32, changePercent: 113 }
+];
+
+const fallingBoyNames: TrendingNameData[] = [
+  { name: 'Jonas', startValue: 45, endValue: 19, changePercent: -58 },
+  { name: 'Mathias', startValue: 40, endValue: 18, changePercent: -55 },
+  { name: 'Andreas', startValue: 38, endValue: 17, changePercent: -55 },
+  { name: 'Tobias', startValue: 32, endValue: 16, changePercent: -50 },
+  { name: 'Sebastian', startValue: 28, endValue: 15, changePercent: -46 }
+];
+
+const TrendingNamesCard: React.FC<TrendingNamesCardProps> = ({ type, gender }) => {
   const isRising = type === 'rising';
-  const data = isRising ? risingNames : fallingNames;
+  
+  let data: TrendingNameData[];
+  if (gender === 'girl') {
+    data = isRising ? risingGirlNames : fallingGirlNames;
+  } else {
+    data = isRising ? risingBoyNames : fallingBoyNames;
+  }
   
   return (
     <Card>
@@ -55,8 +79,8 @@ const TrendingNamesCard: React.FC<TrendingNamesCardProps> = ({ type }) => {
       <CardContent>
         <p className="text-sm text-gray-500 mb-4">
           {isRising
-            ? 'Navn som har økt mest i popularitet fra 2013 til 2024.'
-            : 'Navn som har falt mest i popularitet fra 2013 til 2024.'}
+            ? `${gender === 'girl' ? 'Jente' : 'Gutte'}navn som har økt mest i popularitet fra 2013 til 2024.`
+            : `${gender === 'girl' ? 'Jente' : 'Gutte'}navn som har falt mest i popularitet fra 2013 til 2024.`}
         </p>
         
         <div className="space-y-4">

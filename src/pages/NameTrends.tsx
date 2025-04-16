@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Layout } from '@/components/Layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NameTrendExplorer from '@/components/name-trends/NameTrendExplorer';
@@ -7,8 +7,11 @@ import PopularityTrends from '@/components/name-trends/PopularityTrends';
 import TrendingNamesCard from '@/components/name-trends/TrendingNamesCard';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const NameTrends = () => {
+  const [gender, setGender] = useState<'girl' | 'boy'>('girl');
+  
   return (
     <Layout>
       <main className="container mx-auto px-4 py-12">
@@ -43,20 +46,32 @@ const NameTrends = () => {
                   Oppdagelser og analyser av navnetrender i Norge de siste årene.
                 </p>
                 
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-lg font-medium">Velg kjønn</h3>
+                  <ToggleGroup type="single" value={gender} onValueChange={(value) => value && setGender(value as 'girl' | 'boy')}>
+                    <ToggleGroupItem value="girl" aria-label="Jentenavn">
+                      Jentenavn
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="boy" aria-label="Guttenavn">
+                      Guttenavn
+                    </ToggleGroupItem>
+                  </ToggleGroup>
+                </div>
+                
                 <div className="space-y-8">
                   <div>
                     <h3 className="text-xl font-medium mb-3">Popularitetsendringer over tid</h3>
                     <p className="text-gray-600 mb-4">
-                      Se hvordan populariteten til de mest populære jentenavnene har utviklet seg fra 2013 til 2024.
+                      Se hvordan populariteten til de mest populære {gender === 'girl' ? 'jente' : 'gutte'}navnene har utviklet seg fra 2013 til 2024.
                     </p>
-                    <PopularityTrends />
+                    <PopularityTrends gender={gender} />
                   </div>
                   
                   <Separator />
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <TrendingNamesCard type="rising" />
-                    <TrendingNamesCard type="falling" />
+                    <TrendingNamesCard type="rising" gender={gender} />
+                    <TrendingNamesCard type="falling" gender={gender} />
                   </div>
                 </div>
               </Card>

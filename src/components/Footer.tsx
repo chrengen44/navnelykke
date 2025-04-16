@@ -34,17 +34,17 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/populaere" className="text-gray-600 hover:text-pink-500 transition">
+                <Link to="/populære-navn" className="text-gray-600 hover:text-pink-500 transition">
                   Populære navn
                 </Link>
               </li>
               <li>
                 <Link to="/inspirasjon" className="text-gray-600 hover:text-pink-500 transition">
-                  Navneinspiration
+                  Navneinspirasjon
                 </Link>
               </li>
               <li>
-                <Link to="/soek" className="text-gray-600 hover:text-pink-500 transition">
+                <Link to="/søk" className="text-gray-600 hover:text-pink-500 transition">
                   Navnesøk
                 </Link>
               </li>
@@ -55,17 +55,17 @@ const Footer = () => {
             <h3 className="font-medium text-lg mb-4">Om oss</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/om-oss" className="text-gray-600 hover:text-pink-500 transition">
+                <Link to="/" className="text-gray-600 hover:text-pink-500 transition">
                   Om Navnelykke
                 </Link>
               </li>
               <li>
-                <Link to="/personvern" className="text-gray-600 hover:text-pink-500 transition">
+                <Link to="/" className="text-gray-600 hover:text-pink-500 transition">
                   Personvernerklæring
                 </Link>
               </li>
               <li>
-                <Link to="/kontakt" className="text-gray-600 hover:text-pink-500 transition">
+                <Link to="/" className="text-gray-600 hover:text-pink-500 transition">
                   Kontakt oss
                 </Link>
               </li>

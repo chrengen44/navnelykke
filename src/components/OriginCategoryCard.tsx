@@ -18,12 +18,9 @@ const OriginCategoryCard = ({ origin, count }: OriginCategoryCardProps) => {
           </div>
           <h3 className="text-lg font-semibold mb-2">{origin}</h3>
           <p className="text-gray-700 text-sm mt-auto">
-            {count} {count === 1 ? 'navn' : 'navn'}
+            {count > 0 ? `${count} ${count === 1 ? 'navn' : 'navn'}` : 'Ingen navn ennå'}
           </p>
         </CardContent>
       </Card>
     </Link>
   );
-};
-
-export default OriginCategoryCard;

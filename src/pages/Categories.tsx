@@ -37,6 +37,15 @@ const Categories = () => {
         }
       }
 
+      // Add some missing origins for demonstration if they don't exist
+      // This is just for UI demonstration purposes - in a real app, these would come from the database
+      const requiredOrigins = ['Norse', 'Scandinavian'];
+      for (const origin of requiredOrigins) {
+        if (!originCounts[origin]) {
+          originCounts[origin] = 0; // Set to 0 to show it exists but has no names yet
+        }
+      }
+
       // Convert to array of Origin objects
       return Object.entries(originCounts).map(([origin, count]) => ({
         origin,
@@ -87,13 +96,17 @@ const Categories = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {isLoading ? (
                 <div className="col-span-full text-center py-8">Laster kategorier...</div>
-              ) : origins?.map((origin) => (
-                <OriginCategoryCard
-                  key={origin.origin}
-                  origin={origin.origin}
-                  count={origin.name_count}
-                />
-              ))}
+              ) : origins && origins.length > 0 ? (
+                origins.map((origin) => (
+                  <OriginCategoryCard
+                    key={origin.origin}
+                    origin={origin.origin}
+                    count={origin.name_count}
+                  />
+                ))
+              ) : (
+                <div className="col-span-full text-center py-8">Ingen opprinnelser funnet</div>
+              )}
             </div>
           </div>
         </section>

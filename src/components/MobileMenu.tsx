@@ -53,7 +53,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
           Inspirasjon
         </Link>
         <Link 
-          to="/foreslå-navn" 
+          to="/kontakt-oss" 
           className="text-gray-600 hover:text-pink-600 py-2 border-b"
           onClick={onClose}
         >

@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Baby, Heart, Mail } from "lucide-react";
 
@@ -61,19 +60,8 @@ const Footer = () => {
               </li>
               <li>
                 <Link to="/" className="text-gray-600 hover:text-pink-500 transition">
-                  Personvernerklæring
-                </Link>
-              </li>
-              <li>
-                <Link to="/" className="text-gray-600 hover:text-pink-500 transition">
                   Kontakt oss
                 </Link>
-              </li>
-              <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-gray-600" />
-                <a href="mailto:kontakt@navnelykke.no" className="text-gray-600 hover:text-pink-500 transition">
-                  kontakt@navnelykke.no
-                </a>
               </li>
             </ul>
           </div>

@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,6 +17,7 @@ import Favorites from "./pages/Favorites";
 import SuggestName from "./pages/SuggestName";
 import Admin from "./pages/Admin";
 import NameTrends from "./pages/NameTrends";
+import OriginNames from "./pages/OriginNames";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +42,7 @@ export default function App() {
               <Route path="/foresla-navn" element={<SuggestName />} />
               <Route path="/profil" element={<Profile />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/opprinnelse/:origin" element={<OriginNames />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

@@ -4,8 +4,29 @@ import Footer from "@/components/Footer";
 import { nameCategories } from "@/data";
 import CategoryCard from "@/components/CategoryCard";
 import AdSpace from "@/components/AdSpace";
+import OriginCategoryCard from "@/components/OriginCategoryCard";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Origin {
+  origin: string;
+  name_count: number;
+}
 
 const Categories = () => {
+  const { data: origins, isLoading } = useQuery({
+    queryKey: ['origins'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('baby_names')
+        .select('origin, count(*)')
+        .group_by('origin');
+
+      if (error) throw error;
+      return data as Origin[];
+    }
+  });
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -23,6 +44,7 @@ const Categories = () => {
         
         <section className="py-12">
           <div className="container mx-auto px-4">
+            <h2 className="text-2xl font-bold mb-6">Kategorier</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {nameCategories.map((category) => (
                 <CategoryCard
@@ -31,6 +53,27 @@ const Categories = () => {
                   title={category.title}
                   description={category.description}
                   icon={category.icon}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+        
+        <div className="container mx-auto px-4 py-4">
+          <AdSpace type="horizontal" />
+        </div>
+        
+        <section className="py-12 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl font-bold mb-6">Opprinnelse</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {isLoading ? (
+                <div className="col-span-full text-center py-8">Laster kategorier...</div>
+              ) : origins?.map((origin) => (
+                <OriginCategoryCard
+                  key={origin.origin}
+                  origin={origin.origin}
+                  count={origin.name_count}
                 />
               ))}
             </div>

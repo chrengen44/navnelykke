@@ -1,5 +1,6 @@
+
 import { Link } from "react-router-dom";
-import { Baby, Heart, Mail } from "lucide-react";
+import { Baby, Heart } from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -54,12 +55,12 @@ const Footer = () => {
             <h3 className="font-medium text-lg mb-4">Om oss</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/" className="text-gray-600 hover:text-pink-500 transition">
+                <Link to="/om-navnelykke" className="text-gray-600 hover:text-pink-500 transition">
                   Om Navnelykke
                 </Link>
               </li>
               <li>
-                <Link to="/" className="text-gray-600 hover:text-pink-500 transition">
+                <Link to="/kontakt-oss" className="text-gray-600 hover:text-pink-500 transition">
                   Kontakt oss
                 </Link>
               </li>

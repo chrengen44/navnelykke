@@ -19,6 +19,8 @@ import SuggestName from "./pages/SuggestName";
 import Admin from "./pages/Admin";
 import NameTrends from "./pages/NameTrends";
 import OriginNames from "./pages/OriginNames";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +46,8 @@ export default function App() {
               <Route path="/profil" element={<Profile />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/opprinnelse/:origin" element={<OriginNames />} />
+              <Route path="/om-navnelykke" element={<About />} />
+              <Route path="/kontakt-oss" element={<Contact />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

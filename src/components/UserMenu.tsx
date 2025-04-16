@@ -19,7 +19,7 @@ const UserMenu = () => {
   if (!user) {
     return (
       <Button variant="outline" asChild>
-        <Link to="/auth">Logg inn</Link>
+        <Link to="/auth/login">Logg inn</Link>
       </Button>
     );
   }

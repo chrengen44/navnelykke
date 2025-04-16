@@ -1,31 +1,74 @@
 
 import React from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import NameTrendsChart from '@/components/NameTrendsChart';
+import Layout from '@/components/Layout';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import NameTrendExplorer from '@/components/name-trends/NameTrendExplorer';
+import PopularityTrends from '@/components/name-trends/PopularityTrends';
+import TrendingNamesCard from '@/components/name-trends/TrendingNamesCard';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
 const NameTrends = () => {
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-grow container mx-auto px-4 py-12">
+    <Layout>
+      <main className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
           <div className="mb-6">
             <h1 className="text-3xl font-bold">Navnetrender i Norge</h1>
+            <p className="text-gray-600 mt-2">
+              Utforsk hvordan populære navn har endret seg over tid, basert på data fra Statistisk Sentralbyrå.
+            </p>
           </div>
           
-          <p className="text-gray-600 mb-8">
-            Utforsk hvordan populære jentenavn har endret seg over tid, basert på data fra Statistisk Sentralbyrå.
-            Grafen viser antall jenter med hvert navn per år fra 2013 til 2023.
-          </p>
+          <Tabs defaultValue="explorer" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="explorer">Utforsk navn</TabsTrigger>
+              <TabsTrigger value="insights">Interessante trender</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="explorer" className="space-y-6">
+              <Card className="p-6">
+                <h2 className="text-2xl font-semibold mb-4">Navnetrendutforsker</h2>
+                <p className="text-gray-600 mb-6">
+                  Velg og sammenlign opptil 5 jentenavn for å se hvordan populariteten har utviklet seg fra 2013 til 2024.
+                </p>
+                <NameTrendExplorer />
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="insights" className="space-y-6">
+              <Card className="p-6">
+                <h2 className="text-2xl font-semibold mb-4">Trender og innsikt</h2>
+                <p className="text-gray-600 mb-6">
+                  Oppdagelser og analyser av navnetrender i Norge de siste årene.
+                </p>
+                
+                <div className="space-y-8">
+                  <div>
+                    <h3 className="text-xl font-medium mb-3">Popularitetsendringer over tid</h3>
+                    <p className="text-gray-600 mb-4">
+                      Se hvordan populariteten til de mest populære jentenavnene har utviklet seg fra 2013 til 2024.
+                    </p>
+                    <PopularityTrends />
+                  </div>
+                  
+                  <Separator />
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <TrendingNamesCard type="rising" />
+                    <TrendingNamesCard type="falling" />
+                  </div>
+                </div>
+              </Card>
+            </TabsContent>
+          </Tabs>
           
-          <div className="grid gap-8">
-            <NameTrendsChart />
+          <div className="mt-6 text-sm text-gray-500">
+            <p>Kilde: Statistisk sentralbyrå (SSB), 2024</p>
           </div>
         </div>
       </main>
-      <Footer />
-    </div>
+    </Layout>
   );
 };
 

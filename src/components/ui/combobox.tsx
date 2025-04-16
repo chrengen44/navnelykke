@@ -27,7 +27,7 @@ interface ComboboxProps {
 }
 
 export function Combobox({
-  items = [], // Provide default empty array
+  items = [], // Always default to an empty array
   placeholder = "Velg...",
   onSelect,
   className,
@@ -35,8 +35,16 @@ export function Combobox({
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState("")
 
-  // Ensure items is always an array
-  const safeItems = Array.isArray(items) ? items : [];
+  // Ensure items is always defined with an empty array fallback
+  // This is crucial to prevent "undefined is not iterable" errors
+  const safeItems = React.useMemo(() => {
+    return Array.isArray(items) ? items : [];
+  }, [items]);
+
+  // Find the selected item or return undefined
+  const selectedItem = React.useMemo(() => {
+    return value ? safeItems.find((item) => item.value === value) : undefined;
+  }, [value, safeItems]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -47,9 +55,7 @@ export function Combobox({
           aria-expanded={open}
           className={cn("justify-between", className)}
         >
-          {value
-            ? safeItems.find((item) => item.value === value)?.label || placeholder
-            : placeholder}
+          {selectedItem?.label || placeholder}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>

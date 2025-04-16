@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Combobox } from '@/components/ui/combobox';
@@ -23,6 +22,12 @@ const availableNames = [
   'Leah', 'Ingrid', 'Sara', 'Ida', 'Anna', 'Eva', 'Mia', 'Thea', 'Amalie', 'Frida',
   'Julie', 'Linnea', 'Sigrid', 'Mathilde', 'Aurora', 'Astrid', 'Maria', 'Tuva', 'Tiril'
 ].sort();
+
+// Colors for the chart lines
+const COLORS = [
+  "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF",
+  "#FF9F40", "#8AC926", "#1982C4", "#6A4C93", "#F15BB5"
+];
 
 // Sample trend dataset
 const generateSampleData = (): NameTrendData[] => {
@@ -61,12 +66,6 @@ const generateSampleData = (): NameTrendData[] => {
   });
 };
 
-// Colors for the chart lines
-const COLORS = [
-  "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF",
-  "#FF9F40", "#8AC926", "#1982C4", "#6A4C93", "#F15BB5"
-];
-
 const NameTrendExplorer = () => {
   const [selectedNames, setSelectedNames] = useState<string[]>([]);
   const [chartData, setChartData] = useState<NameTrendData[]>([]);
@@ -92,8 +91,8 @@ const NameTrendExplorer = () => {
   }, []);
   
   const handleSelectName = (name: string) => {
-    if (selectedNames.includes(name)) {
-      return; // Name already selected
+    if (!name || selectedNames.includes(name)) {
+      return; // Name already selected or undefined
     }
     
     if (selectedNames.length >= 5) {
@@ -101,15 +100,16 @@ const NameTrendExplorer = () => {
       return;
     }
     
-    setSelectedNames([...selectedNames, name]);
+    setSelectedNames(prev => [...prev, name]);
   };
   
   const handleRemoveName = (name: string) => {
     setSelectedNames(selectedNames.filter(n => n !== name));
   };
   
-  // Format options for the combobox - ensure we always return an array even if the filter returns nothing
+  // Format options for the combobox - ensure we always return a valid array
   const nameOptions = React.useMemo(() => {
+    // Filter out already selected names
     return availableNames
       .filter(name => !selectedNames.includes(name))
       .map(name => ({
@@ -118,16 +118,12 @@ const NameTrendExplorer = () => {
       }));
   }, [selectedNames]);
   
-  // Initialize with empty array to prevent any race conditions
-  const safeNameOptions = nameOptions || [];
-  
   return (
     <div className="space-y-6">
       <div className="space-y-2">
         <div className="flex flex-col md:flex-row md:items-center gap-4">
-          {/* Ensure the Combobox always has a valid array with proper props */}
           <Combobox
-            items={safeNameOptions}
+            items={nameOptions}
             placeholder="Søk etter jentenavn..."
             onSelect={handleSelectName}
             className="max-w-[300px]"

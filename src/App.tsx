@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +20,7 @@ import NameTrends from "./pages/NameTrends";
 import OriginNames from "./pages/OriginNames";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import PrivacyPolicy from "./components/PrivacyPolicy";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +48,7 @@ export default function App() {
               <Route path="/opprinnelse/:origin" element={<OriginNames />} />
               <Route path="/om-navnelykke" element={<About />} />
               <Route path="/kontakt-oss" element={<Contact />} />
+              <Route path="/personvern" element={<PrivacyPolicy />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

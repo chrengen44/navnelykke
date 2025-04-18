@@ -21,6 +21,7 @@ import OriginNames from "./pages/OriginNames";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./components/PrivacyPolicy";
+import NameTrendTest from './components/NameTrendTest';
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ export default function App() {
               <Route path="/om-navnelykke" element={<About />} />
               <Route path="/kontakt-oss" element={<Contact />} />
               <Route path="/personvern" element={<PrivacyPolicy />} />
+              <Route path="/test" element={<NameTrendTest />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
 
 // Interface for name trend data
@@ -8,18 +7,42 @@ export interface NameTrendData {
   [name: string]: number | string;
 }
 
+interface SSBResponse {
+  value: number[];
+  dimension: {
+    Tid: {
+      category: {
+        label: { [key: string]: string };
+      };
+    };
+    Fornavn: {
+      category: {
+        label: { [key: string]: string };
+      };
+    };
+  };
+}
+
+interface RankingData {
+  year: string;
+  [key: string]: string | number;
+}
+
 // Hook to fetch name trend data from SSB API
 export const useNameTrendData = (gender: 'girl' | 'boy', namesToFetch: string[]) => {
   const [chartData, setChartData] = useState<NameTrendData[]>([]);
-  const [rankingData, setRankingData] = useState<any[]>([]);
+  const [rankingData, setRankingData] = useState<RankingData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Memoize the names array to prevent unnecessary re-renders
+  const memoizedNames = useMemo(() => namesToFetch, [JSON.stringify(namesToFetch)]);
+
   // Generate yearly rank data from chart data
-  const generateRankData = (data: NameTrendData[]) => {
+  const generateRankData = (data: NameTrendData[]): RankingData[] => {
     return data.map(yearData => {
-      const yearRanks: any = { year: yearData.year };
-      const names = Object.keys(yearData).filter(key => key !== 'year');
+      const yearRanks: RankingData = { year: yearData.year };
+      const names = namesToFetch; // Use the original names
       const nameValues = names.map(name => ({
         name,
         value: Number(yearData[name])
@@ -47,6 +70,9 @@ export const useNameTrendData = (gender: 'girl' | 'boy', namesToFetch: string[])
       setError(null);
       
       try {
+        // Log the API request
+        console.log('Fetching name data from SSB API for:', memoizedNames);
+        
         const response = await fetch('https://data.ssb.no/api/v0/no/table/10467', {
           method: 'POST',
           headers: {
@@ -55,17 +81,24 @@ export const useNameTrendData = (gender: 'girl' | 'boy', namesToFetch: string[])
           body: JSON.stringify({
             "query": [
               {
-                "code": "Navn",
+                "code": "Fornavn",
                 "selection": {
-                  "filter": "item",
-                  "values": namesToFetch
+                  "filter": gender === 'boy' ? "vs:NavnGutter02" : "vs:NavnJenter02",
+                  "values": memoizedNames.map(name => (gender === 'boy' ? '2' : '1') + name.toUpperCase())
                 }
               },
               {
                 "code": "ContentsCode",
                 "selection": {
                   "filter": "item",
-                  "values": ["Antall"]
+                  "values": ["Personer"]
+                }
+              },
+              {
+                "code": "Tid",
+                "selection": {
+                  "filter": "item",
+                  "values": ["2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024"]
                 }
               }
             ],
@@ -76,23 +109,50 @@ export const useNameTrendData = (gender: 'girl' | 'boy', namesToFetch: string[])
         });
         
         if (!response.ok) {
-          throw new Error(`API error: ${response.status}`);
+          const errorText = await response.text();
+          console.error('SSB API Error:', {
+            status: response.status,
+            statusText: response.statusText,
+            error: errorText
+          });
+          throw new Error(`SSB API error: ${response.status} - ${errorText}`);
         }
         
-        const result = await response.json();
+        const result: SSBResponse = await response.json();
         
-        const years = result.dimension.År.category.label;
-        const names = result.dimension.Navn.category.label;
+        // Log successful response
+        console.log('SSB API Response:', {
+          years: result.dimension.Tid.category.label,
+          names: result.dimension.Fornavn.category.label,
+          values: result.value
+        });
+        
+        const years = result.dimension.Tid.category.label;
+        const names = result.dimension.Fornavn.category.label;
         const values = result.value;
         
         const formattedData: NameTrendData[] = Object.keys(years).map(yearKey => {
           const yearData: NameTrendData = { year: years[yearKey] };
           
+          // Map the API response names to our input names
+          const nameMapping = Object.keys(names).reduce((acc, nameKey) => {
+            const apiName = names[nameKey];
+            const originalName = namesToFetch.find(name => 
+              (gender === 'boy' ? '2' : '1') + name.toUpperCase() === apiName
+            );
+            if (originalName) {
+              acc[nameKey] = originalName;
+            }
+            return acc;
+          }, {} as { [key: string]: string });
+          
           Object.keys(names).forEach((nameKey, nameIndex) => {
-            const name = names[nameKey];
-            const yearIndex = Object.keys(years).indexOf(yearKey);
-            const valueIndex = yearIndex * Object.keys(names).length + nameIndex;
-            yearData[name] = values[valueIndex] || 0;
+            const originalName = nameMapping[nameKey];
+            if (originalName) {
+              const yearIndex = Object.keys(years).indexOf(yearKey);
+              const valueIndex = yearIndex * Object.keys(names).length + nameIndex;
+              yearData[originalName] = values[valueIndex] || 0;
+            }
           });
           
           return yearData;
@@ -102,7 +162,7 @@ export const useNameTrendData = (gender: 'girl' | 'boy', namesToFetch: string[])
         setRankingData(generateRankData(formattedData));
       } catch (err) {
         console.error('Error fetching name trend data:', err);
-        setError(`Kunne ikke hente navnedata fra SSB.`);
+        setError(`Kunne ikke hente navnedata fra SSB. ${err instanceof Error ? err.message : 'Ukjent feil'}`);
         
         // Use fallback data based on gender
         if (gender === 'girl') {
@@ -116,7 +176,7 @@ export const useNameTrendData = (gender: 'girl' | 'boy', namesToFetch: string[])
     };
     
     fetchNameData();
-  }, [gender, namesToFetch]);
+  }, [gender, memoizedNames, namesToFetch]);
 
   const setFallbackGirlData = () => {
     // Fallback girl data if API fails

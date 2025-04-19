@@ -3,26 +3,100 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { babyNames } from "@/data";
 import { BabyName } from "@/data/types";
+import { supabase } from "@/integrations/supabase/client";
 
 const NameOfTheDay: React.FC = () => {
   const [todaysName, setTodaysName] = useState<BabyName | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get a deterministic "random" name based on the current date
-    // This ensures the same name shows for everyone on the same day
-    const now = new Date();
-    const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
-    const nameIndex = dayOfYear % babyNames.length;
-    setTodaysName(babyNames[nameIndex]);
+    const fetchNameOfTheDay = async () => {
+      try {
+        setLoading(true);
+        // Get a deterministic "random" name based on the current date
+        const now = new Date();
+        const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+
+        // Fetch total count of names to use for deterministic selection
+        const { count, error: countError } = await supabase
+          .from('baby_names')
+          .select('id', { count: 'exact' });
+
+        if (countError || !count) {
+          console.error('Error fetching name count:', countError);
+          return;
+        }
+
+        // Use day of year to deterministically select a name ID
+        const nameIndex = dayOfYear % count;
+
+        // Fetch the name with categories
+        const { data, error } = await supabase
+          .from('baby_names')
+          .select(`
+            id, 
+            name, 
+            gender, 
+            origin, 
+            meaning, 
+            popularity, 
+            length, 
+            first_letter,
+            name_category_mappings (
+              name_categories (name)
+            )
+          `)
+          .order('id')
+          .range(nameIndex, nameIndex)
+          .single();
+
+        if (error) {
+          console.error('Error fetching name of the day:', error);
+          return;
+        }
+
+        // Transform the data to match BabyName interface
+        const transformedName: BabyName = {
+          id: data.id,
+          name: data.name,
+          gender: data.gender as 'boy' | 'girl' | 'unisex',
+          origin: data.origin,
+          meaning: data.meaning,
+          popularity: data.popularity,
+          length: data.length as 'short' | 'medium' | 'long',
+          firstLetter: data.first_letter,
+          categories: data.name_category_mappings.map(
+            (mapping: any) => mapping.name_categories.name
+          )
+        };
+
+        setTodaysName(transformedName);
+      } catch (error) {
+        console.error('Unexpected error fetching name of the day:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNameOfTheDay();
   }, []);
 
-  if (!todaysName) {
+  if (loading) {
     return (
       <Card className="bg-white shadow-sm border-0">
         <CardContent className="p-6 flex items-center justify-center h-40">
           <div className="animate-pulse rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!todaysName) {
+    return (
+      <Card className="bg-white shadow-sm border-0">
+        <CardContent className="p-6 text-center text-gray-600">
+          Ingen navn funnet for dagen
         </CardContent>
       </Card>
     );

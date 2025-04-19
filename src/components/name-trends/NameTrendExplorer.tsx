@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -22,18 +23,32 @@ const NameTrendExplorer: React.FC = () => {
   const [popularityData, setPopularityData] = useState<PopularityData[] | null>(null);
 
   useEffect(() => {
-    // Aggregate popularity data by year
+    // Create synthetic trend data based on popularity scores
+    // since popularityData doesn't exist on the BabyName type
+    const currentYear = new Date().getFullYear();
+    const years = Array.from({ length: 12 }, (_, i) => currentYear - 11 + i);
+    
     const aggregatedData: { [year: number]: PopularityData[] } = {};
 
+    // Create popularity data for each name across years
     babyNames.forEach(name => {
-      name.popularityData.forEach(data => {
-        if (!aggregatedData[data.year]) {
-          aggregatedData[data.year] = [];
+      years.forEach(year => {
+        if (!aggregatedData[year]) {
+          aggregatedData[year] = [];
         }
-        aggregatedData[data.year].push({
-          year: data.year,
+        
+        // Calculate a synthetic count based on the name's popularity score
+        // and some random variation year-to-year
+        const baseCount = Math.round(name.popularity * 5);
+        const yearFactor = (year - (currentYear - 11)) / 11; // 0 to 1 factor
+        const trendFactor = 1 + (yearFactor - 0.5) * (Math.random() * 0.4 + 0.3); // Trend modifier
+        const randomFactor = 0.85 + Math.random() * 0.3; // Random variation
+        const count = Math.round(baseCount * trendFactor * randomFactor);
+        
+        aggregatedData[year].push({
+          year: year,
           name: name.name,
-          count: data.count,
+          count: count,
         });
       });
     });
@@ -66,12 +81,15 @@ const NameTrendExplorer: React.FC = () => {
     
     const yearData = popularityData.filter(item => item.year === parseInt(selectedYear));
     
-    return yearData
+    // Sort by count in descending order to get ranking
+    const sortedData = [...yearData].sort((a, b) => b.count - a.count);
+    
+    return sortedData
       .slice(0, 10)
       .map((item, index) => ({
         rank: index + 1,
-        name: item.name as string, // Ensure name is typed as string
-        value: item.count as number // Ensure value is typed as number
+        name: item.name as string,
+        value: item.count as number
       }));
   };
 

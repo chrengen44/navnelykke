@@ -1,4 +1,3 @@
-
 export interface BabyName {
   id: number;
   name: string;
@@ -9,6 +8,7 @@ export interface BabyName {
   length: 'short' | 'medium' | 'long';
   categories: string[];
   firstLetter: string;
+  popularityData?: { year: number; count: number }[]; // Add this optional property
 }
 
 export interface NameCategory {

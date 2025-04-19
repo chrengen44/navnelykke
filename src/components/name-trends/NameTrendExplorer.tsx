@@ -1,116 +1,122 @@
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { babyNames } from '@/data';
 
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import PopularityRanking from './PopularityRanking';
-import TimelineChart from './TimelineChart';
-import { useNameTrendData } from '@/hooks/useNameTrendData';
-import { boyNames, girlNames, years } from './nameTrendConstants';
+interface RankingItem {
+  rank: number;
+  name: string;
+  value: number;
+}
 
-const NameTrendExplorer = () => {
-  const [selectedYear, setSelectedYear] = useState<string>("2024");
-  const [activeTab, setActiveTab] = useState<string>("popularity");
-  const [gender, setGender] = useState<string>("girl");
-  
-  // Use the hook for each gender type
-  const girlNamesToFetch = girlNames.slice(0, 20); // Limit to avoid large payload
-  const boyNamesToFetch = boyNames.slice(0, 20);
-  
-  const {
-    chartData: girlChartData,
-    rankingData: girlRankingData,
-    loading: girlLoading,
-    error: girlError
-  } = useNameTrendData('girl', girlNamesToFetch);
-  
-  const {
-    chartData: boyChartData,
-    rankingData: boyRankingData,
-    loading: boyLoading,
-    error: boyError
-  } = useNameTrendData('boy', boyNamesToFetch);
+interface PopularityData {
+  year: number;
+  name: string;
+  count: number;
+}
 
-  // Find data for selected year based on gender
-  const selectedYearData = gender === "girl" 
-    ? girlRankingData.find(item => item.year === selectedYear)
-    : boyRankingData.find(item => item.year === selectedYear);
-  
-  // Extract the top 10 names for the selected year
-  const top10ForSelectedYear = selectedYearData 
-    ? Array.from({length: 10}, (_, i) => ({
-        rank: i + 1,
-        name: selectedYearData[`#${i + 1}`],
-        value: selectedYearData[`${selectedYearData[`#${i + 1}`]}_value`],
-      }))
-    : [];
+const NameTrendExplorer: React.FC = () => {
+  const [selectedYear, setSelectedYear] = useState<string | undefined>(undefined);
+  const [rankingData, setRankingData] = useState<RankingItem[]>([]);
+  const [popularityData, setPopularityData] = useState<PopularityData[] | null>(null);
 
-  // Select the appropriate data for popularity over time chart
-  const popularityOverTimeData = gender === "girl"
-    ? ["Emma", "Nora", "Olivia", "Sofia", "Ella"].map(name => {
-        return {
-          name,
-          data: girlChartData.map(yearData => ({
-            year: yearData.year,
-            value: yearData[name] as number
-          }))
-        };
-      })
-    : ["William", "Noah", "Oliver", "Elias", "Aksel"].map(name => {
-        return {
-          name,
-          data: boyChartData.map(yearData => ({
-            year: yearData.year,
-            value: yearData[name] as number
-          }))
-        };
+  useEffect(() => {
+    // Aggregate popularity data by year
+    const aggregatedData: { [year: number]: PopularityData[] } = {};
+
+    babyNames.forEach(name => {
+      name.popularityData.forEach(data => {
+        if (!aggregatedData[data.year]) {
+          aggregatedData[data.year] = [];
+        }
+        aggregatedData[data.year].push({
+          year: data.year,
+          name: name.name,
+          count: data.count,
+        });
       });
+    });
 
-  const loading = gender === "girl" ? girlLoading : boyLoading;
+    // Convert aggregated data to array
+    const dataArray: PopularityData[] = [];
+    Object.keys(aggregatedData).forEach(year => {
+      dataArray.push(...aggregatedData[parseInt(year)]);
+    });
+
+    setPopularityData(dataArray);
+  }, []);
+
+  useEffect(() => {
+    // Load initial ranking data for the latest year
+    if (popularityData) {
+      const latestYear = Math.max(...popularityData.map(item => item.year));
+      setSelectedYear(latestYear.toString());
+    }
+  }, [popularityData]);
+
+  useEffect(() => {
+    // Update ranking data when selected year changes
+    const formattedData = formatRankingData();
+    setRankingData(formattedData);
+  }, [selectedYear]);
+
+  const formatRankingData = () => {
+    if (!selectedYear || !popularityData) return [];
+    
+    const yearData = popularityData.filter(item => item.year === parseInt(selectedYear));
+    
+    return yearData
+      .slice(0, 10)
+      .map((item, index) => ({
+        rank: index + 1,
+        name: item.name as string, // Ensure name is typed as string
+        value: item.count as number // Ensure value is typed as number
+      }));
+  };
+
+  const availableYears = () => {
+    if (!popularityData) return [];
+    const years = [...new Set(popularityData.map(item => item.year))];
+    return years.sort((a, b) => b - a);
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Velg kjønn</h3>
-        <ToggleGroup type="single" value={gender} onValueChange={(value) => value && setGender(value)}>
-          <ToggleGroupItem value="girl" aria-label="Jentenavn">
-            Jentenavn
-          </ToggleGroupItem>
-          <ToggleGroupItem value="boy" aria-label="Guttenavn">
-            Guttenavn
-          </ToggleGroupItem>
-        </ToggleGroup>
-      </div>
-      
-      <Tabs 
-        value={activeTab} 
-        onValueChange={setActiveTab} 
-        className="w-full"
-      >
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="popularity">Popularitetsrangering</TabsTrigger>
-          <TabsTrigger value="timeline">Popularitet over tid</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="popularity" className="space-y-4">
-          <PopularityRanking 
-            selectedYear={selectedYear}
-            setSelectedYear={setSelectedYear}
-            years={years}
-            loading={loading}
-            top10ForSelectedYear={top10ForSelectedYear}
-            gender={gender}
-          />
-        </TabsContent>
-        
-        <TabsContent value="timeline">
-          <TimelineChart 
-            loading={loading}
-            popularityOverTimeData={popularityOverTimeData}
-            gender={gender}
-          />
-        </TabsContent>
-      </Tabs>
-    </div>
+    <Card className="bg-white">
+      <CardContent className="p-6">
+        <h2 className="text-2xl font-semibold mb-4">Navnetrender</h2>
+        <p className="text-gray-600 mb-4">
+          Utforsk populariteten til forskjellige navn over tid.
+        </p>
+
+        <Select onValueChange={setSelectedYear} defaultValue={selectedYear}>
+          <SelectTrigger className="w-full mb-4">
+            <SelectValue placeholder="Velg et år" />
+          </SelectTrigger>
+          <SelectContent>
+            {availableYears().map(year => (
+              <SelectItem key={year} value={year.toString()}>
+                {year}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {rankingData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={rankingData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="value" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <p className="text-gray-500">Ingen data tilgjengelig for valgt år.</p>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

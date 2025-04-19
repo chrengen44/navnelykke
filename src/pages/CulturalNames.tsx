@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import Layout from "@/components/Layout";
+import { Layout } from "@/components/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { getBiblicalNames, getChristianNames, getJewishNames } from "@/data/religiousNames";

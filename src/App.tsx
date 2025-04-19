@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,6 +23,8 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./components/PrivacyPolicy";
 import NameTrendTest from './components/NameTrendTest';
+import Tools from './pages/Tools';
+import CulturalNames from './pages/CulturalNames';
 
 const queryClient = new QueryClient();
 
@@ -51,6 +54,8 @@ export default function App() {
               <Route path="/kontakt-oss" element={<Contact />} />
               <Route path="/personvern" element={<PrivacyPolicy />} />
               <Route path="/test" element={<NameTrendTest />} />
+              <Route path="/verktoy" element={<Tools />} />
+              <Route path="/kulturelle-navn" element={<CulturalNames />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

@@ -8,6 +8,9 @@ import FeaturedSection from "@/components/FeaturedSection";
 import CategoryCard from "@/components/CategoryCard";
 import AdSpace from "@/components/AdSpace";
 import { BabyName } from "@/data/types";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import NameOfTheDay from "@/components/NameOfTheDay";
 
 const Index: React.FC = () => {
   const [popularBoyNames, setPopularBoyNames] = useState<BabyName[]>([]);
@@ -43,6 +46,61 @@ const Index: React.FC = () => {
       <Header />
       <main className="flex-grow">
         <Hero />
+        
+        {/* New tools and name of day section */}
+        <section className="py-6">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-2">
+                <div className="bg-white p-6 rounded-lg shadow-sm mb-4">
+                  <h2 className="text-2xl font-bold mb-3">Navneverktøy</h2>
+                  <p className="text-gray-600 mb-4">
+                    Sjekk ut våre nye verktøy som hjelper deg med å finne det perfekte navnet
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="p-4 border rounded-md">
+                      <h3 className="font-semibold mb-2">Navnekombinator</h3>
+                      <p className="text-sm text-gray-600 mb-3">
+                        Kombiner to navn for å skape et unikt navn
+                      </p>
+                      <Button asChild size="sm" variant="outline" className="w-full">
+                        <Link to="/verktoy">Prøv nå</Link>
+                      </Button>
+                    </div>
+                    <div className="p-4 border rounded-md">
+                      <h3 className="font-semibold mb-2">Navnequiz</h3>
+                      <p className="text-sm text-gray-600 mb-3">
+                        Finn navn som passer din stil og preferanser
+                      </p>
+                      <Button asChild size="sm" variant="outline" className="w-full">
+                        <Link to="/verktoy?tab=quiz">Start quiz</Link>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="mt-4 text-center">
+                    <Button asChild variant="link">
+                      <Link to="/verktoy">Se alle navneverktøy</Link>
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="bg-white p-6 rounded-lg shadow-sm">
+                  <h2 className="text-2xl font-bold mb-3">Kulturelle navn</h2>
+                  <p className="text-gray-600 mb-4">
+                    Utforsk navn fra forskjellige kulturer og religiøse tradisjoner
+                  </p>
+                  <Button asChild className="w-full">
+                    <Link to="/kulturelle-navn">Se kulturelle og religiøse navn</Link>
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="md:col-span-1">
+                <NameOfTheDay />
+              </div>
+            </div>
+          </div>
+        </section>
         
         {/* Categories */}
         <section className="py-12">

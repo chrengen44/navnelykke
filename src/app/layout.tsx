@@ -1,11 +1,10 @@
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import ConsentBannerWrapper from "@/components/ConsentBannerWrapper";
 import AdSenseScript from "@/components/AdSenseScript";
-
-console.log('Loading RootLayout');
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +18,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  console.log('RootLayout rendered');
   return (
     <html lang="no" suppressHydrationWarning>
       <head>
@@ -40,4 +38,4 @@ export default function RootLayout({
       </body>
     </html>
   );
-} 
+}

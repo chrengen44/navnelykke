@@ -25,49 +25,42 @@ import PrivacyPolicy from "./components/PrivacyPolicy";
 import NameTrendTest from './components/NameTrendTest';
 import Tools from './pages/Tools';
 import CulturalNames from './pages/CulturalNames';
-import ConsentBannerWrapper from "./components/ConsentBannerWrapper";
-import AdSenseScript from "./components/AdSenseScript";
-import { ThemeProvider } from "./components/theme-provider";
 
 const queryClient = new QueryClient();
 
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="system" disableTransitionOnChange>
-        <TooltipProvider>
-          <FavoritesProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/navn/:id" element={<NameDetail />} />
-                <Route path="/populære-navn" element={<PopularNames />} />
-                <Route path="/navnetrender" element={<NameTrends />} />
-                <Route path="/kategorier" element={<Categories />} />
-                <Route path="/kategori/:categoryId" element={<Category />} />
-                <Route path="/favoritter" element={<Favorites />} />
-                <Route path="/inspirasjon" element={<Inspiration />} />
-                <Route path="/søk" element={<Search />} />
-                <Route path="/foresla-navn" element={<SuggestName />} />
-                <Route path="/profil" element={<Profile />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/opprinnelse/:origin" element={<OriginNames />} />
-                <Route path="/om-navnelykke" element={<About />} />
-                <Route path="/kontakt-oss" element={<Contact />} />
-                <Route path="/personvern" element={<PrivacyPolicy />} />
-                <Route path="/test" element={<NameTrendTest />} />
-                <Route path="/verktoy" element={<Tools />} />
-                <Route path="/kulturelle-navn" element={<CulturalNames />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-            <ConsentBannerWrapper />
-            <AdSenseScript />
-          </FavoritesProvider>
-        </TooltipProvider>
-      </ThemeProvider>
+      <TooltipProvider>
+        <FavoritesProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/navn/:id" element={<NameDetail />} />
+              <Route path="/populære-navn" element={<PopularNames />} />
+              <Route path="/navnetrender" element={<NameTrends />} />
+              <Route path="/kategorier" element={<Categories />} />
+              <Route path="/kategori/:categoryId" element={<Category />} />
+              <Route path="/favoritter" element={<Favorites />} />
+              <Route path="/inspirasjon" element={<Inspiration />} />
+              <Route path="/søk" element={<Search />} />
+              <Route path="/foresla-navn" element={<SuggestName />} />
+              <Route path="/profil" element={<Profile />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/opprinnelse/:origin" element={<OriginNames />} />
+              <Route path="/om-navnelykke" element={<About />} />
+              <Route path="/kontakt-oss" element={<Contact />} />
+              <Route path="/personvern" element={<PrivacyPolicy />} />
+              <Route path="/test" element={<NameTrendTest />} />
+              <Route path="/verktoy" element={<Tools />} />
+              <Route path="/kulturelle-navn" element={<CulturalNames />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </FavoritesProvider>
+      </TooltipProvider>
     </QueryClientProvider>
   );
 }

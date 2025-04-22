@@ -1,16 +1,18 @@
+
 import React, { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
-import { nameCategories, getPopularNames, getNamesByCategory } from "@/data";
-import FeaturedSection from "@/components/FeaturedSection";
-import CategoryCard from "@/components/CategoryCard";
+import { getPopularNames, getNamesByCategory } from "@/data";
 import AdSpace from "@/components/AdSpace";
 import { BabyName } from "@/data/types";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import NameOfTheDay from "@/components/NameOfTheDay";
-import { Wrench, Gavel, CalendarDays, ChevronRight } from "lucide-react";
+
+// Import new section components
+import ToolsSection from "@/components/sections/ToolsSection";
+import NameOfTheDaySection from "@/components/sections/NameOfTheDaySection";
+import CategoriesSection from "@/components/sections/CategoriesSection";
+import FeaturedNamesSection from "@/components/sections/FeaturedNamesSection";
+import NameTipsSection from "@/components/sections/NameTipsSection";
 
 const Index: React.FC = () => {
   const [popularBoyNames, setPopularBoyNames] = useState<BabyName[]>([]);
@@ -46,192 +48,23 @@ const Index: React.FC = () => {
       <Header />
       <main className="flex-grow">
         <Hero />
-        
-        {/* Tools Section */}
-        <section className="py-12 bg-gradient-to-b from-white to-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="mb-8 text-center">
-              <h2 className="text-2xl md:text-3xl font-bold mb-3">Navneverktøy</h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Utforsk våre interaktive verktøy for å finne det perfekte navnet
-              </p>
-            </div>
-            
-            <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
-              <div className="p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-pink-50 rounded-lg">
-                    <Wrench className="h-6 w-6 text-pink-500" />
-                  </div>
-                  <h2 className="text-2xl font-bold">Navneverktøy</h2>
-                </div>
-                <p className="text-gray-600 mb-6">
-                  Sjekk ut våre nye verktøy som hjelper deg med å finne det perfekte navnet
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="bg-gray-50 rounded-lg p-5 hover:bg-gray-100 transition-colors">
-                    <h3 className="font-semibold mb-2">Navnekombinator</h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Kombiner to navn for å skape et unikt navn
-                    </p>
-                    <Button asChild size="sm" variant="outline" className="w-full">
-                      <Link to="/verktoy">Prøv nå</Link>
-                    </Button>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-5 hover:bg-gray-100 transition-colors">
-                    <h3 className="font-semibold mb-2">Navnequiz</h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Finn navn som passer din stil og preferanser
-                    </p>
-                    <Button asChild size="sm" variant="outline" className="w-full">
-                      <Link to="/verktoy?tab=quiz">Start quiz</Link>
-                    </Button>
-                  </div>
-                </div>
-              </div>
-              <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
-                <Button asChild variant="link" className="w-full justify-center">
-                  <Link to="/verktoy" className="flex items-center gap-2">
-                    Se alle navneverktøy
-                    <ChevronRight className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Name of the Day Section */}
-        <section className="py-12 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="mb-8 text-center">
-              <h2 className="text-2xl md:text-3xl font-bold mb-3">Dagens navn</h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Utforsk dagens utvalgte navn og dets betydning
-              </p>
-            </div>
-            
-            <div className="max-w-2xl mx-auto">
-              <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
-                <div className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-purple-50 rounded-lg">
-                      <CalendarDays className="h-6 w-6 text-purple-500" />
-                    </div>
-                    <h2 className="text-2xl font-bold">Dagens navn</h2>
-                  </div>
-                  <NameOfTheDay />
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-        
-        {/* Categories */}
-        <section className="py-12">
-          <div className="container mx-auto px-4">
-            <div className="mb-8 text-center">
-              <h2 className="text-2xl md:text-3xl font-bold mb-3">Utforsk etter kategorier</h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Finn inspirasjon fra ulike typer navn og tradisjoner
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {/* Cultural Names Card */}
-              <CategoryCard
-                id="kulturelle-navn"
-                title="Kulturelle navn"
-                description="Utforsk navn fra forskjellige kulturer og religiøse tradisjoner"
-                icon="book"
-              />
-              {nameCategories.map((category) => (
-                <CategoryCard
-                  key={category.id}
-                  id={category.id}
-                  title={category.title}
-                  description={category.description}
-                  icon={category.icon}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
+        <ToolsSection />
+        <NameOfTheDaySection />
+        <CategoriesSection />
         
         {/* Ad Space */}
         <div className="container mx-auto px-4 py-4">
           <AdSpace type="horizontal" />
         </div>
         
-        {loading ? (
-          <div className="container mx-auto px-4 py-12 flex justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
-          </div>
-        ) : (
-          <>
-            {/* Featured Names for Boys */}
-            <FeaturedSection
-              title="Populære guttenavn"
-              description="Utforsk de mest populære guttenavnene i Norge akkurat nå"
-              names={popularBoyNames}
-              linkTo="/populære-navn?gender=boy"
-              backgroundClass="bg-babyblue/30"
-            />
-            
-            {/* Featured Names for Girls */}
-            <FeaturedSection
-              title="Populære jentenavn"
-              description="Utforsk de mest populære jentenavnene i Norge akkurat nå"
-              names={popularGirlNames}
-              linkTo="/populære-navn?gender=girl"
-              backgroundClass="bg-babypink/30"
-            />
-            
-            {/* Featured Viking Names */}
-            <FeaturedSection
-              title="Vikingnavn med historie"
-              description="Sterke og tradisjonelle nordiske navn fra vikingtiden"
-              names={vikingNames}
-              linkTo="/kategori/vikingnavn"
-              backgroundClass="bg-babypeach/30"
-            />
-          </>
-        )}
+        <FeaturedNamesSection
+          popularBoyNames={popularBoyNames}
+          popularGirlNames={popularGirlNames}
+          vikingNames={vikingNames}
+          loading={loading}
+        />
         
-        {/* Name Tips */}
-        <section className="py-12 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="mb-8 text-center">
-              <h2 className="text-2xl md:text-3xl font-bold mb-3">Tips for å velge det perfekte navnet</h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Noen råd til foreldre som leter etter det ideelle navnet til sitt barn
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-white p-6 rounded-lg shadow-sm">
-                <h3 className="text-xl font-semibold mb-3">Tenk på uttale og stavelse</h3>
-                <p className="text-gray-600">
-                  Vurder hvor enkelt navnet er å uttale og stave. Et navn som ofte mistolkes kan bli frustrerende for barnet.
-                </p>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg shadow-sm">
-                <h3 className="text-xl font-semibold mb-3">Utforsk betydningen</h3>
-                <p className="text-gray-600">
-                  Mange navn har spesielle betydninger eller historie bak seg. Et navn med en vakker eller meningsfull betydning kan være en fin gave.
-                </p>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg shadow-sm">
-                <h3 className="text-xl font-semibold mb-3">Test navnet</h3>
-                <p className="text-gray-600">
-                  Si navnet høyt. Hvordan høres det ut med etternavnet? Kan det forkortes til kallenavn? Tenk på hvordan det vil passe i ulike livsfaser.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
+        <NameTipsSection />
       </main>
       <Footer />
     </div>

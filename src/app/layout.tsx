@@ -1,7 +1,7 @@
 
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+import { Inter } from "@next/font/google";
+import "../index.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import ConsentBannerWrapper from "@/components/ConsentBannerWrapper";
 import AdSenseScript from "@/components/AdSenseScript";

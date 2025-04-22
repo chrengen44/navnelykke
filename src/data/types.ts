@@ -1,4 +1,11 @@
 
+export interface NameCategory {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+}
+
 export interface BabyName {
   id: number;
   name: string;
@@ -9,6 +16,6 @@ export interface BabyName {
   length: 'short' | 'medium' | 'long';
   categories: string[];
   firstLetter: string;
-  phonetic?: string; // New optional field
+  phonetic?: string; // Optional phonetic spelling
   popularityData?: { year: number; count: number }[];
 }

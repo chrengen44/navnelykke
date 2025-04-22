@@ -1,24 +1,26 @@
 
-// 'use client';
-
 import Script from "next/script";
+import { useEffect } from "react";
+
+declare global {
+  interface Window {
+    adsbygoogle?: any[];
+  }
+}
 
 const AdSenseScript = () => {
-  // Only show ads if consent is given
-  const canShowAds =
-    typeof window !== "undefined" && localStorage.getItem("consent") === "true";
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    }
+  }, []);
 
   return (
     <Script
-      id="adsense-script"
-      strategy="afterInteractive"
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3372507393637890"
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
       crossOrigin="anonymous"
-      onLoad={() => {
-        if (typeof window !== "undefined" && window.adsbygoogle && canShowAds) {
-          window.adsbygoogle.push({});
-        }
-      }}
+      strategy="afterInteractive"
     />
   );
 };

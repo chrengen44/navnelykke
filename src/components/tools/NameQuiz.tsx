@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { babyNames } from "@/data";
 import { BabyName } from "@/data/types";
-import { Check } from "lucide-react";
+import { Check, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface QuizQuestion {
@@ -23,7 +23,8 @@ const NameQuiz: React.FC = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [results, setResults] = useState<BabyName[]>([]);
   const [gender, setGender] = useState<string>("any");
-  
+  const [loading, setLoading] = useState(false);
+
   const questions: QuizQuestion[] = [
     {
       id: "nameLength",
@@ -79,61 +80,47 @@ const NameQuiz: React.FC = () => {
   const handleBack = () => {
     setCurrentStep(Math.max(0, currentStep - 1));
   };
-  
+
   const handleSubmit = () => {
-    // Filter names based on quiz answers
-    let filteredNames = [...babyNames];
-    
-    // Filter by gender
-    if (gender !== "any") {
-      filteredNames = filteredNames.filter(name => 
-        gender === "both" ? name.gender === "unisex" : name.gender === gender
-      );
-    }
-    
-    // Filter by name length
-    if (answers.nameLength && answers.nameLength !== "any") {
-      filteredNames = filteredNames.filter(name => name.length === answers.nameLength);
-    }
-    
-    // Filter by origin
-    if (answers.nameOrigin && answers.nameOrigin !== "any") {
-      filteredNames = filteredNames.filter(name => 
-        name.origin.includes(answers.nameOrigin)
-      );
-    }
-    
-    // Filter by style/category
-    if (answers.nameStyle && answers.nameStyle !== "any") {
-      filteredNames = filteredNames.filter(name => 
-        name.categories.includes(answers.nameStyle)
-      );
-    }
-    
-    // Additional category filters if selected
-    if (categories.length > 0) {
-      filteredNames = filteredNames.filter(name => 
-        categories.some(category => name.categories.includes(category))
-      );
-    }
-    
-    // Sort by popularity for better results
-    filteredNames.sort((a, b) => b.popularity - a.popularity);
-    
-    // Take top 12 results
-    const finalResults = filteredNames.slice(0, 12);
-    
-    setResults(finalResults);
-    
-    if (finalResults.length === 0) {
-      toast({
-        title: "Ingen treff",
-        description: "Prøv å justere kriteriene dine for å få flere resultater",
-      });
-    }
-    
-    // Move to results step
-    setCurrentStep(questions.length + 1);
+    setLoading(true);
+    setTimeout(() => {
+      // Filter names based on quiz answers
+      let filteredNames = [...babyNames];
+      if (gender !== "any") {
+        filteredNames = filteredNames.filter(name => 
+          gender === "both" ? name.gender === "unisex" : name.gender === gender
+        );
+      }
+      if (answers.nameLength && answers.nameLength !== "any") {
+        filteredNames = filteredNames.filter(name => name.length === answers.nameLength);
+      }
+      if (answers.nameOrigin && answers.nameOrigin !== "any") {
+        filteredNames = filteredNames.filter(name => 
+          name.origin.includes(answers.nameOrigin)
+        );
+      }
+      if (answers.nameStyle && answers.nameStyle !== "any") {
+        filteredNames = filteredNames.filter(name => 
+          name.categories.includes(answers.nameStyle)
+        );
+      }
+      if (categories.length > 0) {
+        filteredNames = filteredNames.filter(name => 
+          categories.some(category => name.categories.includes(category))
+        );
+      }
+      filteredNames.sort((a, b) => b.popularity - a.popularity);
+      const finalResults = filteredNames.slice(0, 12);
+      setResults(finalResults);
+      setLoading(false);
+      if (finalResults.length === 0) {
+        toast({
+          title: "Ingen treff",
+          description: "Prøv å justere kriteriene dine for å få flere resultater",
+        });
+      }
+      setCurrentStep(questions.length + 1);
+    }, 800);
   };
   
   const resetQuiz = () => {
@@ -142,19 +129,18 @@ const NameQuiz: React.FC = () => {
     setCategories([]);
     setResults([]);
     setGender("any");
+    setLoading(false);
   };
-  
+
   return (
-    <Card className="bg-white">
-      <CardContent className="p-6">
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold mb-4">Navnequiz</h2>
-          <p className="text-gray-600 mb-4">
+    <Card className="bg-white shadow-md border-0">
+      <CardContent className="p-6 md:p-8 flex flex-col gap-6">
+        <div>
+          <h2 className="text-2xl font-semibold mb-1">Navnequiz</h2>
+          <p className="text-gray-600 mb-2 text-sm">
             Svar på noen spørsmål for å finne navn som passer din stil og preferanser.
           </p>
-          
-          {/* Progress indicator */}
-          <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+          <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
             <div 
               className="bg-pink-500 h-2.5 rounded-full transition-all"
               style={{ 
@@ -165,9 +151,9 @@ const NameQuiz: React.FC = () => {
         </div>
         
         {currentStep === 0 && (
-          <div className="mb-6">
+          <div>
             <h3 className="text-lg font-medium mb-3">Velg kjønn</h3>
-            <RadioGroup value={gender} onValueChange={setGender} className="gap-3">
+            <RadioGroup value={gender} onValueChange={setGender} className="gap-3 flex flex-wrap">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="girl" id="girl" />
                 <Label htmlFor="girl">Jente</Label>
@@ -189,12 +175,12 @@ const NameQuiz: React.FC = () => {
         )}
         
         {currentStep > 0 && currentStep <= questions.length && (
-          <div className="mb-6">
+          <div>
             <h3 className="text-lg font-medium mb-3">{questions[currentStep - 1].question}</h3>
             <RadioGroup 
               value={answers[questions[currentStep - 1].id] || ""} 
               onValueChange={(value) => handleAnswerChange(questions[currentStep - 1].id, value)}
-              className="gap-3"
+              className="gap-3 flex flex-col"
             >
               {questions[currentStep - 1].options.map((option) => (
                 <div className="flex items-center space-x-2" key={option.value}>
@@ -207,7 +193,7 @@ const NameQuiz: React.FC = () => {
         )}
         
         {currentStep === questions.length && (
-          <div className="mb-6">
+          <div>
             <h3 className="text-lg font-medium mb-3">Ekstra kategorier (valgfritt)</h3>
             <p className="text-sm text-gray-500 mb-3">
               Velg ytterligere kategorier du er interessert i
@@ -258,34 +244,41 @@ const NameQuiz: React.FC = () => {
         )}
         
         {currentStep === questions.length + 1 && (
-          <div className="mb-6">
+          <div>
             <h3 className="text-lg font-medium mb-3">Dine navneforslag</h3>
-            
-            {results.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                {results.map((name) => (
-                  <div 
-                    key={name.id} 
-                    className="p-3 bg-gray-50 rounded-md text-center border border-gray-100 hover:bg-gray-100 transition-colors"
-                  >
-                    <div className="font-medium">{name.name}</div>
-                    <div className="text-xs text-gray-500">{name.origin}</div>
-                  </div>
-                ))}
+            {loading ? (
+              <div className="w-full py-10 flex flex-col items-center justify-center animate-fade-in">
+                <Loader className="w-10 h-10 text-pink-400 animate-spin mb-2" />
+                <span className="text-gray-400 text-sm">Laster forslag...</span>
               </div>
             ) : (
-              <div className="text-center py-6 text-gray-500">
-                Ingen navn funnet med disse kriteriene. Prøv å justere valgene dine.
-              </div>
+              results.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 animate-fade-in">
+                  {results.map((name) => (
+                    <div 
+                      key={name.id} 
+                      className="p-3 bg-gray-50 rounded-lg text-center border border-gray-100 hover:bg-pink-50 transition-colors shadow-sm flex flex-col min-h-[70px]"
+                    >
+                      <div className="font-medium text-pink-700 text-base">{name.name}</div>
+                      <div className="text-xs mt-1 text-gray-500 min-h-[28px] truncate" title={name.meaning}>
+                        {name.meaning}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6 text-gray-500">
+                  Ingen navn funnet med disse kriteriene. Prøv å justere valgene dine.
+                </div>
+              )
             )}
-            
             <Button onClick={resetQuiz} variant="outline" className="mt-4 w-full">
               Start på nytt
             </Button>
           </div>
         )}
-        
-        <div className="flex justify-between mt-6">
+
+        <div className="flex justify-between mt-2">
           {currentStep > 0 && currentStep <= questions.length + 1 && (
             <Button onClick={handleBack} variant="outline">
               Tilbake

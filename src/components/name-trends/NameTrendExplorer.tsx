@@ -44,14 +44,17 @@ const NameTrendExplorer = () => {
     ? ["Emma", "Nora", "Olivia", "Sofia", "Ella"]
     : ["William", "Noah", "Oliver", "Elias", "Aksel"];
 
-  const popularityOverTimeData = topNames.map(name => {
-    return {
-      name,
-      data: chartData.map(yearData => ({
-        year: yearData.year,
-        value: yearData[name] as number
-      }))
+  // Format data for TimelineChart
+  const timelineData = chartData.map(yearData => {
+    const dataPoint: { year: string; [key: string]: string | number } = {
+      year: yearData.year
     };
+    
+    topNames.forEach(name => {
+      dataPoint[name] = yearData[name] as number;
+    });
+    
+    return dataPoint;
   });
 
   return (
@@ -91,7 +94,7 @@ const NameTrendExplorer = () => {
         
         <TabsContent value="timeline" className="space-y-4">
           <TimelineChart 
-            popularityOverTimeData={popularityOverTimeData}
+            data={timelineData}
             loading={loading}
             gender={gender}
           />

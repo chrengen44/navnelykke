@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import MobileMenu from './MobileMenu';
@@ -25,6 +24,7 @@ const Header = () => {
           <Link to="/kategorier" className="text-gray-600 hover:text-pink-600">Kategorier</Link>
           <Link to="/inspirasjon" className="text-gray-600 hover:text-pink-600">Inspirasjon</Link>
           <Link to="/kontakt-oss" className="text-gray-600 hover:text-pink-600">Foreslå navn</Link>
+          <Link to="/social-features" className="text-gray-600 hover:text-pink-600">Navnefellesskapet</Link>
         </div>
 
         <div className="flex items-center gap-4">

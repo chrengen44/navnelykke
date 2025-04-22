@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,7 +12,7 @@ interface PopularityRankingProps {
     name: string;
     value: number;
   }[];
-  gender: string;
+  gender: 'girl' | 'boy';
 }
 
 const PopularityRanking = ({
@@ -28,7 +27,7 @@ const PopularityRanking = ({
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:justify-between gap-4 items-start sm:items-center">
         <h3 className="text-lg font-medium">
-          {gender === "girl" ? "Topp 10 jentenavn i Norge" : "Topp 10 guttenavn i Norge"}
+          Topp 10 {gender === 'girl' ? 'jentenavn' : 'guttenavn'} i Norge {selectedYear}
         </h3>
         
         <div className="flex flex-wrap gap-2">
@@ -66,10 +65,10 @@ const PopularityRanking = ({
               <div className="flex-1">
                 <h4 className="font-semibold">{item.name}</h4>
                 <p className="text-sm text-muted-foreground">
-                  {item.value} per 1000 fødte {gender === "girl" ? "jenter" : "gutter"}
+                  {item.value} {gender === 'girl' ? 'jenter' : 'gutter'}
                 </p>
               </div>
-              <div className="hidden sm:flex h-2 bg-muted rounded-full" style={{ width: `${Math.min(200, item.value * 3)}px` }}>
+              <div className="hidden sm:flex h-2 bg-muted rounded-full" style={{ width: `${Math.min(200, item.value * 0.3)}px` }}>
                 <div className="h-full bg-primary rounded-full" style={{ 
                   width: `${(item.value / (top10ForSelectedYear[0]?.value || 1)) * 100}%` 
                 }}></div>

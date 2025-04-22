@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -10,68 +9,56 @@ import { boyNames, girlNames, years } from './nameTrendConstants';
 const NameTrendExplorer = () => {
   const [selectedYear, setSelectedYear] = useState<string>("2024");
   const [activeTab, setActiveTab] = useState<string>("popularity");
-  const [gender, setGender] = useState<string>("girl");
+  const [gender, setGender] = useState<'girl' | 'boy'>('girl');
   
   // Use the hook for each gender type
-  const girlNamesToFetch = girlNames.slice(0, 20); // Limit to avoid large payload
-  const boyNamesToFetch = boyNames.slice(0, 20);
+  const namesToFetch = gender === 'girl' 
+    ? girlNames.slice(0, 50)
+    : boyNames.slice(0, 50);
   
   const {
-    chartData: girlChartData,
-    rankingData: girlRankingData,
-    loading: girlLoading,
-    error: girlError
-  } = useNameTrendData('girl', girlNamesToFetch);
-  
-  const {
-    chartData: boyChartData,
-    rankingData: boyRankingData,
-    loading: boyLoading,
-    error: boyError
-  } = useNameTrendData('boy', boyNamesToFetch);
+    chartData,
+    rankingData,
+    loading,
+    error
+  } = useNameTrendData(gender, namesToFetch);
 
-  // Find data for selected year based on gender
-  const selectedYearData = gender === "girl" 
-    ? girlRankingData.find(item => item.year === selectedYear)
-    : boyRankingData.find(item => item.year === selectedYear);
+  // Find data for selected year
+  const selectedYearData = rankingData.find(item => item.year === selectedYear);
   
   // Extract the top 10 names for the selected year
   const top10ForSelectedYear = selectedYearData 
-    ? Array.from({length: 10}, (_, i) => ({
-        rank: i + 1,
-        name: selectedYearData[`#${i + 1}`],
-        value: selectedYearData[`${selectedYearData[`#${i + 1}`]}_value`],
-      }))
+    ? Array.from({length: 10}, (_, i) => {
+        const name = selectedYearData[`#${i + 1}`] as string;
+        const value = selectedYearData[`${name}_value`] as number;
+        return {
+          rank: i + 1,
+          name,
+          value
+        };
+      })
     : [];
 
   // Select the appropriate data for popularity over time chart
-  const popularityOverTimeData = gender === "girl"
-    ? ["Emma", "Nora", "Olivia", "Sofia", "Ella"].map(name => {
-        return {
-          name,
-          data: girlChartData.map(yearData => ({
-            year: yearData.year,
-            value: yearData[name] as number
-          }))
-        };
-      })
-    : ["William", "Noah", "Oliver", "Elias", "Aksel"].map(name => {
-        return {
-          name,
-          data: boyChartData.map(yearData => ({
-            year: yearData.year,
-            value: yearData[name] as number
-          }))
-        };
-      });
+  const topNames = gender === 'girl' 
+    ? ["Emma", "Nora", "Olivia", "Sofia", "Ella"]
+    : ["William", "Noah", "Oliver", "Elias", "Aksel"];
 
-  const loading = gender === "girl" ? girlLoading : boyLoading;
+  const popularityOverTimeData = topNames.map(name => {
+    return {
+      name,
+      data: chartData.map(yearData => ({
+        year: yearData.year,
+        value: yearData[name] as number
+      }))
+    };
+  });
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium">Velg kjønn</h3>
-        <ToggleGroup type="single" value={gender} onValueChange={(value) => value && setGender(value)}>
+        <ToggleGroup type="single" value={gender} onValueChange={(value) => value && setGender(value as 'girl' | 'boy')}>
           <ToggleGroupItem value="girl" aria-label="Jentenavn">
             Jentenavn
           </ToggleGroupItem>
@@ -102,10 +89,10 @@ const NameTrendExplorer = () => {
           />
         </TabsContent>
         
-        <TabsContent value="timeline">
+        <TabsContent value="timeline" className="space-y-4">
           <TimelineChart 
-            loading={loading}
             popularityOverTimeData={popularityOverTimeData}
+            loading={loading}
             gender={gender}
           />
         </TabsContent>

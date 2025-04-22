@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { BabyName } from "@/data/types";
 import { fetchNameOfTheDay } from "@/utils/nameOfTheDay";
-import NameOfTheDayIllustration from "./NameOfTheDayIllustration";
 import NameFunFacts from "./NameFunFacts";
 import FavoriteButton from "@/components/FavoritesButton";
 import { useFavorites } from "@/contexts/FavoritesContext";
@@ -51,13 +50,9 @@ const NameOfTheDay: React.FC = () => {
 
   return (
     <div className={`space-y-5 ${animatedWrapper}`}>
-      <div className="flex flex-col sm:flex-row sm:items-start gap-5">
-        {/* Decorative Illustration */}
-        <div className="flex-shrink-0">
-          <NameOfTheDayIllustration origin={todaysName.origin} />
-        </div>
+      <div className="flex flex-col gap-5">
         {/* Main name info */}
-        <div className="flex-1">
+        <div>
           <div className="flex gap-2 items-center mb-1">
             <Link
               to={`/navn/${todaysName.id}`}
@@ -73,10 +68,8 @@ const NameOfTheDay: React.FC = () => {
           <div className="text-sm text-gray-500 mt-1">Kjønn: {todaysName.gender === "boy" ? "Gutt" : todaysName.gender === "girl" ? "Jente" : "Unisex"}</div>
           <p className="text-base text-gray-700 mt-1">{todaysName.meaning}</p>
         </div>
-      </div>
 
-      {/* Fun facts, history, notable people */}
-      <div>
+        {/* Fun facts, history, notable people */}
         <NameFunFacts nameObj={todaysName} />
       </div>
 

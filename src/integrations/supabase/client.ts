@@ -150,9 +150,70 @@ export const batchInsertNames = async (names: {
 
 // New functions for fetching baby names from Supabase
 
+export const fetchNameById = async (id: number): Promise<BabyName | null> => {
+  try {
+    const { data: name, error: nameError } = await supabase
+      .from('baby_names')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (nameError) {
+      console.error('Error fetching name:', nameError);
+      return null;
+    }
+
+    if (!name) {
+      console.log('No name found with ID:', id);
+      return null;
+    }
+
+    // Fetch categories for this name
+    const { data: mappings, error: mappingsError } = await supabase
+      .from('name_category_mappings')
+      .select('name_categories(name)')
+      .eq('name_id', id);
+
+    if (mappingsError) {
+      console.error('Error fetching categories:', mappingsError);
+      // We still return name data even if categories failed to fetch
+      return {
+        id: name.id,
+        name: name.name,
+        gender: name.gender as 'boy' | 'girl' | 'unisex',
+        origin: name.origin,
+        meaning: name.meaning,
+        popularity: name.popularity,
+        length: name.length as 'short' | 'medium' | 'long',
+        categories: [],
+        firstLetter: name.first_letter,
+        phonetic: name.phonetic || undefined,
+      };
+    }
+
+    // Transform to BabyName format
+    const categories = mappings.map(mapping => mapping.name_categories.name);
+
+    return {
+      id: name.id,
+      name: name.name,
+      gender: name.gender as 'boy' | 'girl' | 'unisex',
+      origin: name.origin,
+      meaning: name.meaning,
+      popularity: name.popularity,
+      length: name.length as 'short' | 'medium' | 'long',
+      categories: categories,
+      firstLetter: name.first_letter,
+      phonetic: name.phonetic || undefined,
+    };
+  } catch (error) {
+    console.error('Error fetching name by ID:', error);
+    return null;
+  }
+};
+
 export const fetchAllNames = async (): Promise<BabyName[]> => {
   try {
-    // Fetch names from the database
     const { data: namesData, error: namesError } = await supabase
       .from('baby_names')
       .select('*');
@@ -183,7 +244,8 @@ export const fetchAllNames = async (): Promise<BabyName[]> => {
         popularity: name.popularity,
         length: name.length as 'short' | 'medium' | 'long',
         categories: categories,
-        firstLetter: name.first_letter
+        firstLetter: name.first_letter,
+        phonetic: name.phonetic || undefined,
       };
     });
 
@@ -211,76 +273,6 @@ export const fetchCategories = async (): Promise<NameCategory[]> => {
   } catch (error) {
     console.error('Error fetching categories:', error);
     throw error;
-  }
-};
-
-export const fetchNameById = async (id: number): Promise<BabyName | null> => {
-  try {
-    console.log('Fetching name with ID:', id);
-    
-    if (!id || isNaN(id)) {
-      console.error('Invalid name ID:', id);
-      return null;
-    }
-    
-    // Fetch the name
-    const { data: name, error: nameError } = await supabase
-      .from('baby_names')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (nameError) {
-      console.error('Error fetching name:', nameError);
-      return null;
-    }
-    
-    if (!name) {
-      console.log('No name found with ID:', id);
-      return null;
-    }
-
-    console.log('Name data retrieved:', name);
-
-    // Fetch categories for this name
-    const { data: mappings, error: mappingsError } = await supabase
-      .from('name_category_mappings')
-      .select('name_categories(name)')
-      .eq('name_id', id);
-
-    if (mappingsError) {
-      console.error('Error fetching categories:', mappingsError);
-      // We still return name data even if categories failed to fetch
-      return {
-        id: name.id,
-        name: name.name,
-        gender: name.gender as 'boy' | 'girl' | 'unisex',
-        origin: name.origin,
-        meaning: name.meaning,
-        popularity: name.popularity,
-        length: name.length as 'short' | 'medium' | 'long',
-        categories: [],
-        firstLetter: name.first_letter
-      };
-    }
-
-    // Transform to BabyName format
-    const categories = mappings.map(mapping => mapping.name_categories.name);
-
-    return {
-      id: name.id,
-      name: name.name,
-      gender: name.gender as 'boy' | 'girl' | 'unisex',
-      origin: name.origin,
-      meaning: name.meaning,
-      popularity: name.popularity,
-      length: name.length as 'short' | 'medium' | 'long',
-      categories: categories,
-      firstLetter: name.first_letter
-    };
-  } catch (error) {
-    console.error('Error fetching name by ID:', error);
-    return null;
   }
 };
 
@@ -339,7 +331,8 @@ export const fetchNamesByCategory = async (category: string): Promise<BabyName[]
         popularity: name.popularity,
         length: name.length as 'short' | 'medium' | 'long',
         categories: categories,
-        firstLetter: name.first_letter
+        firstLetter: name.first_letter,
+        phonetic: name.phonetic || undefined,
       };
     });
   } catch (error) {
@@ -396,7 +389,8 @@ export const fetchPopularNames = async (
         popularity: name.popularity,
         length: name.length as 'short' | 'medium' | 'long',
         categories: categories,
-        firstLetter: name.first_letter
+        firstLetter: name.first_letter,
+        phonetic: name.phonetic || undefined,
       };
     });
   } catch (error) {
@@ -444,7 +438,8 @@ export const searchNames = async (query: string): Promise<BabyName[]> => {
         popularity: name.popularity,
         length: name.length as 'short' | 'medium' | 'long',
         categories: categories,
-        firstLetter: name.first_letter
+        firstLetter: name.first_letter,
+        phonetic: name.phonetic || undefined,
       };
     });
   } catch (error) {

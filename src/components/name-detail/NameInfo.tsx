@@ -1,4 +1,3 @@
-
 import { BabyName } from "@/data/types";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +21,12 @@ const NameInfo = ({ name, getGenderLabel }: NameInfoProps) => {
             <h3 className="font-medium text-gray-700">Betydning</h3>
             <p>{name.meaning}</p>
           </div>
+          {name.phonetic && (
+            <div>
+              <h3 className="font-medium text-gray-700">Uttale</h3>
+              <p>{name.phonetic}</p>
+            </div>
+          )}
           <div>
             <h3 className="font-medium text-gray-700">Popularitet</h3>
             <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">

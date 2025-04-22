@@ -19,6 +19,7 @@ export type Database = {
           meaning: string
           name: string
           origin: string
+          phonetic: string | null
           popularity: number
         }
         Insert: {
@@ -30,6 +31,7 @@ export type Database = {
           meaning: string
           name: string
           origin: string
+          phonetic?: string | null
           popularity: number
         }
         Update: {
@@ -41,6 +43,7 @@ export type Database = {
           meaning?: string
           name?: string
           origin?: string
+          phonetic?: string | null
           popularity?: number
         }
         Relationships: []

@@ -42,6 +42,11 @@ const NameCard = ({ name, showDetails = false }: NameCardProps) => {
         <div className={`p-4 ${getGenderColorClass()} flex justify-between items-start`}>
           <div>
             <h3 className="text-xl font-bold">{name.name}</h3>
+            {name.phonetic && (
+              <Badge variant="secondary" className="mt-1 text-xs">
+                Uttales: {name.phonetic}
+              </Badge>
+            )}
             <Badge variant="outline" className="mt-1 bg-white/50 backdrop-blur-sm">
               {getGenderLabel()}
             </Badge>

@@ -1,6 +1,5 @@
 
-// 'use client';
-
+import React from 'react';
 import ConsentBanner from './ConsentBanner';
 
 const ConsentBannerWrapper = () => {

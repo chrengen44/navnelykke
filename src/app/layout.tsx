@@ -29,7 +29,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
-          <ConsentBanner />
+          <div className="fixed bottom-0 left-0 right-0 z-50">
+            <ConsentBanner />
+          </div>
         </ThemeProvider>
       </body>
     </html>

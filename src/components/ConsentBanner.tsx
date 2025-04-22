@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
 interface TCFAPI {
@@ -15,7 +15,16 @@ declare global {
 }
 
 const ConsentBanner = () => {
+  const [isVisible, setIsVisible] = useState(true);
+
   useEffect(() => {
+    // Check if consent was already given
+    const consent = localStorage.getItem('consent');
+    if (consent) {
+      setIsVisible(false);
+      return;
+    }
+
     // Load Google CMP script
     const script = document.createElement('script');
     script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3372507393637890';
@@ -46,10 +55,16 @@ const ConsentBanner = () => {
         }
       }
     });
+    
+    // Store consent in localStorage
+    localStorage.setItem('consent', consent.toString());
+    setIsVisible(false);
   };
 
+  if (!isVisible) return null;
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg z-50">
+    <div className="bg-white p-4 shadow-lg">
       <div className="max-w-4xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex-1">

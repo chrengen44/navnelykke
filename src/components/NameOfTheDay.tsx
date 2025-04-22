@@ -1,85 +1,26 @@
-
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BabyName } from "@/data/types";
-import { supabase } from "@/integrations/supabase/client";
+import { fetchNameOfTheDay } from "@/utils/nameOfTheDay";
 
 const NameOfTheDay: React.FC = () => {
   const [todaysName, setTodaysName] = useState<BabyName | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchNameOfTheDay = async () => {
+    const loadNameOfTheDay = async () => {
       try {
         setLoading(true);
-        // Get a deterministic "random" name based on the current date
-        const now = new Date();
-        const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
-
-        // Fetch total count of names to use for deterministic selection
-        const { count, error: countError } = await supabase
-          .from('baby_names')
-          .select('id', { count: 'exact' });
-
-        if (countError || !count) {
-          console.error('Error fetching name count:', countError);
-          return;
-        }
-
-        // Use day of year to deterministically select a name ID
-        const nameIndex = dayOfYear % count;
-
-        // Fetch the name with categories
-        const { data, error } = await supabase
-          .from('baby_names')
-          .select(`
-            id, 
-            name, 
-            gender, 
-            origin, 
-            meaning, 
-            popularity, 
-            length, 
-            first_letter,
-            name_category_mappings (
-              name_categories (name)
-            )
-          `)
-          .order('id')
-          .range(nameIndex, nameIndex)
-          .single();
-
-        if (error) {
-          console.error('Error fetching name of the day:', error);
-          return;
-        }
-
-        // Transform the data to match BabyName interface
-        const transformedName: BabyName = {
-          id: data.id,
-          name: data.name,
-          gender: data.gender as 'boy' | 'girl' | 'unisex',
-          origin: data.origin,
-          meaning: data.meaning,
-          popularity: data.popularity,
-          length: data.length as 'short' | 'medium' | 'long',
-          firstLetter: data.first_letter,
-          categories: data.name_category_mappings.map(
-            (mapping: any) => mapping.name_categories.name
-          )
-        };
-
-        setTodaysName(transformedName);
-      } catch (error) {
-        console.error('Unexpected error fetching name of the day:', error);
+        const name = await fetchNameOfTheDay();
+        setTodaysName(name);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchNameOfTheDay();
+    loadNameOfTheDay();
   }, []);
 
   if (loading) {
@@ -102,10 +43,9 @@ const NameOfTheDay: React.FC = () => {
     );
   }
 
-  // Determine the background color based on gender
-  const bgColorClass = todaysName.gender === 'girl' 
+  const bgColorClass = todaysName?.gender === 'girl' 
     ? 'bg-babypink/30' 
-    : todaysName.gender === 'boy' 
+    : todaysName?.gender === 'boy' 
       ? 'bg-babyblue/30'
       : 'bg-babypeach/30';
 

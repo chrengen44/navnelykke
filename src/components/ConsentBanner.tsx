@@ -16,24 +16,49 @@ declare global {
 
 const ConsentBanner = () => {
   const [isVisible, setIsVisible] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
+
+  console.log('ConsentBanner component mounted, initial isVisible:', isVisible);
 
   useEffect(() => {
+    console.log('ConsentBanner useEffect running');
+    setIsMounted(true);
+    
     // Check if consent was already given
     const consent = localStorage.getItem('consent');
-    if (consent) {
+    console.log('Consent from localStorage:', consent);
+    
+    if (consent === 'true') {
+      console.log('Consent already given, hiding banner');
       setIsVisible(false);
+    } else if (consent === 'false') {
+      console.log('Consent explicitly denied, hiding banner');
+      setIsVisible(false);
+    } else {
+      console.log('No consent found, showing banner');
+      setIsVisible(true);
     }
   }, []);
 
   const handleConsent = (consent: boolean) => {
+    console.log('Handling consent:', consent);
     localStorage.setItem('consent', consent.toString());
     setIsVisible(false);
   };
 
-  if (!isVisible) return null;
+  if (!isMounted) {
+    console.log('Component not mounted yet, returning null');
+    return null;
+  }
 
+  if (!isVisible) {
+    console.log('Banner not visible, returning null');
+    return null;
+  }
+
+  console.log('Rendering consent banner content');
   return (
-    <div className="bg-white p-4 shadow-lg">
+    <div className="bg-white p-4 shadow-lg fixed bottom-0 left-0 right-0 z-50">
       <div className="max-w-4xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex-1">
@@ -47,12 +72,16 @@ const ConsentBanner = () => {
             <Button 
               variant="outline" 
               onClick={() => handleConsent(false)}
+              id="consent-reject"
+              name="consent-reject"
             >
               Ikke godta
             </Button>
             <Button 
               variant="default" 
               onClick={() => handleConsent(true)}
+              id="consent-accept"
+              name="consent-accept"
             >
               Godta
             </Button>

@@ -1,17 +1,12 @@
 'use client';
 
-import dynamic from 'next/dynamic';
+import ConsentBanner from './ConsentBanner';
 
-const ConsentBanner = dynamic(() => import('./ConsentBanner'), {
-  ssr: false,
-});
+console.log('Loading ConsentBannerWrapper');
 
 const ConsentBannerWrapper = () => {
-  return (
-    <div className="fixed bottom-0 left-0 right-0 z-50">
-      <ConsentBanner />
-    </div>
-  );
+  console.log('ConsentBannerWrapper rendered');
+  return <ConsentBanner />;
 };
 
 export default ConsentBannerWrapper; 

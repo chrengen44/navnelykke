@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import NameGrid from "@/components/NameGrid";
-import NameFilters, { FilterState } from "@/components/NameFilters";
+import AdvancedNameFilters, { AdvancedFilterState } from "@/components/search/AdvancedNameFilters";
 import AdSpace from "@/components/AdSpace";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,11 +13,16 @@ import { BabyName } from "@/data/types";
 
 const OriginNames = () => {
   const { origin } = useParams<{ origin: string }>();
-  const [filters, setFilters] = useState<FilterState>({
+  const [filters, setFilters] = useState<AdvancedFilterState>({
     gender: "all",
     length: "all",
     letter: "",
-    search: ""
+    search: "",
+    meaning: "",
+    origin: "",
+    popularity: [0, 100],
+    excludeLetters: "",
+    excludeTopPopular: false
   });
 
   const { data: names, isLoading } = useQuery({
@@ -56,6 +61,21 @@ const OriginNames = () => {
         query = query.ilike('name', `%${filters.search}%`);
       }
 
+      if (filters.meaning) {
+        query = query.ilike('meaning', `%${filters.meaning}%`);
+      }
+
+      if (filters.excludeLetters) {
+        const excludedLetters = filters.excludeLetters
+          .split(",")
+          .map(letter => letter.trim().toUpperCase());
+        query = query.not('first_letter', 'in', `(${excludedLetters.join(',')})`);
+      }
+
+      if (filters.excludeTopPopular) {
+        query = query.gt('popularity', 10);
+      }
+
       const { data, error } = await query;
       if (error) throw error;
 
@@ -75,7 +95,7 @@ const OriginNames = () => {
     }
   });
 
-  const handleFilter = (newFilters: FilterState) => {
+  const handleFilter = (newFilters: AdvancedFilterState) => {
     setFilters(newFilters);
   };
 
@@ -101,7 +121,7 @@ const OriginNames = () => {
         
         <section className="py-8">
           <div className="container mx-auto px-4">
-            <NameFilters onFilter={handleFilter} />
+            <AdvancedNameFilters onFilter={handleFilter} />
             
             {isLoading ? (
               <div className="flex justify-center py-12">

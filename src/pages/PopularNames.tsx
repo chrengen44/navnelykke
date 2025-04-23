@@ -4,19 +4,24 @@ import { useSearchParams } from 'react-router-dom';
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import NameGrid from '@/components/NameGrid';
-import NameFilters from '@/components/NameFilters';
+import AdvancedNameFilters, { AdvancedFilterState } from '@/components/search/AdvancedNameFilters';
 import { getPopularNames, BabyName } from '@/data';
-import { babyNames } from '@/data/namesData'; // Import the hardcoded names directly
+import { babyNames } from '@/data/namesData';
 
 const PopularNames = () => {
   const [searchParams] = useSearchParams();
   const [names, setNames] = useState<BabyName[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<AdvancedFilterState>({
     gender: (searchParams.get('gender') || 'all') as "boy" | "girl" | "unisex" | "all",
     length: (searchParams.get('length') || 'all') as "short" | "medium" | "long" | "all",
     letter: searchParams.get('letter') || '',
     search: searchParams.get('search') || '',
+    meaning: '',
+    origin: '',
+    popularity: [0, 100],
+    excludeLetters: '',
+    excludeTopPopular: false
   });
 
   useEffect(() => {
@@ -25,25 +30,22 @@ const PopularNames = () => {
       try {
         let popularNames = await getPopularNames(undefined, 100);
         
-        // If no names returned from database, use hardcoded names
         if (!popularNames || popularNames.length === 0) {
-          console.log('No names returned from database, using hardcoded names');
-          popularNames = [...babyNames]; // Use hardcoded names as fallback
+          popularNames = [...babyNames];
         }
         
         // Apply filters
         let filteredNames = [...popularNames];
         
         if (filters.gender !== 'all') {
-          // Use type assertion to handle the "all" case that doesn't overlap with BabyName gender types
-          filteredNames = filteredNames.filter(name => name.gender === (filters.gender as "boy" | "girl" | "unisex"));
+          filteredNames = filteredNames.filter(name => name.gender === filters.gender);
         }
         
         if (filters.length !== 'all') {
           filteredNames = filteredNames.filter(name => name.length === filters.length);
         }
         
-        if (filters.letter !== '' && filters.letter !== 'all') {
+        if (filters.letter) {
           filteredNames = filteredNames.filter(name => 
             name.firstLetter.toLowerCase() === filters.letter.toLowerCase()
           );
@@ -56,39 +58,39 @@ const PopularNames = () => {
             name.meaning.toLowerCase().includes(searchLower) ||
             name.origin.toLowerCase().includes(searchLower)
           );
+        }
+
+        if (filters.meaning) {
+          const meaningLower = filters.meaning.toLowerCase();
+          filteredNames = filteredNames.filter(name => 
+            name.meaning.toLowerCase().includes(meaningLower)
+          );
+        }
+        
+        if (filters.origin) {
+          const originLower = filters.origin.toLowerCase();
+          filteredNames = filteredNames.filter(name => 
+            name.origin.toLowerCase().includes(originLower)
+          );
+        }
+        
+        if (filters.excludeLetters) {
+          const excludedLetters = filters.excludeLetters
+            .split(",")
+            .map(letter => letter.trim().toLowerCase());
+          filteredNames = filteredNames.filter(name => 
+            !excludedLetters.includes(name.firstLetter.toLowerCase())
+          );
+        }
+        
+        if (filters.excludeTopPopular) {
+          filteredNames = filteredNames.filter(name => name.popularity > 10);
         }
         
         setNames(filteredNames);
       } catch (error) {
         console.error("Error fetching popular names:", error);
-        // On error, use hardcoded names as fallback
-        let filteredNames = [...babyNames];
-        
-        // Apply the same filters to hardcoded names
-        if (filters.gender !== 'all') {
-          filteredNames = filteredNames.filter(name => name.gender === (filters.gender as "boy" | "girl" | "unisex"));
-        }
-        
-        if (filters.length !== 'all') {
-          filteredNames = filteredNames.filter(name => name.length === filters.length);
-        }
-        
-        if (filters.letter !== '' && filters.letter !== 'all') {
-          filteredNames = filteredNames.filter(name => 
-            name.firstLetter.toLowerCase() === filters.letter.toLowerCase()
-          );
-        }
-        
-        if (filters.search) {
-          const searchLower = filters.search.toLowerCase();
-          filteredNames = filteredNames.filter(name => 
-            name.name.toLowerCase().includes(searchLower) ||
-            name.meaning.toLowerCase().includes(searchLower) ||
-            name.origin.toLowerCase().includes(searchLower)
-          );
-        }
-        
-        setNames(filteredNames);
+        setNames([]);
       } finally {
         setLoading(false);
       }
@@ -97,7 +99,7 @@ const PopularNames = () => {
     fetchNames();
   }, [filters]);
 
-  const handleFilter = (newFilters) => {
+  const handleFilter = (newFilters: AdvancedFilterState) => {
     setFilters(newFilters);
   };
 
@@ -112,10 +114,9 @@ const PopularNames = () => {
             Bruk filtrene nedenfor for å finne det perfekte navnet.
           </p>
           
-          <NameFilters 
+          <AdvancedNameFilters 
             onFilter={handleFilter}
             initialFilters={filters}
-            showSearch={true}
           />
           
           {loading ? (

@@ -52,7 +52,7 @@ const AdvancedNameFilters = ({
 
   const handleChange = (
     key: keyof AdvancedFilterState,
-    value: string | number[]
+    value: string | number[] | boolean
   ) => {
     const newFilters = { ...filters };
     if (key === "popularity" && Array.isArray(value)) {
@@ -64,7 +64,7 @@ const AdvancedNameFilters = ({
       newFilters.gender = value as "all" | "boy" | "girl" | "unisex";
     } else if (key === "length" && ["all", "short", "medium", "long"].includes(value as string)) {
       newFilters.length = value as "all" | "short" | "medium" | "long";
-    } else if (typeof value === "string") {
+    } else if (typeof value === "string" || typeof value === "boolean") {
       (newFilters as any)[key] = value;
     }
 

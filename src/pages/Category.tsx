@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getNamesByCategory, nameCategories } from "@/data";
 import NameGrid from "@/components/NameGrid";
-import NameFilters, { FilterState } from "@/components/NameFilters";
+import AdvancedNameFilters, { AdvancedFilterState } from "@/components/search/AdvancedNameFilters";
 import AdSpace from "@/components/AdSpace";
 import { 
   Crown, 
@@ -28,7 +27,6 @@ const Category = () => {
   const category = nameCategories.find(c => c.id === categoryId);
   
   useEffect(() => {
-    // Update names when category changes
     const fetchNames = async () => {
       setLoading(true);
       try {
@@ -45,16 +43,15 @@ const Category = () => {
     fetchNames();
   }, [categoryId]);
   
-  const handleFilter = (filters: FilterState) => {
+  const handleFilter = (filters: AdvancedFilterState) => {
     const fetchAndFilterNames = async () => {
       setLoading(true);
       try {
-        // Get all names in this category
         let filtered = await getNamesByCategory(categoryId || "");
         
         // Filter by gender
         if (filters.gender !== "all") {
-          filtered = filtered.filter(name => name.gender === filters.gender as "boy" | "girl" | "unisex");
+          filtered = filtered.filter(name => name.gender === filters.gender);
         }
         
         // Filter by length
@@ -77,6 +74,45 @@ const Category = () => {
             name.meaning.toLowerCase().includes(query) ||
             name.origin.toLowerCase().includes(query)
           );
+        }
+
+        // Filter by meaning
+        if (filters.meaning) {
+          const meaningLower = filters.meaning.toLowerCase();
+          filtered = filtered.filter(name => 
+            name.meaning.toLowerCase().includes(meaningLower)
+          );
+        }
+        
+        // Filter by origin
+        if (filters.origin) {
+          const originLower = filters.origin.toLowerCase();
+          filtered = filtered.filter(name => 
+            name.origin.toLowerCase().includes(originLower)
+          );
+        }
+        
+        // Filter by popularity range
+        if (filters.popularity) {
+          filtered = filtered.filter(name => 
+            name.popularity >= filters.popularity[0] && 
+            name.popularity <= filters.popularity[1]
+          );
+        }
+        
+        // Apply exclusion filters
+        if (filters.excludeLetters) {
+          const excludedLetters = filters.excludeLetters
+            .split(",")
+            .map(letter => letter.trim().toLowerCase());
+          filtered = filtered.filter(name => 
+            !excludedLetters.includes(name.firstLetter.toLowerCase())
+          );
+        }
+        
+        // Exclude top popular names if selected
+        if (filters.excludeTopPopular) {
+          filtered = filtered.filter(name => name.popularity > 10);
         }
         
         setFilteredNames(filtered);
@@ -152,7 +188,7 @@ const Category = () => {
         
         <section className="py-8">
           <div className="container mx-auto px-4">
-            <NameFilters onFilter={handleFilter} />
+            <AdvancedNameFilters onFilter={handleFilter} />
             
             {loading ? (
               <div className="flex justify-center py-12">

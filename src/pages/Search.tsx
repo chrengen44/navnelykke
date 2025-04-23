@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
@@ -82,6 +81,21 @@ const Search = () => {
         name.popularity >= filters.popularity[0] && 
         name.popularity <= filters.popularity[1]
       );
+    }
+    
+    // Apply exclusion filters
+    if (filters.excludeLetters) {
+      const excludedLetters = filters.excludeLetters
+        .split(",")
+        .map(letter => letter.trim().toLowerCase());
+      filtered = filtered.filter(name => 
+        !excludedLetters.includes(name.firstLetter.toLowerCase())
+      );
+    }
+    
+    // Exclude top popular names if selected
+    if (filters.excludeTopPopular) {
+      filtered = filtered.filter(name => name.popularity > 10);
     }
     
     setFilteredResults(filtered);

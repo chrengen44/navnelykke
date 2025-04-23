@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -12,6 +11,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export interface AdvancedFilterState {
   gender: "all" | "boy" | "girl" | "unisex";
@@ -21,6 +21,8 @@ export interface AdvancedFilterState {
   meaning: string;
   origin: string;
   popularity: number[];
+  excludeLetters: string;
+  excludeTopPopular: boolean;
 }
 
 interface AdvancedNameFiltersProps {
@@ -42,6 +44,8 @@ const AdvancedNameFilters = ({
     meaning: initialFilters.meaning || "",
     origin: initialFilters.origin || "",
     popularity: initialFilters.popularity || [0, 100],
+    excludeLetters: initialFilters.excludeLetters || "",
+    excludeTopPopular: initialFilters.excludeTopPopular || false,
   });
 
   const [isOpen, setIsOpen] = useState(false);
@@ -61,10 +65,20 @@ const AdvancedNameFilters = ({
     } else if (key === "length" && ["all", "short", "medium", "long"].includes(value as string)) {
       newFilters.length = value as "all" | "short" | "medium" | "long";
     } else if (typeof value === "string") {
-      // For string type properties like letter, search, meaning, origin
       (newFilters as any)[key] = value;
     }
 
+    setFilters(newFilters);
+    onFilter(newFilters);
+  };
+
+  const handleExcludeChange = (key: keyof AdvancedFilterState, value: string | boolean) => {
+    const newFilters = { ...filters };
+    if (key === "excludeTopPopular") {
+      newFilters.excludeTopPopular = value as boolean;
+    } else {
+      newFilters[key] = value as string;
+    }
     setFilters(newFilters);
     onFilter(newFilters);
   };
@@ -78,6 +92,8 @@ const AdvancedNameFilters = ({
       meaning: "",
       origin: "",
       popularity: [0, 100],
+      excludeLetters: "",
+      excludeTopPopular: false,
     };
     setFilters(defaultFilters);
     onFilter(defaultFilters);
@@ -90,7 +106,9 @@ const AdvancedNameFilters = ({
     filters.meaning !== "" ||
     filters.origin !== "" ||
     filters.popularity[0] !== 0 ||
-    filters.popularity[1] !== 100;
+    filters.popularity[1] !== 100 ||
+    filters.excludeLetters !== "" ||
+    filters.excludeTopPopular;
 
   return (
     <div className="space-y-4">
@@ -222,6 +240,39 @@ const AdvancedNameFilters = ({
                   <Label htmlFor="long">Lange navn</Label>
                 </div>
               </RadioGroup>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-4">
+              <h3 className="font-medium">Ekskluder kriterier</h3>
+
+              <div className="space-y-2">
+                <Label>Ekskluder forbokstaver</Label>
+                <Input
+                  type="text"
+                  placeholder="F.eks. 'X, Y, Z'"
+                  value={filters.excludeLetters}
+                  onChange={(e) => handleExcludeChange("excludeLetters", e.target.value)}
+                  className="max-w-xs"
+                />
+                <p className="text-sm text-gray-500">
+                  Skriv inn bokstaver adskilt med komma for å utelukke navn som begynner med disse
+                </p>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="excludeTopPopular"
+                  checked={filters.excludeTopPopular}
+                  onCheckedChange={(checked) => 
+                    handleExcludeChange("excludeTopPopular", checked === true)
+                  }
+                />
+                <Label htmlFor="excludeTopPopular">
+                  Ekskluder topp 10 mest populære navn
+                </Label>
+              </div>
             </div>
           </div>
         </CollapsibleContent>

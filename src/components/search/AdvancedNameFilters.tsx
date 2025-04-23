@@ -1,29 +1,20 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-import { Slider } from "@/components/ui/slider";
-import { Filter, Search, X } from "lucide-react";
+import { Filter, X } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Checkbox } from "@/components/ui/checkbox";
 
-export interface AdvancedFilterState {
-  gender: "all" | "boy" | "girl" | "unisex";
-  length: "all" | "short" | "medium" | "long";
-  letter: string;
-  search: string;
-  meaning: string;
-  origin: string;
-  popularity: number[];
-  excludeLetters: string;
-  excludeTopPopular: boolean;
-}
+import { SearchFields } from "./filters/SearchFields";
+import { GenderFilter } from "./filters/GenderFilter";
+import { LengthFilter } from "./filters/LengthFilter";
+import { PopularityFilter } from "./filters/PopularityFilter";
+import { ExclusionFilters } from "./filters/ExclusionFilters";
+import { AdvancedFilterState } from "./filters/types";
 
 interface AdvancedNameFiltersProps {
   onFilter: (filters: AdvancedFilterState) => void;
@@ -72,17 +63,6 @@ const AdvancedNameFilters = ({
     onFilter(newFilters);
   };
 
-  const handleExcludeChange = (key: keyof AdvancedFilterState, value: string | boolean) => {
-    const newFilters = { ...filters };
-    if (key === "excludeTopPopular") {
-      newFilters.excludeTopPopular = value as boolean;
-    } else {
-      newFilters[key] = value as string;
-    }
-    setFilters(newFilters);
-    onFilter(newFilters);
-  };
-
   const resetFilters = () => {
     const defaultFilters: AdvancedFilterState = {
       gender: "all",
@@ -112,18 +92,7 @@ const AdvancedNameFilters = ({
 
   return (
     <div className="space-y-4">
-      {showSearch && (
-        <div className="relative">
-          <Input
-            type="text"
-            placeholder="Søk etter navn, betydning eller opprinnelse..."
-            value={filters.search}
-            onChange={(e) => handleChange("search", e.target.value)}
-            className="pl-10"
-          />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-        </div>
-      )}
+      <SearchFields onFilterChange={handleChange} showSearch={showSearch} />
 
       <div className="flex items-center justify-between">
         <Button
@@ -152,128 +121,11 @@ const AdvancedNameFilters = ({
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleContent className="space-y-4 bg-gray-50 p-4 rounded-md">
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Betydning</Label>
-              <Input
-                type="text"
-                placeholder="F.eks. 'kjærlighet', 'styrke', 'lys'..."
-                value={filters.meaning}
-                onChange={(e) => handleChange("meaning", e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Opprinnelse</Label>
-              <Input
-                type="text"
-                placeholder="F.eks. 'norrønt', 'gresk', 'arabisk'..."
-                value={filters.origin}
-                onChange={(e) => handleChange("origin", e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Popularitet (0-100)</Label>
-              <Slider
-                value={filters.popularity}
-                onValueChange={(value) => handleChange("popularity", value)}
-                min={0}
-                max={100}
-                step={1}
-                className="my-4"
-              />
-              <div className="flex justify-between text-sm text-gray-500">
-                <span>Sjelden</span>
-                <span>Veldig populær</span>
-              </div>
-            </div>
-
+            <GenderFilter onFilterChange={handleChange} />
+            <LengthFilter onFilterChange={handleChange} />
+            <PopularityFilter onFilterChange={handleChange} />
             <Separator />
-
-            <div className="space-y-2">
-              <Label>Kjønn</Label>
-              <RadioGroup
-                value={filters.gender}
-                onValueChange={(value) => handleChange("gender", value)}
-                className="flex flex-wrap gap-4"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="all" id="all" />
-                  <Label htmlFor="all">Alle</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="boy" id="boy" />
-                  <Label htmlFor="boy">Guttenavn</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="girl" id="girl" />
-                  <Label htmlFor="girl">Jentenavn</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="unisex" id="unisex" />
-                  <Label htmlFor="unisex">Unisex</Label>
-                </div>
-              </RadioGroup>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Lengde</Label>
-              <RadioGroup
-                value={filters.length}
-                onValueChange={(value) => handleChange("length", value)}
-                className="flex flex-wrap gap-4"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="all" id="length-all" />
-                  <Label htmlFor="length-all">Alle</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="short" id="short" />
-                  <Label htmlFor="short">Korte navn</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="medium" id="medium" />
-                  <Label htmlFor="medium">Middels navn</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="long" id="long" />
-                  <Label htmlFor="long">Lange navn</Label>
-                </div>
-              </RadioGroup>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-4">
-              <h3 className="font-medium">Ekskluder kriterier</h3>
-
-              <div className="space-y-2">
-                <Label>Ekskluder forbokstaver</Label>
-                <Input
-                  type="text"
-                  placeholder="F.eks. 'X, Y, Z'"
-                  value={filters.excludeLetters}
-                  onChange={(e) => handleExcludeChange("excludeLetters", e.target.value)}
-                  className="max-w-xs"
-                />
-                <p className="text-sm text-gray-500">
-                  Skriv inn bokstaver adskilt med komma for å utelukke navn som begynner med disse
-                </p>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="excludeTopPopular"
-                  checked={filters.excludeTopPopular}
-                  onCheckedChange={(checked) => 
-                    handleExcludeChange("excludeTopPopular", checked === true)
-                  }
-                />
-                <Label htmlFor="excludeTopPopular">
-                  Ekskluder topp 10 mest populære navn
-                </Label>
-              </div>
-            </div>
+            <ExclusionFilters onFilterChange={handleChange} />
           </div>
         </CollapsibleContent>
       </Collapsible>

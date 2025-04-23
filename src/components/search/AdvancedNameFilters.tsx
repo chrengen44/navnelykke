@@ -51,17 +51,18 @@ const AdvancedNameFilters = ({
     value: string | number[]
   ) => {
     const newFilters = { ...filters };
-    if (Array.isArray(value)) {
-      newFilters.popularity = value as number[];
+    if (key === "popularity" && Array.isArray(value)) {
+      newFilters.popularity = value;
     } else if (
       key === "gender" &&
-      ["all", "boy", "girl", "unisex"].includes(value)
+      ["all", "boy", "girl", "unisex"].includes(value as string)
     ) {
       newFilters.gender = value as "all" | "boy" | "girl" | "unisex";
-    } else if (key === "length" && ["all", "short", "medium", "long"].includes(value)) {
+    } else if (key === "length" && ["all", "short", "medium", "long"].includes(value as string)) {
       newFilters.length = value as "all" | "short" | "medium" | "long";
     } else if (typeof value === "string") {
-      newFilters[key as keyof typeof newFilters] = value;
+      // For string type properties like letter, search, meaning, origin
+      (newFilters as any)[key] = value;
     }
 
     setFilters(newFilters);

@@ -1,6 +1,8 @@
+
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AlertTriangle } from 'lucide-react';
 
 interface PopularityRankingProps {
   selectedYear: string;
@@ -23,6 +25,8 @@ const PopularityRanking = ({
   top10ForSelectedYear,
   gender
 }: PopularityRankingProps) => {
+  const hasData = top10ForSelectedYear && top10ForSelectedYear.length > 0;
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:justify-between gap-4 items-start sm:items-center">
@@ -49,6 +53,18 @@ const PopularityRanking = ({
           {Array.from({length: 10}).map((_, i) => (
             <Skeleton key={i} className="h-12 w-full rounded-md" />
           ))}
+        </div>
+      ) : !hasData ? (
+        <div className="flex flex-col items-center justify-center py-8 text-center space-y-4">
+          <AlertTriangle className="h-12 w-12 text-amber-500" />
+          <div>
+            <p className="text-lg font-medium text-gray-700">
+              Ingen navnedata å vise for {selectedYear}
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              Vi bruker reservedata ettersom SSB-data ikke er tilgjengelig akkurat nå
+            </p>
+          </div>
         </div>
       ) : (
         <div className="space-y-4">

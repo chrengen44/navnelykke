@@ -24,6 +24,10 @@ export const usePopularityTrends = (gender: 'girl' | 'boy') => {
       setError(null);
       
       try {
+        // Set up fetch with timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+        
         const response = await fetch('https://data.ssb.no/api/v0/no/table/10467', {
           method: 'POST',
           headers: {
@@ -49,8 +53,11 @@ export const usePopularityTrends = (gender: 'girl' | 'boy') => {
             "response": {
               "format": "json-stat2"
             }
-          })
+          }),
+          signal: controller.signal
         });
+        
+        clearTimeout(timeoutId);
         
         if (!response.ok) {
           throw new Error(`API error: ${response.status}`);
@@ -78,10 +85,12 @@ export const usePopularityTrends = (gender: 'girl' | 'boy') => {
         setData(formattedData);
       } catch (err) {
         console.error(`Error fetching ${gender} name trend data:`, err);
-        setError(`Kunne ikke hente ${gender === 'girl' ? 'jente' : 'gutte'}navnedata fra SSB.`);
-        // Use fallback data if API call fails
+        setError(`Kunne ikke hente navnedata fra SSB. Server utilgjengelig.`);
+        // Always use fallback data if API call fails
         setData(getFallbackData(gender));
-        toast.error(`Kunne ikke hente ${gender === 'girl' ? 'jente' : 'gutte'}navnedata fra SSB.`);
+        toast.error(`Kunne ikke hente ${gender === 'girl' ? 'jente' : 'gutte'}navnedata fra SSB. Viser reservedata.`, {
+          duration: 5000,
+        });
       } finally {
         setLoading(false);
       }
@@ -132,4 +141,3 @@ function getFallbackData(gender: 'girl' | 'boy'): NameTrendData[] {
   
   return baseData;
 }
-

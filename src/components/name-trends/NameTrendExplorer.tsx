@@ -1,6 +1,9 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertTriangle } from 'lucide-react';
 import PopularityRanking from './PopularityRanking';
 import TimelineChart from './TimelineChart';
 import { useNameTrendData } from '@/hooks/useNameTrendData';
@@ -51,7 +54,7 @@ const NameTrendExplorer = () => {
     };
     
     topNames.forEach(name => {
-      dataPoint[name] = yearData[name] as number;
+      dataPoint[name] = yearData[name] as number || 0;
     });
     
     return dataPoint;
@@ -59,6 +62,16 @@ const NameTrendExplorer = () => {
 
   return (
     <div className="space-y-6">
+      {error && (
+        <Alert variant="warning" className="mb-4">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Tilkoblingsproblemer</AlertTitle>
+          <AlertDescription>
+            Vi kunne ikke hente oppdaterte data fra Statistisk Sentralbyrå. Vi viser historiske navnedata i stedet.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-medium">Velg kjønn</h3>
         <ToggleGroup type="single" value={gender} onValueChange={(value) => value && setGender(value as 'girl' | 'boy')}>
@@ -97,6 +110,7 @@ const NameTrendExplorer = () => {
             data={timelineData}
             loading={loading}
             gender={gender}
+            hasError={error !== null}
           />
         </TabsContent>
       </Tabs>

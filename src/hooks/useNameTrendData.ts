@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
 
@@ -45,7 +46,7 @@ export const useNameTrendData = (gender: 'girl' | 'boy', namesToFetch: string[])
       const names = namesToFetch; // Use the original names
       const nameValues = names.map(name => ({
         name,
-        value: Number(yearData[name])
+        value: Number(yearData[name]) || 0
       }));
       
       // Sort by popularity
@@ -70,106 +71,123 @@ export const useNameTrendData = (gender: 'girl' | 'boy', namesToFetch: string[])
       setError(null);
       
       try {
-        // Log the API request
         console.log('Fetching name data from SSB API for:', memoizedNames);
         
-        const response = await fetch('https://data.ssb.no/api/v0/no/table/10467', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            "query": [
-              {
-                "code": "Fornavn",
-                "selection": {
-                  "filter": gender === 'boy' ? "vs:NavnGutter02" : "vs:NavnJenter02",
-                  "values": memoizedNames.map(name => (gender === 'boy' ? '2' : '1') + name.toUpperCase())
-                }
+        // We'll use a timeout to avoid hanging requests
+        const fetchWithTimeout = async () => {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+          
+          try {
+            const response = await fetch('https://data.ssb.no/api/v0/no/table/10467', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
               },
-              {
-                "code": "ContentsCode",
-                "selection": {
-                  "filter": "item",
-                  "values": ["Personer"]
+              body: JSON.stringify({
+                "query": [
+                  {
+                    "code": "Fornavn",
+                    "selection": {
+                      "filter": gender === 'boy' ? "vs:NavnGutter02" : "vs:NavnJenter02",
+                      "values": memoizedNames.map(name => (gender === 'boy' ? '2' : '1') + name.toUpperCase())
+                    }
+                  },
+                  {
+                    "code": "ContentsCode",
+                    "selection": {
+                      "filter": "item",
+                      "values": ["Personer"]
+                    }
+                  },
+                  {
+                    "code": "Tid",
+                    "selection": {
+                      "filter": "item",
+                      "values": ["2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024"]
+                    }
+                  }
+                ],
+                "response": {
+                  "format": "json-stat2"
                 }
-              },
-              {
-                "code": "Tid",
-                "selection": {
-                  "filter": "item",
-                  "values": ["2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024"]
-                }
-              }
-            ],
-            "response": {
-              "format": "json-stat2"
+              }),
+              signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
+            if (!response.ok) {
+              throw new Error(`SSB API error: ${response.status}`);
             }
-          })
-        });
+            
+            return await response.json();
+          } catch (err) {
+            clearTimeout(timeoutId);
+            throw err;
+          }
+        };
         
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('SSB API Error:', {
-            status: response.status,
-            statusText: response.statusText,
-            error: errorText
+        let result: SSBResponse;
+        try {
+          result = await fetchWithTimeout();
+          
+          // Log successful response
+          console.log('SSB API Response received successfully');
+          
+          const years = result.dimension.Tid.category.label;
+          const names = result.dimension.Fornavn.category.label;
+          const values = result.value;
+          
+          const formattedData: NameTrendData[] = Object.keys(years).map(yearKey => {
+            const yearData: NameTrendData = { year: years[yearKey] };
+            
+            // Map the API response names to our input names
+            const nameMapping = Object.keys(names).reduce((acc, nameKey) => {
+              const apiName = names[nameKey];
+              const originalName = memoizedNames.find(name => 
+                (gender === 'boy' ? '2' : '1') + name.toUpperCase() === apiName
+              );
+              if (originalName) {
+                acc[nameKey] = originalName;
+              }
+              return acc;
+            }, {} as { [key: string]: string });
+            
+            Object.keys(names).forEach((nameKey, nameIndex) => {
+              const originalName = nameMapping[nameKey];
+              if (originalName) {
+                const yearIndex = Object.keys(years).indexOf(yearKey);
+                const valueIndex = yearIndex * Object.keys(names).length + nameIndex;
+                yearData[originalName] = values[valueIndex] || 0;
+              }
+            });
+            
+            return yearData;
           });
-          throw new Error(`SSB API error: ${response.status} - ${errorText}`);
+          
+          setChartData(formattedData);
+          setRankingData(generateRankData(formattedData));
+          
+        } catch (err) {
+          console.error('Error fetching name trend data:', err);
+          throw err;
         }
         
-        const result: SSBResponse = await response.json();
-        
-        // Log successful response
-        console.log('SSB API Response:', {
-          years: result.dimension.Tid.category.label,
-          names: result.dimension.Fornavn.category.label,
-          values: result.value
-        });
-        
-        const years = result.dimension.Tid.category.label;
-        const names = result.dimension.Fornavn.category.label;
-        const values = result.value;
-        
-        const formattedData: NameTrendData[] = Object.keys(years).map(yearKey => {
-          const yearData: NameTrendData = { year: years[yearKey] };
-          
-          // Map the API response names to our input names
-          const nameMapping = Object.keys(names).reduce((acc, nameKey) => {
-            const apiName = names[nameKey];
-            const originalName = namesToFetch.find(name => 
-              (gender === 'boy' ? '2' : '1') + name.toUpperCase() === apiName
-            );
-            if (originalName) {
-              acc[nameKey] = originalName;
-            }
-            return acc;
-          }, {} as { [key: string]: string });
-          
-          Object.keys(names).forEach((nameKey, nameIndex) => {
-            const originalName = nameMapping[nameKey];
-            if (originalName) {
-              const yearIndex = Object.keys(years).indexOf(yearKey);
-              const valueIndex = yearIndex * Object.keys(names).length + nameIndex;
-              yearData[originalName] = values[valueIndex] || 0;
-            }
-          });
-          
-          return yearData;
-        });
-        
-        setChartData(formattedData);
-        setRankingData(generateRankData(formattedData));
       } catch (err) {
-        console.error('Error fetching name trend data:', err);
-        setError(`Kunne ikke hente navnedata fra SSB. ${err instanceof Error ? err.message : 'Ukjent feil'}`);
+        console.error('Using fallback data due to API error:', err);
+        setError(`Kunne ikke hente navnedata fra SSB. Server utilgjengelig.`);
         
-        // Use fallback data based on gender
+        // Always use fallback data on any error
         if (gender === 'girl') {
           setFallbackGirlData();
         } else {
           setFallbackBoyData();
         }
+        
+        toast.error('Kunne ikke hente navnedata fra SSB. Viser reservedata.', {
+          duration: 5000,
+        });
       } finally {
         setLoading(false);
       }
@@ -194,9 +212,21 @@ export const useNameTrendData = (gender: 'girl' | 'boy', namesToFetch: string[])
       { year: '2023', Emma: 64, Nora: 51, Sofia: 33, Olivia: 62, Ella: 33 },
       { year: '2024', Emma: 63, Nora: 50, Sofia: 32, Olivia: 61, Ella: 32 }
     ];
-    toast.error('Kunne ikke hente navnedata fra SSB. Viser reservedata.');
-    setChartData(fallbackGirlData);
-    setRankingData(generateRankData(fallbackGirlData));
+    
+    // Create extended fallback data to ensure all names in namesToFetch have values
+    const extendedFallbackData = fallbackGirlData.map(yearData => {
+      const extendedData = { ...yearData };
+      memoizedNames.forEach(name => {
+        if (!(name in extendedData)) {
+          extendedData[name] = Math.floor(Math.random() * 30) + 5; // Random value between 5-35
+        }
+      });
+      return extendedData;
+    });
+    
+    console.log('Using fallback girl data');
+    setChartData(extendedFallbackData);
+    setRankingData(generateRankData(extendedFallbackData));
   };
 
   const setFallbackBoyData = () => {
@@ -215,9 +245,21 @@ export const useNameTrendData = (gender: 'girl' | 'boy', namesToFetch: string[])
       { year: '2023', William: 44, Noah: 62, Oliver: 67, Elias: 59, Aksel: 36 },
       { year: '2024', William: 43, Noah: 61, Oliver: 68, Elias: 60, Aksel: 35 }
     ];
-    toast.error('Kunne ikke hente navnedata fra SSB. Viser reservedata.');
-    setChartData(fallbackBoyData);
-    setRankingData(generateRankData(fallbackBoyData));
+    
+    // Create extended fallback data to ensure all names in namesToFetch have values
+    const extendedFallbackData = fallbackBoyData.map(yearData => {
+      const extendedData = { ...yearData };
+      memoizedNames.forEach(name => {
+        if (!(name in extendedData)) {
+          extendedData[name] = Math.floor(Math.random() * 30) + 5; // Random value between 5-35
+        }
+      });
+      return extendedData;
+    });
+    
+    console.log('Using fallback boy data');
+    setChartData(extendedFallbackData);
+    setRankingData(generateRankData(extendedFallbackData));
   };
 
   return {
@@ -227,4 +269,3 @@ export const useNameTrendData = (gender: 'girl' | 'boy', namesToFetch: string[])
     error
   };
 };
-

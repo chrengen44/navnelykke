@@ -25,6 +25,8 @@ import NameTrendTest from './components/NameTrendTest';
 import Tools from './pages/Tools';
 import CulturalNames from './pages/CulturalNames';
 import CreatePoll from './pages/CreatePoll';
+import EditPoll from './pages/EditPoll';
+import ViewPoll from './pages/ViewPoll';
 
 const queryClient = new QueryClient();
 
@@ -57,6 +59,8 @@ export default function App() {
               <Route path="/verktoy" element={<Tools />} />
               <Route path="/kulturelle-navn" element={<CulturalNames />} />
               <Route path="/poll/create" element={<CreatePoll />} />
+              <Route path="/poll/:id/edit" element={<EditPoll />} />
+              <Route path="/poll/:id" element={<ViewPoll />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

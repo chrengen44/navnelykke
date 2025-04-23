@@ -2,7 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Wrench, ChevronRight, Puzzle, Users } from "lucide-react";
+import { Wrench, Puzzle, Users } from "lucide-react";
 
 const ToolsSection = () => {
   return (
@@ -14,13 +14,6 @@ const ToolsSection = () => {
         
         <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
           <div className="p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-pink-50 rounded-lg">
-                <Wrench className="h-6 w-6 text-pink-500" />
-              </div>
-              <h2 className="text-2xl font-bold">Navneverktøy</h2>
-            </div>
-            
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-gray-50 rounded-lg p-5 hover:bg-gray-100 transition-colors">
                 <h3 className="font-semibold mb-2 flex items-center gap-2">
@@ -82,3 +75,4 @@ const ToolsSection = () => {
 };
 
 export default ToolsSection;
+

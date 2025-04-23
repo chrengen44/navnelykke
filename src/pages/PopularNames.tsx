@@ -4,7 +4,8 @@ import { useSearchParams } from 'react-router-dom';
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import NameGrid from '@/components/NameGrid';
-import AdvancedNameFilters, { AdvancedFilterState } from '@/components/search/AdvancedNameFilters';
+import AdvancedNameFilters from '@/components/search/AdvancedNameFilters';
+import { AdvancedFilterState } from '@/components/search/filters/types';
 import { getPopularNames, BabyName } from '@/data';
 import { babyNames } from '@/data/namesData';
 

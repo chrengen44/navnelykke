@@ -1,8 +1,7 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Wrench, Puzzle, Users } from "lucide-react";
+import { Wrench, Puzzle, Users, Vote } from "lucide-react";
 
 const ToolsSection = () => {
   return (
@@ -66,6 +65,19 @@ const ToolsSection = () => {
                   Kommer snart
                 </Button>
               </div>
+              
+              <div className="bg-gray-50 rounded-lg p-5 hover:bg-gray-100 transition-colors">
+                <h3 className="font-semibold mb-2 flex items-center gap-2">
+                  <Vote className="h-5 w-5 text-purple-500" />
+                  Navneavstemning
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  La familie og venner stemme på deres favoritter
+                </p>
+                <Button asChild size="sm" variant="outline" className="w-full">
+                  <Link to="/poll/create">Opprett avstemning</Link>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -75,4 +87,3 @@ const ToolsSection = () => {
 };
 
 export default ToolsSection;
-

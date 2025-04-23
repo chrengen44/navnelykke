@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { searchNames, BabyName } from "@/data";
 import NameGrid from "@/components/NameGrid";
-import NameFilters, { FilterState } from "@/components/NameFilters";
+import AdvancedNameFilters, { AdvancedFilterState } from "@/components/search/AdvancedNameFilters";
 import AdSpace from "@/components/AdSpace";
 
 const Search = () => {
@@ -40,12 +40,12 @@ const Search = () => {
     fetchSearchResults();
   }, [query]);
   
-  const handleFilter = (filters: FilterState) => {
+  const handleFilter = (filters: AdvancedFilterState) => {
     let filtered = [...allResults];
     
     // Filter by gender
     if (filters.gender !== "all") {
-      filtered = filtered.filter(name => name.gender === filters.gender as "boy" | "girl" | "unisex");
+      filtered = filtered.filter(name => name.gender === filters.gender);
     }
     
     // Filter by length
@@ -57,6 +57,30 @@ const Search = () => {
     if (filters.letter) {
       filtered = filtered.filter(name => 
         name.firstLetter.toLowerCase() === filters.letter.toLowerCase()
+      );
+    }
+    
+    // Filter by meaning
+    if (filters.meaning) {
+      const meaningLower = filters.meaning.toLowerCase();
+      filtered = filtered.filter(name => 
+        name.meaning.toLowerCase().includes(meaningLower)
+      );
+    }
+    
+    // Filter by origin
+    if (filters.origin) {
+      const originLower = filters.origin.toLowerCase();
+      filtered = filtered.filter(name => 
+        name.origin.toLowerCase().includes(originLower)
+      );
+    }
+    
+    // Filter by popularity range
+    if (filters.popularity) {
+      filtered = filtered.filter(name => 
+        name.popularity >= filters.popularity[0] && 
+        name.popularity <= filters.popularity[1]
       );
     }
     
@@ -82,7 +106,7 @@ const Search = () => {
         
         <section className="py-8">
           <div className="container mx-auto px-4">
-            <NameFilters onFilter={handleFilter} showSearch={false} />
+            <AdvancedNameFilters onFilter={handleFilter} showSearch={false} />
             
             <div className="mb-6">
               <p className="text-gray-600">
@@ -98,7 +122,7 @@ const Search = () => {
               <NameGrid 
                 names={filteredResults} 
                 showDetails={true}
-                emptyMessage={query ? `Ingen navn funnet for "${query}". Prøv et annet søkeord.` : "Skriv inn et søkeord for å finne babynavn."}
+                emptyMessage={query ? `Ingen navn funnet for "${query}". Prøv et annet søkeord eller juster filtrene.` : "Skriv inn et søkeord for å finne babynavn."}
               />
             )}
             

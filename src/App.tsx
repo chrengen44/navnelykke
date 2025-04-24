@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -30,6 +29,7 @@ import EditPoll from './pages/EditPoll';
 import ViewPoll from './pages/ViewPoll';
 import Auth from './pages/Auth';
 import { AuthProvider } from "./hooks/useAuth";
+import SecuritySettings from './pages/SecuritySettings';
 
 const queryClient = new QueryClient();
 
@@ -67,6 +67,7 @@ export default function App() {
                 <Route path="/poll/:id" element={<ViewPoll />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/auth/:action" element={<Auth />} />
+                <Route path="/sikkerhet" element={<SecuritySettings />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

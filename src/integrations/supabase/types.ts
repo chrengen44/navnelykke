@@ -451,6 +451,57 @@ export type Database = {
           },
         ]
       }
+      user_privacy_settings: {
+        Row: {
+          allow_public_favorites: boolean | null
+          show_email: boolean | null
+          show_full_name: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          allow_public_favorites?: boolean | null
+          show_email?: boolean | null
+          show_full_name?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          allow_public_favorites?: boolean | null
+          show_email?: boolean | null
+          show_full_name?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_sessions: {
+        Row: {
+          created_at: string | null
+          device_info: string | null
+          id: string
+          ip_address: string | null
+          last_active: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          device_info?: string | null
+          id?: string
+          ip_address?: string | null
+          last_active?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          device_info?: string | null
+          id?: string
+          ip_address?: string | null
+          last_active?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

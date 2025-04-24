@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FavoriteButton from "@/components/FavoritesButton";
+import { toast } from "sonner";
 
 interface NameHeaderProps {
   name: BabyName;
@@ -12,6 +13,26 @@ interface NameHeaderProps {
 }
 
 const NameHeader = ({ name, getGenderLabel, getGenderColorClass }: NameHeaderProps) => {
+  const handleShare = async () => {
+    const shareData = {
+      title: `${name.name} - Navnelykke`,
+      text: `Les mer om navnet ${name.name} og dets betydning`,
+      url: `${window.location.origin}/navn/${name.id}`
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+        toast.success("Lenke kopiert til utklippstavlen");
+      }
+    } catch (error) {
+      console.error("Error sharing:", error);
+      toast.error("Kunne ikke dele navnet");
+    }
+  };
+
   return (
     <div className={`py-12 ${getGenderColorClass()}`}>
       <div className="container mx-auto px-4">
@@ -30,6 +51,7 @@ const NameHeader = ({ name, getGenderLabel, getGenderColorClass }: NameHeaderPro
                 variant="outline"
                 size="icon"
                 className="rounded-full bg-white/70 backdrop-blur-sm text-gray-500"
+                onClick={handleShare}
               >
                 <Share2 className="h-5 w-5" />
               </Button>

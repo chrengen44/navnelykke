@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,6 +9,7 @@ import { BabyName } from "@/data/types";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AddNameToPoll from "./AddNameToPoll";
+import { fetchNameById } from "@/integrations/supabase/name-queries";
 
 interface PollItem {
   id: string;
@@ -46,31 +46,25 @@ const EditPollForm = ({ pollId }: EditPollFormProps) => {
 
         const { data: items, error: itemsError } = await supabase
           .from("poll_items")
-          .select(`
-            id,
-            name_id,
-            custom_name,
-            baby_names (
-              id,
-              name,
-              gender,
-              origin,
-              meaning,
-              popularity,
-              length,
-              categories,
-              firstLetter,
-              phonetic
-            )
-          `)
+          .select("id, name_id, custom_name")
           .eq("poll_id", pollId);
 
         if (itemsError) throw itemsError;
 
-        setPollItems(items.map(item => ({
-          ...item,
-          baby_name: item.baby_names
-        })));
+        const itemsWithNames = await Promise.all(
+          items.map(async (item) => {
+            if (item.name_id) {
+              const babyName = await fetchNameById(item.name_id);
+              return {
+                ...item,
+                baby_name: babyName
+              };
+            }
+            return item;
+          })
+        );
+
+        setPollItems(itemsWithNames);
       } catch (error) {
         console.error("Error fetching poll data:", error);
         toast.error("Kunne ikke hente avstemningsdata");

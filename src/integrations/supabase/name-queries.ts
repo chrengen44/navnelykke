@@ -1,14 +1,12 @@
-
 import { supabase } from './client';
 import { BabyName } from '@/data/types';
 
 export const trackNameVisit = async (nameId: number) => {
   try {
     const { error } = await supabase
-      .from('name_analytics')
+      .from('name_visits')
       .insert({
-        name_id: nameId,
-        event_type: 'view'
+        name_id: nameId
       });
 
     if (error) console.error('Error tracking name visit:', error);

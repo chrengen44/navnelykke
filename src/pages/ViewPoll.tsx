@@ -135,6 +135,9 @@ const ViewPoll = () => {
         return item;
       }));
 
+      // Add analytics tracking for the vote
+      await trackPollAnalytics(id!, 'vote', { poll_item_id: selectedItem });
+
       toast.success("Takk for din stemme!");
       setSelectedItem(null);
       setVoterName("");

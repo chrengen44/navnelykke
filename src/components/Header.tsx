@@ -14,14 +14,14 @@ const Header = () => {
   const { user } = useAuth();
 
   return (
-    <header className="relative">
-      {/* Announcement banner - this will scroll away */}
+    <header>
+      {/* Announcement banner */}
       <div className="bg-pink-50 py-2 text-center text-pink-700">
         Oppdag de nyeste navnene og trendene!
       </div>
 
-      {/* Navigation - this will stick to the top */}
-      <nav className="sticky top-0 z-50 bg-white shadow-sm">
+      {/* Navigation - fixed to the top */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="text-xl font-bold text-pink-600">Navnelykke</Link>
           
@@ -58,6 +58,9 @@ const Header = () => {
           </div>
         </div>
       </nav>
+
+      {/* Spacer to prevent content from going under fixed nav */}
+      <div className="h-[72px]"></div>
 
       <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
     </header>

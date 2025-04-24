@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -16,7 +15,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { BabyName } from "@/data/types";
 import { Pencil, Trash2, Plus } from "lucide-react";
-import { fetchCategories } from "@/integrations/supabase/client";
+import { fetchCategories } from "@/integrations/supabase/category-queries";
 import { NameCategory } from "@/data/types";
 
 export const AdminPanel = () => {
@@ -452,4 +451,3 @@ export const AdminPanel = () => {
     </div>
   );
 };
-

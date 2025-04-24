@@ -7,7 +7,7 @@ import RelatedNames from "@/components/RelatedNames";
 import AdSpace from "@/components/AdSpace";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { trackNameVisit, fetchNameById } from "@/integrations/supabase/client";
+import { trackNameVisit, fetchNameById } from "@/integrations/supabase/name-queries";
 import { toast } from "sonner";
 import NameHeader from "@/components/name-detail/NameHeader";
 import NameInfo from "@/components/name-detail/NameInfo";

@@ -1,118 +1,46 @@
-
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import { nameCategories } from "@/data";
-import CategoryCard from "@/components/CategoryCard";
-import AdSpace from "@/components/AdSpace";
-import OriginCategoryCard from "@/components/OriginCategoryCard";
-import { useQuery } from "@tanstack/react-query";
-import { supabase, getOriginCounts } from "@/integrations/supabase/client";
-
-interface Origin {
-  origin: string;
-  name_count: number;
-}
+import { useState, useEffect } from "react";
+import { Layout } from "@/components/Layout";
+import { Link } from "react-router-dom";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { getOriginCounts } from "@/integrations/supabase/analytics-queries";
 
 const Categories = () => {
-  const { data: origins, isLoading } = useQuery({
-    queryKey: ['origins'],
-    queryFn: async () => {
-      const originsWithCount = await getOriginCounts();
-      console.log('Origins fetched from database:', originsWithCount);
-      return originsWithCount;
-    }
-  });
+  const [originCounts, setOriginCounts] = useState<{origin: string, name_count: number}[]>([]);
+
+  useEffect(() => {
+    const fetchOriginCounts = async () => {
+      const counts = await getOriginCounts();
+      setOriginCounts(counts);
+    };
+
+    fetchOriginCounts();
+  }, []);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-grow">
-        <div className="bg-gradient-to-br from-babyblue via-white to-babypink py-12">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center">
-              <h1 className="text-3xl md:text-4xl font-bold mb-4">Navnekategorier</h1>
-              <p className="text-lg text-gray-700">
-                Utforsk babynavn sortert etter ulike kategorier og typer
-              </p>
-            </div>
-          </div>
+    <Layout>
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">Navn etter opprinnelse</h1>
+        <p className="text-gray-600 mb-8">Utforsk navn basert på deres geografiske og kulturelle opprinnelse.</p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {originCounts.map((origin) => (
+            <Link key={origin.origin} to={`/opprinnelse/${origin.origin}`}>
+              <Card className="hover:shadow-md transition-shadow duration-200">
+                <CardHeader>
+                  <CardTitle>{origin.origin}</CardTitle>
+                  <CardDescription>
+                    {origin.name_count} navn
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-500">Utforsk navn fra {origin.origin}</p>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
         </div>
-        
-        <section className="py-12">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold mb-6">Kategorier</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {nameCategories.map((category) => (
-                <CategoryCard
-                  key={category.id}
-                  id={category.id}
-                  title={category.title}
-                  description={category.description}
-                  icon={category.icon}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-        
-        <div className="container mx-auto px-4 py-4">
-          <AdSpace type="horizontal" />
-        </div>
-        
-        <section className="py-12 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold mb-6">Opprinnelse</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {isLoading ? (
-                <div className="col-span-full text-center py-8">Laster kategorier...</div>
-              ) : origins && origins.length > 0 ? (
-                origins.map((origin) => (
-                  <OriginCategoryCard
-                    key={origin.origin}
-                    origin={origin.origin}
-                    count={origin.name_count}
-                  />
-                ))
-              ) : (
-                <div className="col-span-full text-center py-8">Ingen opprinnelser funnet</div>
-              )}
-            </div>
-          </div>
-        </section>
-        
-        <div className="container mx-auto px-4 py-4">
-          <AdSpace type="horizontal" />
-        </div>
-        
-        <section className="py-12 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold mb-3">Hvorfor er kategori viktig?</h2>
-              <p className="text-gray-600 max-w-3xl">
-                Hvilken type navn du velger kan si mye om dine verdier og hva du vil gi videre til ditt barn. Klassiske navn gir en følelse av tidløshet, mens unike navn kan gi barnet en distinkt identitet.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="bg-white p-6 rounded-lg shadow-sm">
-                <h3 className="text-xl font-semibold mb-3">Navnetrender endrer seg</h3>
-                <p className="text-gray-600">
-                  Navn går inn og ut av moten, akkurat som klær og musikk. Noen foreldre foretrekker populære, moderne navn, mens andre liker mer tidløse klassikere eller unike alternativer.
-                </p>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg shadow-sm">
-                <h3 className="text-xl font-semibold mb-3">Kulturarv gjennom navn</h3>
-                <p className="text-gray-600">
-                  Navn kan reflektere din kulturelle bakgrunn og arv. Nordiske navn har dype røtter i vår historie, mens internasjonale navn kan representere en mer global tilnærming.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </Layout>
   );
 };
 

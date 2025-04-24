@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Layout } from "@/components/Layout";
@@ -9,6 +8,8 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { trackPollAnalytics, getPollAnalytics } from "@/integrations/supabase/poll-analytics";
+import { Bar, BarChart, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 interface PollItem {
   id: string;
@@ -30,6 +31,11 @@ const ViewPoll = () => {
   const [voterEmail, setVoterEmail] = useState("");
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [pollAnalytics, setPollAnalytics] = useState<{
+    views: number;
+    shares: number;
+    votes: number;
+  } | null>(null);
 
   useEffect(() => {
     const fetchPollData = async () => {
@@ -58,7 +64,6 @@ const ViewPoll = () => {
 
         if (itemsError) throw itemsError;
 
-        // Fetch vote counts for each item
         const { data: votes, error: votesError } = await supabase
           .from("poll_votes")
           .select("poll_item_id")
@@ -66,7 +71,6 @@ const ViewPoll = () => {
 
         if (votesError) throw votesError;
 
-        // Count votes for each item
         const voteCounts = votes.reduce((acc: { [key: string]: number }, vote) => {
           acc[vote.poll_item_id] = (acc[vote.poll_item_id] || 0) + 1;
           return acc;
@@ -78,6 +82,15 @@ const ViewPoll = () => {
         }));
 
         setPollItems(itemsWithVotes);
+
+        // Track poll view
+        await trackPollAnalytics(id!, 'view');
+
+        // Fetch poll analytics (only for poll creator)
+        if (user) {
+          const analytics = await getPollAnalytics(id!);
+          setPollAnalytics(analytics);
+        }
       } catch (error) {
         console.error("Error fetching poll data:", error);
         toast.error("Kunne ikke hente avstemningsdata");
@@ -85,7 +98,7 @@ const ViewPoll = () => {
     };
 
     fetchPollData();
-  }, [id]);
+  }, [id, user]);
 
   const handleVote = async () => {
     if (!selectedItem) {
@@ -112,7 +125,6 @@ const ViewPoll = () => {
 
       if (error) throw error;
 
-      // Update local state to show the new vote
       setPollItems(pollItems.map(item => {
         if (item.id === selectedItem) {
           return {
@@ -132,6 +144,27 @@ const ViewPoll = () => {
       toast.error("Kunne ikke registrere stemmen");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      const shareData = {
+        title: 'Stem på navn!',
+        text: 'Hjelp oss å velge navn! Stem på dine favoritter.',
+        url: `${window.location.origin}/poll/${id}`
+      };
+
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+        toast.success("Lenke kopiert til utklippstavlen");
+      }
+
+      await trackPollAnalytics(id!, 'share');
+    } catch (error) {
+      console.error("Error sharing:", error);
     }
   };
 
@@ -213,6 +246,24 @@ const ViewPoll = () => {
           >
             {isLoading ? "Sender inn stemme..." : "Stem"}
           </Button>
+
+          {pollAnalytics && user && (
+            <div className="mt-8 bg-gray-50 p-6 rounded-lg">
+              <h3 className="text-xl font-semibold mb-4">Polling Analytics</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={[
+                  { name: 'Views', count: pollAnalytics.views },
+                  { name: 'Shares', count: pollAnalytics.shares },
+                  { name: 'Votes', count: pollAnalytics.votes }
+                ]}>
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="count" fill="#8884d8" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
       </div>
     </Layout>

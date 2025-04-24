@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { BabyName } from "@/data";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { fetchAllNames } from "@/integrations/supabase/client";
+import { fetchAllNames } from "@/integrations/supabase/name-queries";
 
 interface RelatedNamesProps {
   currentName: BabyName;

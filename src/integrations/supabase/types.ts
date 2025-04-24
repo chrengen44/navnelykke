@@ -258,6 +258,41 @@ export type Database = {
         }
         Relationships: []
       }
+      poll_analytics: {
+        Row: {
+          created_at: string | null
+          event_type: string
+          id: string
+          metadata: Json | null
+          poll_id: string
+          visitor_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          poll_id: string
+          visitor_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          poll_id?: string
+          visitor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "poll_analytics_poll_id_fkey"
+            columns: ["poll_id"]
+            isOneToOne: false
+            referencedRelation: "name_polls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       poll_items: {
         Row: {
           created_at: string

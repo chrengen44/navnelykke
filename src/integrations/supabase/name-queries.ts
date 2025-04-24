@@ -2,6 +2,21 @@
 import { supabase } from './client';
 import { BabyName } from '@/data/types';
 
+export const trackNameVisit = async (nameId: number) => {
+  try {
+    const { error } = await supabase
+      .from('name_analytics')
+      .insert({
+        name_id: nameId,
+        event_type: 'view'
+      });
+
+    if (error) console.error('Error tracking name visit:', error);
+  } catch (error) {
+    console.error('Error tracking name visit:', error);
+  }
+};
+
 export const fetchNameById = async (id: number): Promise<BabyName | null> => {
   try {
     const { data: name, error: nameError } = await supabase
@@ -100,4 +115,3 @@ export const fetchAllNames = async (): Promise<BabyName[]> => {
     throw error;
   }
 };
-

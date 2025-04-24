@@ -1,7 +1,27 @@
+
 import { fetchPopularNames } from "@/integrations/supabase/popular-names";
 import { fetchNamesByCategory } from "@/integrations/supabase/category-queries";
 import { searchNames } from "@/integrations/supabase/search";
-import { fetchAllNames } from "@/integrations/supabase/name-queries";
+import { fetchAllNames, fetchNameById } from "@/integrations/supabase/name-queries";
+import { BabyName } from "./types";
+
+// Export the direct functions for backward compatibility
+export const getPopularNames = async (gender?: 'boy' | 'girl' | 'unisex', limit = 10): Promise<BabyName[]> => {
+  return fetchPopularNames(gender, limit);
+};
+
+export const getNamesByCategory = async (category: string, limit?: number): Promise<BabyName[]> => {
+  const names = await fetchNamesByCategory(category);
+  return limit ? names.slice(0, limit) : names;
+};
+
+export const getNameById = async (id: number): Promise<BabyName | null> => {
+  return fetchNameById(id);
+};
+
+export const getAllNames = async (): Promise<BabyName[]> => {
+  return fetchAllNames();
+};
 
 export const getPopularityData = async (gender?: 'boy' | 'girl' | 'unisex') => {
   const popularNames = await fetchPopularNames(gender, 5);

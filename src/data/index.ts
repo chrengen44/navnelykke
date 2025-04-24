@@ -4,3 +4,4 @@ export * from './types';
 export * from './namesData';
 export * from './categories';
 export * from './nameUtils';
+export { searchNames } from '@/integrations/supabase/search';

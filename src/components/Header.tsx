@@ -5,10 +5,13 @@ import MobileMenu from './MobileMenu';
 import { Heart } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useFavorites } from '@/contexts/FavoritesContext';
+import { useAuth } from '@/hooks/useAuth';
+import UserMenu from '@/UserMenu';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { favoritesCount } = useFavorites();
+  const { user } = useAuth();
 
   return (
     <header className="bg-white shadow-sm">
@@ -37,6 +40,8 @@ const Header = () => {
               </span>
             )}
           </Link>
+          
+          <UserMenu />
           
           <button
             onClick={() => setMobileMenuOpen(true)}

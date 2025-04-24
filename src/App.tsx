@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -27,6 +28,8 @@ import CulturalNames from './pages/CulturalNames';
 import CreatePoll from './pages/CreatePoll';
 import EditPoll from './pages/EditPoll';
 import ViewPoll from './pages/ViewPoll';
+import Auth from './pages/Auth';
+import { AuthProvider } from "./hooks/useAuth";
 
 const queryClient = new QueryClient();
 
@@ -34,37 +37,41 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <FavoritesProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/navn/:id" element={<NameDetail />} />
-              <Route path="/populære-navn" element={<PopularNames />} />
-              <Route path="/navnetrender" element={<NameTrends />} />
-              <Route path="/kategorier" element={<Categories />} />
-              <Route path="/kategori/:categoryId" element={<Category />} />
-              <Route path="/favoritter" element={<Favorites />} />
-              <Route path="/inspirasjon" element={<Inspiration />} />
-              <Route path="/søk" element={<Search />} />
-              <Route path="/foresla-navn" element={<SuggestName />} />
-              <Route path="/profil" element={<Profile />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/opprinnelse/:origin" element={<OriginNames />} />
-              <Route path="/om-navnelykke" element={<About />} />
-              <Route path="/kontakt-oss" element={<Contact />} />
-              <Route path="/personvern" element={<PrivacyPolicy />} />
-              <Route path="/test" element={<NameTrendTest />} />
-              <Route path="/verktoy" element={<Tools />} />
-              <Route path="/kulturelle-navn" element={<CulturalNames />} />
-              <Route path="/poll/create" element={<CreatePoll />} />
-              <Route path="/poll/:id/edit" element={<EditPoll />} />
-              <Route path="/poll/:id" element={<ViewPoll />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </FavoritesProvider>
+        <AuthProvider>
+          <FavoritesProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/navn/:id" element={<NameDetail />} />
+                <Route path="/populære-navn" element={<PopularNames />} />
+                <Route path="/navnetrender" element={<NameTrends />} />
+                <Route path="/kategorier" element={<Categories />} />
+                <Route path="/kategori/:categoryId" element={<Category />} />
+                <Route path="/favoritter" element={<Favorites />} />
+                <Route path="/inspirasjon" element={<Inspiration />} />
+                <Route path="/søk" element={<Search />} />
+                <Route path="/foresla-navn" element={<SuggestName />} />
+                <Route path="/profil" element={<Profile />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/opprinnelse/:origin" element={<OriginNames />} />
+                <Route path="/om-navnelykke" element={<About />} />
+                <Route path="/kontakt-oss" element={<Contact />} />
+                <Route path="/personvern" element={<PrivacyPolicy />} />
+                <Route path="/test" element={<NameTrendTest />} />
+                <Route path="/verktoy" element={<Tools />} />
+                <Route path="/kulturelle-navn" element={<CulturalNames />} />
+                <Route path="/poll/create" element={<CreatePoll />} />
+                <Route path="/poll/:id/edit" element={<EditPoll />} />
+                <Route path="/poll/:id" element={<ViewPoll />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/auth/:action" element={<Auth />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </FavoritesProvider>
+        </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

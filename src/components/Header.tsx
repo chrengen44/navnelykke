@@ -59,9 +59,6 @@ const Header = () => {
         </div>
       </nav>
 
-      {/* Spacer to prevent content from going under fixed nav */}
-      <div className="h-[72px]"></div>
-
       <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
     </header>
   );

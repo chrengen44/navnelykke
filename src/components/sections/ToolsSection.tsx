@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -53,19 +54,6 @@ const ToolsSection = () => {
                 </Button>
               </div>
               
-              <div className="bg-gray-50 rounded-lg p-5 hover:bg-gray-100 transition-colors opacity-50 cursor-not-allowed">
-                <h3 className="font-semibold mb-2 flex items-center gap-2">
-                  <Wrench className="h-5 w-5 text-gray-400" />
-                  Kommende verktøy
-                </h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Nytt navneverktøy kommer snart!
-                </p>
-                <Button size="sm" variant="outline" className="w-full" disabled>
-                  Kommer snart
-                </Button>
-              </div>
-              
               <div className="bg-gray-50 rounded-lg p-5 hover:bg-gray-100 transition-colors">
                 <h3 className="font-semibold mb-2 flex items-center gap-2">
                   <Vote className="h-5 w-5 text-purple-500" />
@@ -87,3 +75,4 @@ const ToolsSection = () => {
 };
 
 export default ToolsSection;
+

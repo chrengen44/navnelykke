@@ -137,28 +137,34 @@ export function useSecureData<T>(
 }
 
 // Define a list of all valid table names as a literal union type
-type TableName = 'baby_names' | 'favorites' | 'profiles' | 'name_categories' | 
-  'name_category_mappings' | 'name_list_items' | 'name_lists' | 'name_polls' | 
-  'name_visits' | 'poll_analytics' | 'poll_items' | 'poll_votes' | 
-  'suggested_names' | 'user_privacy_settings' | 'user_sessions';
+// Using a const assertion to prevent excessive type instantiation
+const VALID_TABLES = [
+  'baby_names', 
+  'favorites', 
+  'profiles', 
+  'name_categories', 
+  'name_category_mappings', 
+  'name_list_items', 
+  'name_lists', 
+  'name_polls', 
+  'name_visits', 
+  'poll_analytics', 
+  'poll_items', 
+  'poll_votes', 
+  'suggested_names', 
+  'user_privacy_settings', 
+  'user_sessions'
+] as const;
 
-// This type helps us handle cases where a string might be used as a table name
-type TableNameInput = TableName | string;
+// Create type from the array
+type TableName = typeof VALID_TABLES[number];
+type TableNameInput = string;
 
 /**
  * Helper function to safely handle table name type casting
- * This avoids excessive type instantiations
  */
 const toTableName = (tableName: TableNameInput): TableName => {
-  // Type checking for table names at runtime
-  const validTableNames: TableName[] = [
-    'baby_names', 'favorites', 'profiles', 'name_categories',
-    'name_category_mappings', 'name_list_items', 'name_lists', 'name_polls',
-    'name_visits', 'poll_analytics', 'poll_items', 'poll_votes',
-    'suggested_names', 'user_privacy_settings', 'user_sessions'
-  ];
-
-  if (!validTableNames.includes(tableName as TableName)) {
+  if (!VALID_TABLES.includes(tableName as TableName)) {
     console.warn(`Warning: ${tableName} is not a recognized table name`);
   }
   

@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
@@ -6,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
-import { secureApi, sanitizeInput } from "@/utils/apiClient";
+import { secureApi, sanitizeInput } from "@/utils/api";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Shield, Trash2, AlertCircle } from "lucide-react";
 import {

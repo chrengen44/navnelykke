@@ -34,8 +34,11 @@ export const secureApi = {
         return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
+      // Use a type assertion after validation
+      const validTableName = tableName as ValidTableName;
+      
       const { data, error } = await supabase
-        .from(tableName)
+        .from(validTableName)
         .select(query.select || '*')
         .order(query.orderBy || 'created_at', { ascending: false });
       
@@ -64,8 +67,11 @@ export const secureApi = {
         return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
+      // Use a type assertion after validation
+      const validTableName = tableName as ValidTableName;
+      
       const result = await supabase
-        .from(tableName)
+        .from(validTableName)
         .insert([sanitizedData]);
       
       return { data: result.data as T, error: result.error };
@@ -95,8 +101,11 @@ export const secureApi = {
         return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
+      // Use a type assertion after validation
+      const validTableName = tableName as ValidTableName;
+      
       const result = await supabase
-        .from(tableName)
+        .from(validTableName)
         .update(sanitizedData)
         .eq(sanitizedQuery.column, sanitizedQuery.value);
       
@@ -125,8 +134,11 @@ export const secureApi = {
         return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
+      // Use a type assertion after validation
+      const validTableName = tableName as ValidTableName;
+      
       const result = await supabase
-        .from(tableName)
+        .from(validTableName)
         .delete()
         .eq(sanitizedQuery.column, sanitizedQuery.value);
       

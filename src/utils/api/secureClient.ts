@@ -37,13 +37,16 @@ export const secureApi = {
       // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Simplify the typing of the result to avoid deep instantiation
-      const { data, error } = await supabase
+      // Execute the query with explicit type casting to break complex type inference
+      const response = await supabase
         .from(validTableName)
         .select(query.select || '*')
         .order(query.orderBy || 'created_at', { ascending: false });
       
-      return { data: data as T, error };
+      return { 
+        data: response.data as unknown as T, 
+        error: response.error 
+      };
     } catch (err: any) {
       return { data: null, error: err };
     }
@@ -71,12 +74,15 @@ export const secureApi = {
       // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Simplify typing to avoid deep instantiation
-      const { data: resultData, error } = await supabase
+      // Execute with explicit type casting
+      const response = await supabase
         .from(validTableName)
         .insert([sanitizedData]);
       
-      return { data: resultData as T, error };
+      return { 
+        data: response.data as unknown as T, 
+        error: response.error 
+      };
     } catch (err: any) {
       return { data: null, error: err };
     }
@@ -106,15 +112,19 @@ export const secureApi = {
       // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Use a type cast to any to break the deep instantiation
-      const result: any = await supabase
+      // Completely bypass complex type inference with a more direct approach
+      type SimpleResponse = { data: any; error: any };
+      const updateQuery = supabase
         .from(validTableName)
         .update(sanitizedData)
         .eq(sanitizedQuery.column, sanitizedQuery.value);
+        
+      // Use explicit Promise with simple types to avoid deep instantiation
+      const response = await updateQuery as unknown as SimpleResponse;
       
       return { 
-        data: result.data as T, 
-        error: result.error 
+        data: response.data as T, 
+        error: response.error 
       };
     } catch (err: any) {
       return { data: null, error: err };
@@ -143,15 +153,19 @@ export const secureApi = {
       // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Use a type cast to any to break the deep instantiation
-      const result: any = await supabase
+      // Completely bypass complex type inference with a more direct approach
+      type SimpleResponse = { data: any; error: any };
+      const deleteQuery = supabase
         .from(validTableName)
         .delete()
         .eq(sanitizedQuery.column, sanitizedQuery.value);
+        
+      // Use explicit Promise with simple types to avoid deep instantiation
+      const response = await deleteQuery as unknown as SimpleResponse;
       
       return { 
-        data: result.data as T, 
-        error: result.error 
+        data: response.data as T, 
+        error: response.error 
       };
     } catch (err: any) {
       return { data: null, error: err };

@@ -136,11 +136,34 @@ export function useSecureData<T>(
   return { data, error, isLoading };
 }
 
-// Define a type for table names to avoid the type instantiation error
+// Define a list of all valid table names as a literal union type
 type TableName = 'baby_names' | 'favorites' | 'profiles' | 'name_categories' | 
   'name_category_mappings' | 'name_list_items' | 'name_lists' | 'name_polls' | 
   'name_visits' | 'poll_analytics' | 'poll_items' | 'poll_votes' | 
   'suggested_names' | 'user_privacy_settings' | 'user_sessions';
+
+// This type helps us handle cases where a string might be used as a table name
+type TableNameInput = TableName | string;
+
+/**
+ * Helper function to safely handle table name type casting
+ * This avoids excessive type instantiations
+ */
+const toTableName = (tableName: TableNameInput): TableName => {
+  // Type checking for table names at runtime
+  const validTableNames: TableName[] = [
+    'baby_names', 'favorites', 'profiles', 'name_categories',
+    'name_category_mappings', 'name_list_items', 'name_lists', 'name_polls',
+    'name_visits', 'poll_analytics', 'poll_items', 'poll_votes',
+    'suggested_names', 'user_privacy_settings', 'user_sessions'
+  ];
+
+  if (!validTableNames.includes(tableName as TableName)) {
+    console.warn(`Warning: ${tableName} is not a recognized table name`);
+  }
+  
+  return tableName as TableName;
+};
 
 /**
  * Secure API client for handling data operations
@@ -150,7 +173,7 @@ export const secureApi = {
    * Securely fetch data from Supabase
    */
   async fetch<T>(
-    tableName: TableName | string, 
+    tableName: TableNameInput, 
     query: any = {},
     endpoint = 'default'
   ): Promise<{ data: T | null; error: Error | null }> {
@@ -175,9 +198,11 @@ export const secureApi = {
         return { data: null, error: new Error(`Unsupported auth method: ${tableName}`) };
       }
 
-      // For regular table operations, proceed as before but with type safety
+      // For regular table operations, proceed with the tableName cast
+      const safeTableName = toTableName(tableName);
+      
       const { data, error } = await supabase
-        .from(tableName as TableName)
+        .from(safeTableName)
         .select(query.select || '*')
         .order(query.orderBy || 'created_at', { ascending: false });
       
@@ -194,7 +219,7 @@ export const secureApi = {
    * Securely insert data into Supabase
    */
   async insert<T>(
-    tableName: TableName | string,
+    tableName: TableNameInput,
     data: Record<string, any>,
     endpoint = 'update'
   ): Promise<{ data: T | null; error: Error | null }> {
@@ -207,10 +232,11 @@ export const secureApi = {
     try {
       // Sanitize the input data
       const sanitizedData = sanitizeInput(data);
+      const safeTableName = toTableName(tableName);
       
       // Insert the data
       const result = await supabase
-        .from(tableName as TableName)
+        .from(safeTableName)
         .insert([sanitizedData]);
       
       return { 
@@ -226,7 +252,7 @@ export const secureApi = {
    * Securely update data in Supabase
    */
   async update<T>(
-    tableName: TableName | string,
+    tableName: TableNameInput,
     query: { column: string; value: any },
     data: Record<string, any>,
     endpoint = 'update'
@@ -241,10 +267,11 @@ export const secureApi = {
       // Sanitize the input data
       const sanitizedData = sanitizeInput(data);
       const sanitizedQuery = sanitizeInput(query);
+      const safeTableName = toTableName(tableName);
       
       // Update the data
       const result = await supabase
-        .from(tableName as TableName)
+        .from(safeTableName)
         .update(sanitizedData)
         .eq(sanitizedQuery.column, sanitizedQuery.value);
       
@@ -261,7 +288,7 @@ export const secureApi = {
    * Securely delete data from Supabase
    */
   async delete<T>(
-    tableName: TableName | string,
+    tableName: TableNameInput,
     query: { column: string; value: any },
     endpoint = 'update'
   ): Promise<{ data: T | null; error: Error | null }> {
@@ -273,10 +300,11 @@ export const secureApi = {
     
     try {
       const sanitizedQuery = sanitizeInput(query);
+      const safeTableName = toTableName(tableName);
       
       // Delete the data
       const result = await supabase
-        .from(tableName as TableName)
+        .from(safeTableName)
         .delete()
         .eq(sanitizedQuery.column, sanitizedQuery.value);
       

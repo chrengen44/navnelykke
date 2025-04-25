@@ -1,9 +1,11 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
+import SecurityHeaders from "@/components/SecurityHeaders";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Categories from "./pages/Categories";
@@ -39,6 +41,7 @@ export default function App() {
       <TooltipProvider>
         <AuthProvider>
           <FavoritesProvider>
+            <SecurityHeaders />
             <Toaster />
             <Sonner />
             <BrowserRouter>

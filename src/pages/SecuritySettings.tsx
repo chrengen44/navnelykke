@@ -7,8 +7,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Shield, Trash2 } from "lucide-react";
+import { secureApi, sanitizeInput } from "@/utils/apiClient";
+import { Loader2, Shield, Trash2, AlertCircle } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface PrivacySettings {
   show_email: boolean;
@@ -35,7 +46,10 @@ export default function SecuritySettings() {
   });
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingSettings, setLoadingSettings] = useState(false);
+  const [loadingSessions, setLoadingSessions] = useState(false);
   const [deletingAccount, setDeletingAccount] = useState(false);
+  const [terminatingSessionId, setTerminatingSessionId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -48,31 +62,39 @@ export default function SecuritySettings() {
   }, [user, navigate]);
 
   const loadSettings = async () => {
+    setLoadingSettings(true);
     try {
-      const { data, error } = await supabase
-        .from("user_privacy_settings")
-        .select("*")
-        .eq("user_id", user?.id)
-        .single();
+      const { data, error } = await secureApi.fetch<PrivacySettings[]>(
+        "user_privacy_settings",
+        { column: "user_id", value: user?.id }
+      );
 
       if (error) throw error;
-      if (data) setPrivacySettings(data);
+      if (data && data.length > 0) setPrivacySettings(data[0]);
     } catch (error: any) {
       toast({
         title: "Feil ved lasting av innstillinger",
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setLoadingSettings(false);
     }
   };
 
   const loadSessions = async () => {
+    setLoadingSessions(true);
     try {
-      const { data, error } = await supabase
-        .from("user_sessions")
-        .select("*")
-        .eq("user_id", user?.id)
-        .order("last_active", { ascending: false });
+      const { data, error } = await secureApi.fetch<Session[]>(
+        "user_sessions",
+        {
+          select: "*",
+          params: { user_id: user?.id },
+          orderBy: "last_active",
+          ascending: false
+        },
+        "default"
+      );
 
       if (error) throw error;
       if (data) setSessions(data);
@@ -83,16 +105,27 @@ export default function SecuritySettings() {
         variant: "destructive",
       });
     } finally {
+      setLoadingSessions(false);
       setLoading(false);
     }
   };
 
   const updatePrivacySettings = async (key: keyof PrivacySettings, value: boolean) => {
+    if (loadingSettings) return;
+    setLoadingSettings(true);
+
     try {
-      const { error } = await supabase
-        .from("user_privacy_settings")
-        .update({ [key]: value })
-        .eq("user_id", user?.id);
+      // Validate the input first
+      if (typeof value !== 'boolean') {
+        throw new Error("Invalid input type");
+      }
+
+      const settings = { ...privacySettings, [key]: value };
+      const { error } = await secureApi.update(
+        "user_privacy_settings",
+        { column: "user_id", value: user?.id },
+        { [key]: value }
+      );
 
       if (error) throw error;
 
@@ -107,14 +140,23 @@ export default function SecuritySettings() {
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setLoadingSettings(false);
     }
   };
 
   const handlePasswordReset = async () => {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(user?.email || "", {
-        redirectTo: `${window.location.origin}/auth/reset`,
-      });
+      if (!user?.email) {
+        throw new Error("No email associated with this account");
+      }
+
+      // Sanitize the email before passing to the function
+      const sanitizedEmail = sanitizeInput(user.email);
+      const { error } = await secureApi.fetch(
+        "auth.resetPasswordForEmail",
+        { email: sanitizedEmail, options: { redirectTo: `${window.location.origin}/auth/reset` } }
+      );
 
       if (error) throw error;
 
@@ -132,11 +174,12 @@ export default function SecuritySettings() {
   };
 
   const handleSessionTermination = async (sessionId: string) => {
+    setTerminatingSessionId(sessionId);
     try {
-      const { error } = await supabase
-        .from("user_sessions")
-        .delete()
-        .eq("id", sessionId);
+      const { error } = await secureApi.delete(
+        "user_sessions", 
+        { column: "id", value: sessionId }
+      );
 
       if (error) throw error;
 
@@ -151,20 +194,33 @@ export default function SecuritySettings() {
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setTerminatingSessionId(null);
     }
   };
 
   const handleAccountDeletion = async () => {
-    if (!window.confirm("Er du sikker på at du vil slette kontoen din? Dette kan ikke angres.")) {
-      return;
-    }
-
     setDeletingAccount(true);
     try {
-      const { error } = await supabase.auth.admin.deleteUser(user?.id || "");
+      if (!user?.id) {
+        throw new Error("No user ID available");
+      }
+      
+      // First, clear all user data
+      await Promise.all([
+        secureApi.delete("user_sessions", { column: "user_id", value: user.id }),
+        secureApi.delete("user_privacy_settings", { column: "user_id", value: user.id })
+      ]);
+      
+      // Then delete the auth user
+      const { error } = await secureApi.delete(
+        "auth.users", 
+        { column: "id", value: user.id }
+      );
+
       if (error) throw error;
 
-      await supabase.auth.signOut();
+      await secureApi.fetch("auth.signOut");
       navigate("/");
       toast({
         title: "Konto slettet",
@@ -179,6 +235,51 @@ export default function SecuritySettings() {
     } finally {
       setDeletingAccount(false);
     }
+  };
+
+  // Function to format ISO date to a more readable format
+  const formatDate = (isoDate: string): string => {
+    try {
+      const date = new Date(isoDate);
+      return new Intl.DateTimeFormat('no-NO', {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+      }).format(date);
+    } catch (e) {
+      return 'Ugyldig dato';
+    }
+  };
+
+  // Function to get a friendly device name from user agent
+  const getDeviceName = (userAgent: string | null): string => {
+    if (!userAgent) return 'Ukjent enhet';
+    
+    let deviceName = 'Annen enhet';
+    
+    if (userAgent.includes('iPhone') || userAgent.includes('iPad')) {
+      deviceName = userAgent.includes('iPad') ? 'iPad' : 'iPhone';
+    } else if (userAgent.includes('Android')) {
+      deviceName = 'Android-enhet';
+    } else if (userAgent.includes('Windows')) {
+      deviceName = 'Windows-enhet';
+    } else if (userAgent.includes('Mac')) {
+      deviceName = 'Mac-enhet';
+    } else if (userAgent.includes('Linux')) {
+      deviceName = 'Linux-enhet';
+    }
+    
+    // Add browser info
+    if (userAgent.includes('Chrome') && !userAgent.includes('Chromium')) {
+      deviceName += ' - Chrome';
+    } else if (userAgent.includes('Firefox')) {
+      deviceName += ' - Firefox';
+    } else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) {
+      deviceName += ' - Safari';
+    } else if (userAgent.includes('Edge')) {
+      deviceName += ' - Edge';
+    }
+    
+    return deviceName;
   };
 
   if (loading) {
@@ -218,6 +319,7 @@ export default function SecuritySettings() {
                 <Switch
                   checked={privacySettings.show_email}
                   onCheckedChange={(checked) => updatePrivacySettings("show_email", checked)}
+                  disabled={loadingSettings}
                 />
               </div>
               
@@ -231,6 +333,7 @@ export default function SecuritySettings() {
                 <Switch
                   checked={privacySettings.show_full_name}
                   onCheckedChange={(checked) => updatePrivacySettings("show_full_name", checked)}
+                  disabled={loadingSettings}
                 />
               </div>
               
@@ -244,6 +347,7 @@ export default function SecuritySettings() {
                 <Switch
                   checked={privacySettings.allow_public_favorites}
                   onCheckedChange={(checked) => updatePrivacySettings("allow_public_favorites", checked)}
+                  disabled={loadingSettings}
                 />
               </div>
             </CardContent>
@@ -257,27 +361,63 @@ export default function SecuritySettings() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {sessions.map((session) => (
-                  <div key={session.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <div className="font-medium">
-                        {session.device_info || "Ukjent enhet"}
+              {loadingSessions ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+                </div>
+              ) : sessions.length > 0 ? (
+                <div className="space-y-4">
+                  {sessions.map((session) => {
+                    const deviceName = getDeviceName(session.device_info);
+                    const isCurrentDevice = session.device_info === navigator.userAgent;
+                    
+                    return (
+                      <div 
+                        key={session.id} 
+                        className={`flex items-center justify-between p-4 border rounded-lg ${isCurrentDevice ? 'border-primary/30 bg-primary/5' : ''}`}
+                      >
+                        <div>
+                          <div className="font-medium flex items-center">
+                            {deviceName}
+                            {isCurrentDevice && (
+                              <span className="ml-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">
+                                Denne enheten
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            Sist aktiv: {formatDate(session.last_active)}
+                          </div>
+                          {session.ip_address && (
+                            <div className="text-xs text-muted-foreground mt-1">
+                              IP: {session.ip_address}
+                            </div>
+                          )}
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleSessionTermination(session.id)}
+                          disabled={terminatingSessionId === session.id}
+                        >
+                          {terminatingSessionId === session.id ? (
+                            <>
+                              <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                              Avslutter...
+                            </>
+                          ) : (
+                            "Avslutt økt"
+                          )}
+                        </Button>
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        Sist aktiv: {new Date(session.last_active).toLocaleString()}
-                      </div>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleSessionTermination(session.id)}
-                    >
-                      Avslutt økt
-                    </Button>
-                  </div>
-                ))}
-              </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  Ingen aktive økter funnet
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -297,27 +437,45 @@ export default function SecuritySettings() {
               </Button>
 
               <div className="border-t pt-4">
-                <h3 className="text-lg font-medium text-destructive mb-2">Faresone</h3>
+                <h3 className="text-lg font-medium text-destructive mb-2 flex items-center">
+                  <AlertCircle className="h-5 w-5 mr-1.5" />
+                  Faresone
+                </h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Når du sletter kontoen din, slettes all din data permanent.
+                  Når du sletter kontoen din, slettes all din data permanent. Denne handlingen kan ikke angres.
                 </p>
-                <Button
-                  variant="destructive"
-                  onClick={handleAccountDeletion}
-                  disabled={deletingAccount}
-                >
-                  {deletingAccount ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Sletter konto...
-                    </>
-                  ) : (
-                    <>
+                
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive">
                       <Trash2 className="mr-2 h-4 w-4" />
                       Slett konto
-                    </>
-                  )}
-                </Button>
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Er du helt sikker?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Denne handlingen kan ikke angres. Dette vil permanent slette din konto og fjerne alle dine data fra våre servere.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Avbryt</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        onClick={handleAccountDeletion}
+                        disabled={deletingAccount}
+                      >
+                        {deletingAccount ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Sletter...
+                          </>
+                        ) : "Ja, slett kontoen min"}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </CardContent>
           </Card>

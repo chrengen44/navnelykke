@@ -112,21 +112,17 @@ export const secureApi = {
       // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Define result with explicit type structure to avoid deep instantiation
-      let result;
-      
-      // Perform the update operation without complex type inference
-      const response = await supabase
+      // Execute the update operation directly without storing in a variable first
+      const { data: responseData, error: responseError } = await supabase
         .from(validTableName)
         .update(sanitizedData)
         .eq(sanitizedQuery.column, sanitizedQuery.value);
       
-      result = {
-        data: response.data,
-        error: response.error
+      // Return with explicit casting to avoid deep type instantiation
+      return { 
+        data: responseData as T, 
+        error: responseError 
       };
-      
-      return { data: result.data as T, error: result.error };
     } catch (err: any) {
       return { data: null, error: err };
     }
@@ -154,21 +150,17 @@ export const secureApi = {
       // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Define result with explicit type structure to avoid deep instantiation
-      let result;
-      
-      // Perform the delete operation without complex type inference
-      const response = await supabase
+      // Execute the delete operation directly without storing in a variable first
+      const { data: responseData, error: responseError } = await supabase
         .from(validTableName)
         .delete()
         .eq(sanitizedQuery.column, sanitizedQuery.value);
       
-      result = {
-        data: response.data,
-        error: response.error
+      // Return with explicit casting to avoid deep type instantiation
+      return { 
+        data: responseData as T, 
+        error: responseError 
       };
-      
-      return { data: result.data as T, error: result.error };
     } catch (err: any) {
       return { data: null, error: err };
     }

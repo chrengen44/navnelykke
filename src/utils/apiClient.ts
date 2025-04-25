@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import DOMPurify from 'dompurify';
@@ -135,8 +136,26 @@ export function useSecureData<T>(
   return { data, error, isLoading };
 }
 
-// Define valid table names as literal strings to avoid type recursion issues
-const VALID_TABLES = [
+// Define valid table names as literal strings using a union type
+type ValidTableName = 
+  | 'baby_names'
+  | 'favorites'
+  | 'profiles'
+  | 'name_categories'
+  | 'name_category_mappings'
+  | 'name_list_items'
+  | 'name_lists'
+  | 'name_polls'
+  | 'name_visits'
+  | 'poll_analytics'
+  | 'poll_items'
+  | 'poll_votes'
+  | 'suggested_names'
+  | 'user_privacy_settings'
+  | 'user_sessions';
+
+// Store valid table names in an array for runtime validation
+const VALID_TABLES: ValidTableName[] = [
   'baby_names', 
   'favorites', 
   'profiles', 
@@ -152,17 +171,13 @@ const VALID_TABLES = [
   'suggested_names', 
   'user_privacy_settings', 
   'user_sessions'
-] as const;
-
-// Simple type alias instead of complex indexed type
-type TableName = string;
+];
 
 /**
  * Helper function to validate table names
  */
-const validateTableName = (tableName: string): boolean => {
-  const validTables = VALID_TABLES as readonly string[];
-  return validTables.includes(tableName);
+const validateTableName = (tableName: string): tableName is ValidTableName => {
+  return VALID_TABLES.includes(tableName as ValidTableName);
 };
 
 /**
@@ -201,10 +216,11 @@ export const secureApi = {
       // For regular table operations, validate the table name
       if (!validateTableName(tableName)) {
         console.warn(`Warning: ${tableName} is not a recognized table name`);
+        return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
       const { data, error } = await supabase
-        .from(tableName)
+        .from(tableName as ValidTableName)
         .select(query.select || '*')
         .order(query.orderBy || 'created_at', { ascending: false });
       
@@ -238,11 +254,12 @@ export const secureApi = {
       // Validate the table name
       if (!validateTableName(tableName)) {
         console.warn(`Warning: ${tableName} is not a recognized table name`);
+        return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
       // Insert the data
       const result = await supabase
-        .from(tableName)
+        .from(tableName as ValidTableName)
         .insert([sanitizedData]);
       
       return { 
@@ -277,11 +294,12 @@ export const secureApi = {
       // Validate the table name
       if (!validateTableName(tableName)) {
         console.warn(`Warning: ${tableName} is not a recognized table name`);
+        return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
       // Update the data
       const result = await supabase
-        .from(tableName)
+        .from(tableName as ValidTableName)
         .update(sanitizedData)
         .eq(sanitizedQuery.column, sanitizedQuery.value);
       
@@ -314,11 +332,12 @@ export const secureApi = {
       // Validate the table name
       if (!validateTableName(tableName)) {
         console.warn(`Warning: ${tableName} is not a recognized table name`);
+        return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
       // Delete the data
       const result = await supabase
-        .from(tableName)
+        .from(tableName as ValidTableName)
         .delete()
         .eq(sanitizedQuery.column, sanitizedQuery.value);
       

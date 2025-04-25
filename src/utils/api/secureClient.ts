@@ -112,17 +112,19 @@ export const secureApi = {
       // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Perform update operation without complex type inference
-      // Using any as an intermediate type to prevent deep instantiation
-      const response: any = await supabase
+      // Split the operation to simplify type handling
+      const updateOperation = supabase
         .from(validTableName)
         .update(sanitizedData)
         .eq(sanitizedQuery.column, sanitizedQuery.value);
+        
+      // Execute the operation and manually handle the result
+      const rawResponse = await updateOperation;
       
-      // Explicitly shape the return value without complex typing
+      // Return with simple explicit typing
       return { 
-        data: (response?.data || null) as T, 
-        error: response?.error || null 
+        data: rawResponse.data as T, 
+        error: rawResponse.error 
       };
     } catch (err: any) {
       return { data: null, error: err };
@@ -151,17 +153,19 @@ export const secureApi = {
       // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Perform delete operation without complex type inference
-      // Using any as an intermediate type to prevent deep instantiation
-      const response: any = await supabase
+      // Split the operation to simplify type handling
+      const deleteOperation = supabase
         .from(validTableName)
         .delete()
         .eq(sanitizedQuery.column, sanitizedQuery.value);
       
-      // Explicitly shape the return value without complex typing
+      // Execute the operation and manually handle the result
+      const rawResponse = await deleteOperation;
+      
+      // Return with simple explicit typing
       return { 
-        data: (response?.data || null) as T, 
-        error: response?.error || null 
+        data: rawResponse.data as T, 
+        error: rawResponse.error 
       };
     } catch (err: any) {
       return { data: null, error: err };

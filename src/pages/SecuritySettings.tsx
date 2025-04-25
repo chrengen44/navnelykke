@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import { secureApi, sanitizeInput } from "@/utils/apiClient";
+import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Shield, Trash2, AlertCircle } from "lucide-react";
 import {
   AlertDialog,
@@ -114,7 +115,6 @@ export default function SecuritySettings() {
     setLoadingSettings(true);
 
     try {
-      // Validate the input first
       if (typeof value !== 'boolean') {
         throw new Error("Invalid input type");
       }
@@ -150,7 +150,6 @@ export default function SecuritySettings() {
         throw new Error("No email associated with this account");
       }
 
-      // Use the auth method directly instead of through secureApi
       const { error } = await supabase.auth.resetPasswordForEmail(
         sanitizeInput(user.email),
         { redirectTo: `${window.location.origin}/auth/reset` }
@@ -204,15 +203,11 @@ export default function SecuritySettings() {
         throw new Error("No user ID available");
       }
       
-      // First, clear all user data
-      // Use direct Supabase calls for deletion
       await Promise.all([
         supabase.from("user_sessions").delete().eq("user_id", user.id),
         supabase.from("user_privacy_settings").delete().eq("user_id", user.id)
       ]);
       
-      // Then delete the auth user
-      // This will use the auth API directly
       await supabase.auth.admin.deleteUser(user.id);
 
       await supabase.auth.signOut();
@@ -232,7 +227,6 @@ export default function SecuritySettings() {
     }
   };
 
-  // Function to format ISO date to a more readable format
   const formatDate = (isoDate: string): string => {
     try {
       const date = new Date(isoDate);
@@ -245,7 +239,6 @@ export default function SecuritySettings() {
     }
   };
 
-  // Function to get a friendly device name from user agent
   const getDeviceName = (userAgent: string | null): string => {
     if (!userAgent) return 'Ukjent enhet';
     
@@ -263,7 +256,6 @@ export default function SecuritySettings() {
       deviceName = 'Linux-enhet';
     }
     
-    // Add browser info
     if (userAgent.includes('Chrome') && !userAgent.includes('Chromium')) {
       deviceName += ' - Chrome';
     } else if (userAgent.includes('Firefox')) {

@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import DOMPurify from 'dompurify';
@@ -136,8 +135,7 @@ export function useSecureData<T>(
   return { data, error, isLoading };
 }
 
-// Define a list of all valid table names as a literal union type
-// Using a const assertion to prevent excessive type instantiation
+// Define valid table names as literal strings to avoid type recursion issues
 const VALID_TABLES = [
   'baby_names', 
   'favorites', 
@@ -156,19 +154,15 @@ const VALID_TABLES = [
   'user_sessions'
 ] as const;
 
-// Create type from the array
-type TableName = typeof VALID_TABLES[number];
-type TableNameInput = string;
+// Simple type alias instead of complex indexed type
+type TableName = string;
 
 /**
- * Helper function to safely handle table name type casting
+ * Helper function to validate table names
  */
-const toTableName = (tableName: TableNameInput): TableName => {
-  if (!VALID_TABLES.includes(tableName as TableName)) {
-    console.warn(`Warning: ${tableName} is not a recognized table name`);
-  }
-  
-  return tableName as TableName;
+const validateTableName = (tableName: string): boolean => {
+  const validTables = VALID_TABLES as readonly string[];
+  return validTables.includes(tableName);
 };
 
 /**
@@ -179,7 +173,7 @@ export const secureApi = {
    * Securely fetch data from Supabase
    */
   async fetch<T>(
-    tableName: TableNameInput, 
+    tableName: string, 
     query: any = {},
     endpoint = 'default'
   ): Promise<{ data: T | null; error: Error | null }> {
@@ -204,11 +198,13 @@ export const secureApi = {
         return { data: null, error: new Error(`Unsupported auth method: ${tableName}`) };
       }
 
-      // For regular table operations, proceed with the tableName cast
-      const safeTableName = toTableName(tableName);
+      // For regular table operations, validate the table name
+      if (!validateTableName(tableName)) {
+        console.warn(`Warning: ${tableName} is not a recognized table name`);
+      }
       
       const { data, error } = await supabase
-        .from(safeTableName)
+        .from(tableName)
         .select(query.select || '*')
         .order(query.orderBy || 'created_at', { ascending: false });
       
@@ -225,7 +221,7 @@ export const secureApi = {
    * Securely insert data into Supabase
    */
   async insert<T>(
-    tableName: TableNameInput,
+    tableName: string,
     data: Record<string, any>,
     endpoint = 'update'
   ): Promise<{ data: T | null; error: Error | null }> {
@@ -238,11 +234,15 @@ export const secureApi = {
     try {
       // Sanitize the input data
       const sanitizedData = sanitizeInput(data);
-      const safeTableName = toTableName(tableName);
+      
+      // Validate the table name
+      if (!validateTableName(tableName)) {
+        console.warn(`Warning: ${tableName} is not a recognized table name`);
+      }
       
       // Insert the data
       const result = await supabase
-        .from(safeTableName)
+        .from(tableName)
         .insert([sanitizedData]);
       
       return { 
@@ -258,7 +258,7 @@ export const secureApi = {
    * Securely update data in Supabase
    */
   async update<T>(
-    tableName: TableNameInput,
+    tableName: string,
     query: { column: string; value: any },
     data: Record<string, any>,
     endpoint = 'update'
@@ -273,11 +273,15 @@ export const secureApi = {
       // Sanitize the input data
       const sanitizedData = sanitizeInput(data);
       const sanitizedQuery = sanitizeInput(query);
-      const safeTableName = toTableName(tableName);
+      
+      // Validate the table name
+      if (!validateTableName(tableName)) {
+        console.warn(`Warning: ${tableName} is not a recognized table name`);
+      }
       
       // Update the data
       const result = await supabase
-        .from(safeTableName)
+        .from(tableName)
         .update(sanitizedData)
         .eq(sanitizedQuery.column, sanitizedQuery.value);
       
@@ -294,7 +298,7 @@ export const secureApi = {
    * Securely delete data from Supabase
    */
   async delete<T>(
-    tableName: TableNameInput,
+    tableName: string,
     query: { column: string; value: any },
     endpoint = 'update'
   ): Promise<{ data: T | null; error: Error | null }> {
@@ -306,11 +310,15 @@ export const secureApi = {
     
     try {
       const sanitizedQuery = sanitizeInput(query);
-      const safeTableName = toTableName(tableName);
+      
+      // Validate the table name
+      if (!validateTableName(tableName)) {
+        console.warn(`Warning: ${tableName} is not a recognized table name`);
+      }
       
       // Delete the data
       const result = await supabase
-        .from(safeTableName)
+        .from(tableName)
         .delete()
         .eq(sanitizedQuery.column, sanitizedQuery.value);
       

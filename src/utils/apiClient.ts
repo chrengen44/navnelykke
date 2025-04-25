@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import DOMPurify from 'dompurify';
@@ -135,7 +136,7 @@ export function useSecureData<T>(
   return { data, error, isLoading };
 }
 
-// Define valid table names as a union type (but don't use it in complex type operations)
+// List of valid table names for runtime validation
 export const VALID_TABLES = [
   'baby_names', 
   'favorites', 
@@ -152,16 +153,16 @@ export const VALID_TABLES = [
   'suggested_names', 
   'user_privacy_settings', 
   'user_sessions'
-] as const;
+];
 
-// Define the type as a simple union of string literals to avoid deep type instantiation
-type ValidTableName = typeof VALID_TABLES[number];
+// Simple string type for table names - avoiding complex type calculations
+type ValidTableName = string;
 
 /**
  * Helper function to validate table names
  */
-const validateTableName = (tableName: string): tableName is ValidTableName => {
-  return VALID_TABLES.includes(tableName as ValidTableName);
+const validateTableName = (tableName: string): boolean => {
+  return VALID_TABLES.includes(tableName);
 };
 
 /**
@@ -203,9 +204,9 @@ export const secureApi = {
         return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
-      // Here we cast to ValidTableName after validation to satisfy TypeScript
+      // Use the table name after validation
       const { data, error } = await supabase
-        .from(tableName as ValidTableName)
+        .from(tableName)
         .select(query.select || '*')
         .order(query.orderBy || 'created_at', { ascending: false });
       
@@ -242,9 +243,9 @@ export const secureApi = {
         return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
-      // Insert the data with casting to ValidTableName
+      // Insert the data after validation
       const result = await supabase
-        .from(tableName as ValidTableName)
+        .from(tableName)
         .insert([sanitizedData]);
       
       return { 
@@ -282,9 +283,9 @@ export const secureApi = {
         return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
-      // Update the data with casting to ValidTableName
+      // Update the data after validation
       const result = await supabase
-        .from(tableName as ValidTableName)
+        .from(tableName)
         .update(sanitizedData)
         .eq(sanitizedQuery.column, sanitizedQuery.value);
       
@@ -320,9 +321,9 @@ export const secureApi = {
         return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
-      // Delete the data with casting to ValidTableName
+      // Delete the data after validation
       const result = await supabase
-        .from(tableName as ValidTableName)
+        .from(tableName)
         .delete()
         .eq(sanitizedQuery.column, sanitizedQuery.value);
       

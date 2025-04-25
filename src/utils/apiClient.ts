@@ -153,16 +153,16 @@ export const VALID_TABLES = [
   'suggested_names', 
   'user_privacy_settings', 
   'user_sessions'
-];
+] as const;
 
-// Simple string type for table names - avoiding complex type calculations
-type ValidTableName = string;
+// Define the table name type as a union of string literals
+type ValidTableName = typeof VALID_TABLES[number];
 
 /**
  * Helper function to validate table names
  */
-const validateTableName = (tableName: string): boolean => {
-  return VALID_TABLES.includes(tableName);
+const validateTableName = (tableName: string): tableName is ValidTableName => {
+  return (VALID_TABLES as readonly string[]).includes(tableName);
 };
 
 /**
@@ -204,9 +204,9 @@ export const secureApi = {
         return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
-      // Use the table name after validation
+      // TypeScript accepts this because validateTableName is a type guard
       const { data, error } = await supabase
-        .from(tableName)
+        .from(tableName as ValidTableName)
         .select(query.select || '*')
         .order(query.orderBy || 'created_at', { ascending: false });
       
@@ -245,7 +245,7 @@ export const secureApi = {
       
       // Insert the data after validation
       const result = await supabase
-        .from(tableName)
+        .from(tableName as ValidTableName)
         .insert([sanitizedData]);
       
       return { 
@@ -285,7 +285,7 @@ export const secureApi = {
       
       // Update the data after validation
       const result = await supabase
-        .from(tableName)
+        .from(tableName as ValidTableName)
         .update(sanitizedData)
         .eq(sanitizedQuery.column, sanitizedQuery.value);
       
@@ -323,7 +323,7 @@ export const secureApi = {
       
       // Delete the data after validation
       const result = await supabase
-        .from(tableName)
+        .from(tableName as ValidTableName)
         .delete()
         .eq(sanitizedQuery.column, sanitizedQuery.value);
       

@@ -37,12 +37,16 @@ export const secureApi = {
       // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      const { data, error } = await supabase
+      // Use explicit typing to avoid deep type instantiation
+      const result: {
+        data: any;
+        error: Error | null;
+      } = await supabase
         .from(validTableName)
         .select(query.select || '*')
         .order(query.orderBy || 'created_at', { ascending: false });
       
-      return { data: data as T, error };
+      return { data: result.data as T, error: result.error };
     } catch (err: any) {
       return { data: null, error: err };
     }
@@ -109,8 +113,9 @@ export const secureApi = {
       const validTableName = tableName as ValidTableName;
       
       // Use explicit type for result to avoid deep type instantiation
+      // Using 'unknown' instead of 'any' for more type safety
       const result: {
-        data: any;
+        data: unknown;
         error: Error | null;
       } = await supabase
         .from(validTableName)
@@ -147,7 +152,7 @@ export const secureApi = {
       
       // Use explicit type for result to avoid deep type instantiation
       const result: {
-        data: any;
+        data: unknown;
         error: Error | null;
       } = await supabase
         .from(validTableName)

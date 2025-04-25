@@ -5,13 +5,13 @@ import { sanitizeInput } from './sanitizer';
 import { validateTableName, type ValidTableName } from './tableValidator';
 
 // Define a simple response type to use throughout the file
-type ApiResponse<T> = {
+type ApiResponse<T = any> = {
   data: T | null;
   error: Error | null;
 };
 
 export const secureApi = {
-  async fetch<T>(
+  async fetch<T = any>(
     tableName: string, 
     query: any = {},
     endpoint = 'default'
@@ -43,23 +43,23 @@ export const secureApi = {
       // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Break the complex type chain completely with a two-step approach
-      const query_response = await supabase
+      // Break the complex type chain completely by using Promise and awaiting it
+      const response = await supabase
         .from(validTableName)
         .select(query.select || '*')
         .order(query.orderBy || 'created_at', { ascending: false });
       
-      // Return with explicit type casting to avoid deep instantiation
+      // Return with simple structure and no complex type inference
       return { 
-        data: query_response.data as any as T, 
-        error: query_response.error 
+        data: response.data as unknown as T, 
+        error: response.error 
       };
     } catch (err: any) {
       return { data: null, error: err };
     }
   },
   
-  async insert<T>(
+  async insert<T = any>(
     tableName: string,
     data: Record<string, any>,
     endpoint = 'update'
@@ -80,21 +80,21 @@ export const secureApi = {
       
       const validTableName = tableName as ValidTableName;
       
-      // Two-step approach to break the type chain
-      const query_response = await supabase
+      // Break complex type chains with Promise and await
+      const response = await supabase
         .from(validTableName)
         .insert([sanitizedData]);
       
       return { 
-        data: query_response.data as any as T, 
-        error: query_response.error 
+        data: response.data as unknown as T, 
+        error: response.error 
       };
     } catch (err: any) {
       return { data: null, error: err };
     }
   },
   
-  async update<T>(
+  async update<T = any>(
     tableName: string,
     query: { column: string; value: any },
     data: Record<string, any>,
@@ -117,26 +117,26 @@ export const secureApi = {
       
       const validTableName = tableName as ValidTableName;
       
-      // First define the query without executing it
-      const updateOperation = supabase
+      // Simplified approach - store the operation in a variable
+      const updateQuery = supabase
         .from(validTableName)
         .update(sanitizedData)
         .eq(sanitizedQuery.column, sanitizedQuery.value);
       
-      // Then execute and collect the response as a plain object
-      const query_response = await updateOperation;
+      // Then execute it separately to break the type chain
+      const response = await updateQuery;
       
-      // Return with explicit type casting
+      // Return with simpler typing that avoids deep instantiation
       return {
-        data: query_response.data as any as T,
-        error: query_response.error
+        data: response.data as unknown as T,
+        error: response.error
       };
     } catch (err: any) {
       return { data: null, error: err };
     }
   },
   
-  async delete<T>(
+  async delete<T = any>(
     tableName: string,
     query: { column: string; value: any },
     endpoint = 'update'
@@ -157,19 +157,19 @@ export const secureApi = {
       
       const validTableName = tableName as ValidTableName;
       
-      // First define the query without executing it
-      const deleteOperation = supabase
+      // Simplified approach with separate steps
+      const deleteQuery = supabase
         .from(validTableName)
         .delete()
         .eq(sanitizedQuery.column, sanitizedQuery.value);
       
-      // Then execute and collect the response as a plain object
-      const query_response = await deleteOperation;
+      // Execute separately to break the type chain
+      const response = await deleteQuery;
       
-      // Return with explicit type casting
+      // Return with simpler typing
       return {
-        data: query_response.data as any as T,
-        error: query_response.error
+        data: response.data as unknown as T,
+        error: response.error
       };
     } catch (err: any) {
       return { data: null, error: err };

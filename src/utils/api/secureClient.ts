@@ -70,7 +70,11 @@ export const secureApi = {
       // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      const result = await supabase
+      // Use explicit type for result to avoid deep type instantiation
+      const result: {
+        data: any;
+        error: Error | null;
+      } = await supabase
         .from(validTableName)
         .insert([sanitizedData]);
       
@@ -104,7 +108,11 @@ export const secureApi = {
       // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      const result = await supabase
+      // Use explicit type for result to avoid deep type instantiation
+      const result: {
+        data: any;
+        error: Error | null;
+      } = await supabase
         .from(validTableName)
         .update(sanitizedData)
         .eq(sanitizedQuery.column, sanitizedQuery.value);
@@ -137,7 +145,11 @@ export const secureApi = {
       // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      const result = await supabase
+      // Use explicit type for result to avoid deep type instantiation
+      const result: {
+        data: any;
+        error: Error | null;
+      } = await supabase
         .from(validTableName)
         .delete()
         .eq(sanitizedQuery.column, sanitizedQuery.value);

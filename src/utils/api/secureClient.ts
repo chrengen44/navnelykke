@@ -23,6 +23,7 @@ export const secureApi = {
     incrementRequestCount(endpoint);
     
     try {
+      // Handle auth-related endpoints
       if (typeof tableName === 'string' && tableName.startsWith('auth.')) {
         if (tableName === 'auth.resetPasswordForEmail') {
           const sanitizedEmail = typeof query.email === 'string' ? sanitizeInput(query.email) : '';
@@ -35,24 +36,30 @@ export const secureApi = {
         return { data: null, error: new Error(`Unsupported auth method: ${tableName}`) };
       }
 
+      // Validate table name
       if (!validateTableName(tableName)) {
         console.warn(`Warning: ${tableName} is not a recognized table name`);
         return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
-      // Use a type assertion after validation
+      // Type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Break the complex type chain completely by using Promise and awaiting it
-      const response = await supabase
+      // First step: Create the query object
+      const selectQuery = supabase
         .from(validTableName)
-        .select(query.select || '*')
-        .order(query.orderBy || 'created_at', { ascending: false });
+        .select(query.select || '*');
       
-      // Return with simple structure and no complex type inference
+      // Second step: Add ordering if needed
+      const orderedQuery = selectQuery.order(query.orderBy || 'created_at', { ascending: false });
+      
+      // Third step: Execute query and get raw response
+      const rawResponse = await orderedQuery;
+      
+      // Fourth step: Return with simple typing to avoid deep instantiation
       return { 
-        data: response.data as unknown as T, 
-        error: response.error 
+        data: rawResponse.data as unknown as T, 
+        error: rawResponse.error 
       };
     } catch (err: any) {
       return { data: null, error: err };
@@ -78,16 +85,21 @@ export const secureApi = {
         return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
+      // Type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Break complex type chains with Promise and await
-      const response = await supabase
+      // Step 1: Create insert query
+      const insertQuery = supabase
         .from(validTableName)
         .insert([sanitizedData]);
       
+      // Step 2: Execute query and get raw response
+      const rawResponse = await insertQuery;
+      
+      // Step 3: Return with explicit type to break complex chains
       return { 
-        data: response.data as unknown as T, 
-        error: response.error 
+        data: rawResponse.data as unknown as T, 
+        error: rawResponse.error 
       };
     } catch (err: any) {
       return { data: null, error: err };
@@ -115,21 +127,25 @@ export const secureApi = {
         return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
+      // Type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Simplified approach - store the operation in a variable
-      const updateQuery = supabase
-        .from(validTableName)
-        .update(sanitizedData)
-        .eq(sanitizedQuery.column, sanitizedQuery.value);
+      // Step 1: Build query without executing
+      const baseQuery = supabase.from(validTableName);
       
-      // Then execute it separately to break the type chain
-      const response = await updateQuery;
+      // Step 2: Add update operation
+      const updateOperation = baseQuery.update(sanitizedData);
       
-      // Return with simpler typing that avoids deep instantiation
+      // Step 3: Add filter
+      const filteredOperation = updateOperation.eq(sanitizedQuery.column, sanitizedQuery.value);
+      
+      // Step 4: Execute and get raw response
+      const rawResponse = await filteredOperation;
+      
+      // Step 5: Return with explicit type casting to avoid inference chains
       return {
-        data: response.data as unknown as T,
-        error: response.error
+        data: rawResponse.data as unknown as T,
+        error: rawResponse.error
       };
     } catch (err: any) {
       return { data: null, error: err };
@@ -155,21 +171,25 @@ export const secureApi = {
         return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
+      // Type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Simplified approach with separate steps
-      const deleteQuery = supabase
-        .from(validTableName)
-        .delete()
-        .eq(sanitizedQuery.column, sanitizedQuery.value);
+      // Step 1: Build base query
+      const baseQuery = supabase.from(validTableName);
       
-      // Execute separately to break the type chain
-      const response = await deleteQuery;
+      // Step 2: Add delete operation
+      const deleteOperation = baseQuery.delete();
       
-      // Return with simpler typing
+      // Step 3: Add filter
+      const filteredOperation = deleteOperation.eq(sanitizedQuery.column, sanitizedQuery.value);
+      
+      // Step 4: Execute and get raw response
+      const rawResponse = await filteredOperation;
+      
+      // Step 5: Return with explicit type casting
       return {
-        data: response.data as unknown as T,
-        error: response.error
+        data: rawResponse.data as unknown as T,
+        error: rawResponse.error
       };
     } catch (err: any) {
       return { data: null, error: err };

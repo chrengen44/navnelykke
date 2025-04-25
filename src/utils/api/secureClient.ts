@@ -112,15 +112,19 @@ export const secureApi = {
       // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Use explicit type for result to avoid deep type instantiation
-      // Using 'unknown' instead of 'any' for more type safety
-      const result: {
-        data: unknown;
-        error: Error | null;
-      } = await supabase
+      // Define result with explicit type structure to avoid deep instantiation
+      let result;
+      
+      // Perform the update operation without complex type inference
+      const response = await supabase
         .from(validTableName)
         .update(sanitizedData)
         .eq(sanitizedQuery.column, sanitizedQuery.value);
+      
+      result = {
+        data: response.data,
+        error: response.error
+      };
       
       return { data: result.data as T, error: result.error };
     } catch (err: any) {
@@ -150,14 +154,19 @@ export const secureApi = {
       // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Use explicit type for result to avoid deep type instantiation
-      const result: {
-        data: unknown;
-        error: Error | null;
-      } = await supabase
+      // Define result with explicit type structure to avoid deep instantiation
+      let result;
+      
+      // Perform the delete operation without complex type inference
+      const response = await supabase
         .from(validTableName)
         .delete()
         .eq(sanitizedQuery.column, sanitizedQuery.value);
+      
+      result = {
+        data: response.data,
+        error: response.error
+      };
       
       return { data: result.data as T, error: result.error };
     } catch (err: any) {

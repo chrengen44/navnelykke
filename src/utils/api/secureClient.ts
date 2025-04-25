@@ -4,12 +4,18 @@ import { checkRateLimit, incrementRequestCount } from './rateLimiter';
 import { sanitizeInput } from './sanitizer';
 import { validateTableName, type ValidTableName } from './tableValidator';
 
+// Define a simple response type to use throughout the file
+type ApiResponse<T> = {
+  data: T | null;
+  error: Error | null;
+};
+
 export const secureApi = {
   async fetch<T>(
     tableName: string, 
     query: any = {},
     endpoint = 'default'
-  ): Promise<{ data: T | null; error: Error | null }> {
+  ): Promise<ApiResponse<T>> {
     if (!checkRateLimit(endpoint)) {
       return { data: null, error: new Error("Rate limit exceeded") };
     }
@@ -24,7 +30,7 @@ export const secureApi = {
           
           const { error } = await supabase.auth.resetPasswordForEmail(sanitizedEmail, options);
           
-          return { data: null as T, error };
+          return { data: null, error };
         }
         return { data: null, error: new Error(`Unsupported auth method: ${tableName}`) };
       }
@@ -37,15 +43,16 @@ export const secureApi = {
       // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Execute the query with explicit type casting to break complex type inference
-      const response = await supabase
+      // Break the complex type chain completely with a two-step approach
+      const query_response = await supabase
         .from(validTableName)
         .select(query.select || '*')
         .order(query.orderBy || 'created_at', { ascending: false });
       
+      // Return with explicit type casting to avoid deep instantiation
       return { 
-        data: response.data as unknown as T, 
-        error: response.error 
+        data: query_response.data as any as T, 
+        error: query_response.error 
       };
     } catch (err: any) {
       return { data: null, error: err };
@@ -56,7 +63,7 @@ export const secureApi = {
     tableName: string,
     data: Record<string, any>,
     endpoint = 'update'
-  ): Promise<{ data: T | null; error: Error | null }> {
+  ): Promise<ApiResponse<T>> {
     if (!checkRateLimit(endpoint)) {
       return { data: null, error: new Error("Rate limit exceeded") };
     }
@@ -71,17 +78,16 @@ export const secureApi = {
         return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
-      // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Execute with explicit type casting
-      const response = await supabase
+      // Two-step approach to break the type chain
+      const query_response = await supabase
         .from(validTableName)
         .insert([sanitizedData]);
       
       return { 
-        data: response.data as unknown as T, 
-        error: response.error 
+        data: query_response.data as any as T, 
+        error: query_response.error 
       };
     } catch (err: any) {
       return { data: null, error: err };
@@ -93,7 +99,7 @@ export const secureApi = {
     query: { column: string; value: any },
     data: Record<string, any>,
     endpoint = 'update'
-  ): Promise<{ data: T | null; error: Error | null }> {
+  ): Promise<ApiResponse<T>> {
     if (!checkRateLimit(endpoint)) {
       return { data: null, error: new Error("Rate limit exceeded") };
     }
@@ -109,22 +115,21 @@ export const secureApi = {
         return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
-      // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Completely bypass complex type inference with a more direct approach
-      type SimpleResponse = { data: any; error: any };
-      const updateQuery = supabase
+      // First define the query without executing it
+      const updateOperation = supabase
         .from(validTableName)
         .update(sanitizedData)
         .eq(sanitizedQuery.column, sanitizedQuery.value);
-        
-      // Use explicit Promise with simple types to avoid deep instantiation
-      const response = await updateQuery as unknown as SimpleResponse;
       
-      return { 
-        data: response.data as T, 
-        error: response.error 
+      // Then execute and collect the response as a plain object
+      const query_response = await updateOperation;
+      
+      // Return with explicit type casting
+      return {
+        data: query_response.data as any as T,
+        error: query_response.error
       };
     } catch (err: any) {
       return { data: null, error: err };
@@ -135,7 +140,7 @@ export const secureApi = {
     tableName: string,
     query: { column: string; value: any },
     endpoint = 'update'
-  ): Promise<{ data: T | null; error: Error | null }> {
+  ): Promise<ApiResponse<T>> {
     if (!checkRateLimit(endpoint)) {
       return { data: null, error: new Error("Rate limit exceeded") };
     }
@@ -150,22 +155,21 @@ export const secureApi = {
         return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
-      // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Completely bypass complex type inference with a more direct approach
-      type SimpleResponse = { data: any; error: any };
-      const deleteQuery = supabase
+      // First define the query without executing it
+      const deleteOperation = supabase
         .from(validTableName)
         .delete()
         .eq(sanitizedQuery.column, sanitizedQuery.value);
-        
-      // Use explicit Promise with simple types to avoid deep instantiation
-      const response = await deleteQuery as unknown as SimpleResponse;
       
-      return { 
-        data: response.data as T, 
-        error: response.error 
+      // Then execute and collect the response as a plain object
+      const query_response = await deleteOperation;
+      
+      // Return with explicit type casting
+      return {
+        data: query_response.data as any as T,
+        error: query_response.error
       };
     } catch (err: any) {
       return { data: null, error: err };

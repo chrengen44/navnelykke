@@ -37,16 +37,13 @@ export const secureApi = {
       // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Use explicit typing to avoid deep type instantiation
-      const result: {
-        data: any;
-        error: Error | null;
-      } = await supabase
+      // Simplify the typing of the result to avoid deep instantiation
+      const { data, error } = await supabase
         .from(validTableName)
         .select(query.select || '*')
         .order(query.orderBy || 'created_at', { ascending: false });
       
-      return { data: result.data as T, error: result.error };
+      return { data: data as T, error };
     } catch (err: any) {
       return { data: null, error: err };
     }
@@ -74,15 +71,12 @@ export const secureApi = {
       // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Use explicit type for result to avoid deep type instantiation
-      const result: {
-        data: any;
-        error: Error | null;
-      } = await supabase
+      // Simplify typing to avoid deep instantiation
+      const { data: resultData, error } = await supabase
         .from(validTableName)
         .insert([sanitizedData]);
       
-      return { data: result.data as T, error: result.error };
+      return { data: resultData as T, error };
     } catch (err: any) {
       return { data: null, error: err };
     }
@@ -112,19 +106,15 @@ export const secureApi = {
       // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Split the operation to simplify type handling
-      const updateOperation = supabase
+      // Use a type cast to any to break the deep instantiation
+      const result: any = await supabase
         .from(validTableName)
         .update(sanitizedData)
         .eq(sanitizedQuery.column, sanitizedQuery.value);
-        
-      // Execute the operation and manually handle the result
-      const rawResponse = await updateOperation;
       
-      // Return with simple explicit typing
       return { 
-        data: rawResponse.data as T, 
-        error: rawResponse.error 
+        data: result.data as T, 
+        error: result.error 
       };
     } catch (err: any) {
       return { data: null, error: err };
@@ -153,19 +143,15 @@ export const secureApi = {
       // Use a type assertion after validation
       const validTableName = tableName as ValidTableName;
       
-      // Split the operation to simplify type handling
-      const deleteOperation = supabase
+      // Use a type cast to any to break the deep instantiation
+      const result: any = await supabase
         .from(validTableName)
         .delete()
         .eq(sanitizedQuery.column, sanitizedQuery.value);
       
-      // Execute the operation and manually handle the result
-      const rawResponse = await deleteOperation;
-      
-      // Return with simple explicit typing
       return { 
-        data: rawResponse.data as T, 
-        error: rawResponse.error 
+        data: result.data as T, 
+        error: result.error 
       };
     } catch (err: any) {
       return { data: null, error: err };

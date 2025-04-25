@@ -159,12 +159,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Update activity periodically while the app is open
     const activityInterval = setInterval(() => {
       if (user) {
+        // Fixed: Removed .catch() and used proper error handling
         supabase.from('user_sessions').upsert({
           user_id: user.id,
           last_active: new Date().toISOString()
         }, {
           onConflict: 'user_id',
-        }).catch(error => console.error("Error updating session activity:", error));
+        }).then(result => {
+          if (result.error) {
+            console.error("Error updating session activity:", result.error);
+          }
+        });
       }
     }, 5 * 60 * 1000); // Update every 5 minutes
 

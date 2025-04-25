@@ -155,18 +155,29 @@ export const secureApi = {
     incrementRequestCount(endpoint);
     
     try {
-      // Sanitize any query parameters
-      const sanitizedQuery = sanitizeInput(query);
-      
-      // Execute the query
+      // Fix: Handle special cases for auth-related actions
+      if (tableName.startsWith('auth.')) {
+        if (tableName === 'auth.resetPasswordForEmail') {
+          const sanitizedEmail = typeof query.email === 'string' ? sanitizeInput(query.email) : '';
+          const options = query.options || {};
+          
+          const { error } = await supabase.auth.resetPasswordForEmail(sanitizedEmail, options);
+          
+          return { data: null as T, error };
+        }
+        // Add other auth methods as needed
+        return { data: null, error: new Error(`Unsupported auth method: ${tableName}`) };
+      }
+
+      // For regular table operations, proceed as before but with type safety
       const { data, error } = await supabase
-        .from(tableName)
-        .select(sanitizedQuery.select || '*')
-        .order(sanitizedQuery.orderBy || 'created_at', { ascending: false });
+        .from(tableName as any)
+        .select(query.select || '*')
+        .order(query.orderBy || 'created_at', { ascending: false });
       
       return { 
         data: data as T, 
-        error: error 
+        error 
       };
     } catch (err: any) {
       return { data: null, error: err };
@@ -193,7 +204,7 @@ export const secureApi = {
       
       // Insert the data
       const result = await supabase
-        .from(tableName)
+        .from(tableName as any)
         .insert([sanitizedData]);
       
       return { 
@@ -227,7 +238,7 @@ export const secureApi = {
       
       // Update the data
       const result = await supabase
-        .from(tableName)
+        .from(tableName as any)
         .update(sanitizedData)
         .eq(sanitizedQuery.column, sanitizedQuery.value);
       
@@ -259,7 +270,7 @@ export const secureApi = {
       
       // Delete the data
       const result = await supabase
-        .from(tableName)
+        .from(tableName as any)
         .delete()
         .eq(sanitizedQuery.column, sanitizedQuery.value);
       

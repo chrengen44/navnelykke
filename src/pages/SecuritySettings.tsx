@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
@@ -66,7 +65,7 @@ export default function SecuritySettings() {
     try {
       const { data, error } = await secureApi.fetch<PrivacySettings[]>(
         "user_privacy_settings",
-        { column: "user_id", value: user?.id }
+        { select: "*", eq: ["user_id", user?.id] }
       );
 
       if (error) throw error;
@@ -89,7 +88,7 @@ export default function SecuritySettings() {
         "user_sessions",
         {
           select: "*",
-          params: { user_id: user?.id },
+          eq: ["user_id", user?.id],
           orderBy: "last_active",
           ascending: false
         },
@@ -151,11 +150,10 @@ export default function SecuritySettings() {
         throw new Error("No email associated with this account");
       }
 
-      // Sanitize the email before passing to the function
-      const sanitizedEmail = sanitizeInput(user.email);
-      const { error } = await secureApi.fetch(
-        "auth.resetPasswordForEmail",
-        { email: sanitizedEmail, options: { redirectTo: `${window.location.origin}/auth/reset` } }
+      // Use the auth method directly instead of through secureApi
+      const { error } = await supabase.auth.resetPasswordForEmail(
+        sanitizeInput(user.email),
+        { redirectTo: `${window.location.origin}/auth/reset` }
       );
 
       if (error) throw error;
@@ -207,20 +205,17 @@ export default function SecuritySettings() {
       }
       
       // First, clear all user data
+      // Use direct Supabase calls for deletion
       await Promise.all([
-        secureApi.delete("user_sessions", { column: "user_id", value: user.id }),
-        secureApi.delete("user_privacy_settings", { column: "user_id", value: user.id })
+        supabase.from("user_sessions").delete().eq("user_id", user.id),
+        supabase.from("user_privacy_settings").delete().eq("user_id", user.id)
       ]);
       
       // Then delete the auth user
-      const { error } = await secureApi.delete(
-        "auth.users", 
-        { column: "id", value: user.id }
-      );
+      // This will use the auth API directly
+      await supabase.auth.admin.deleteUser(user.id);
 
-      if (error) throw error;
-
-      await secureApi.fetch("auth.signOut");
+      await supabase.auth.signOut();
       navigate("/");
       toast({
         title: "Konto slettet",

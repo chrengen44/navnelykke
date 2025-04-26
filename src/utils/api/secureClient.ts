@@ -4,18 +4,24 @@ import { checkRateLimit, incrementRequestCount } from './rateLimiter';
 import { sanitizeInput } from './sanitizer';
 import { validateTableName, type ValidTableName } from './tableValidator';
 
-// Define a simple response type to use throughout the file
-type ApiResponse<T = any> = {
+/**
+ * A simplified response type to use throughout the API
+ */
+type ApiResponse<T = unknown> = {
   data: T | null;
   error: Error | null;
 };
 
 export const secureApi = {
-  async fetch<T = any>(
+  /**
+   * Fetches data securely from a table with rate limiting and validation
+   */
+  async fetch<T>(
     tableName: string, 
-    query: any = {},
+    query: Record<string, any> = {},
     endpoint = 'default'
   ): Promise<ApiResponse<T>> {
+    // Check rate limiting
     if (!checkRateLimit(endpoint)) {
       return { data: null, error: new Error("Rate limit exceeded") };
     }
@@ -42,35 +48,48 @@ export const secureApi = {
         return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
-      // Type assertion after validation
+      // Use validated table name
       const validTableName = tableName as ValidTableName;
       
-      // First step: Create the query object
-      const selectQuery = supabase
-        .from(validTableName)
-        .select(query.select || '*');
+      // Create the base query
+      let query_builder = supabase.from(validTableName).select(query.select || '*');
       
-      // Second step: Add ordering if needed
-      const orderedQuery = selectQuery.order(query.orderBy || 'created_at', { ascending: false });
+      // Add filters if provided
+      if (query.eq) {
+        const [column, value] = query.eq;
+        query_builder = query_builder.eq(column, value);
+      }
       
-      // Third step: Execute query and get raw response
-      const rawResponse = await orderedQuery;
+      // Add ordering if provided
+      if (query.orderBy) {
+        const ascending = query.ascending !== undefined ? query.ascending : false;
+        query_builder = query_builder.order(query.orderBy, { ascending });
+      } else {
+        query_builder = query_builder.order('created_at', { ascending: false });
+      }
       
-      // Fourth step: Return with simple typing to avoid deep instantiation
+      // Execute the query
+      const { data, error } = await query_builder;
+      
+      // Return the result with explicit type casting
       return { 
-        data: rawResponse.data as unknown as T, 
-        error: rawResponse.error 
+        data: data as unknown as T, 
+        error: error as Error | null
       };
     } catch (err: any) {
       return { data: null, error: err };
     }
   },
   
-  async insert<T = any>(
+  /**
+   * Inserts data securely into a table with rate limiting and validation
+   */
+  async insert<T>(
     tableName: string,
     data: Record<string, any>,
     endpoint = 'update'
   ): Promise<ApiResponse<T>> {
+    // Check rate limiting
     if (!checkRateLimit(endpoint)) {
       return { data: null, error: new Error("Rate limit exceeded") };
     }
@@ -78,40 +97,44 @@ export const secureApi = {
     incrementRequestCount(endpoint);
     
     try {
+      // Sanitize input data
       const sanitizedData = sanitizeInput(data);
       
+      // Validate table name
       if (!validateTableName(tableName)) {
         console.warn(`Warning: ${tableName} is not a recognized table name`);
         return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
-      // Type assertion after validation
+      // Use validated table name
       const validTableName = tableName as ValidTableName;
       
-      // Step 1: Create insert query
-      const insertQuery = supabase
+      // Execute the insert operation
+      const { data: resultData, error } = await supabase
         .from(validTableName)
-        .insert([sanitizedData]);
+        .insert([sanitizedData])
+        .select();
       
-      // Step 2: Execute query and get raw response
-      const rawResponse = await insertQuery;
-      
-      // Step 3: Return with explicit type to break complex chains
+      // Return the result with explicit type casting
       return { 
-        data: rawResponse.data as unknown as T, 
-        error: rawResponse.error 
+        data: resultData as unknown as T, 
+        error: error as Error | null
       };
     } catch (err: any) {
       return { data: null, error: err };
     }
   },
   
-  async update<T = any>(
+  /**
+   * Updates data securely in a table with rate limiting and validation
+   */
+  async update<T>(
     tableName: string,
     query: { column: string; value: any },
     data: Record<string, any>,
     endpoint = 'update'
   ): Promise<ApiResponse<T>> {
+    // Check rate limiting
     if (!checkRateLimit(endpoint)) {
       return { data: null, error: new Error("Rate limit exceeded") };
     }
@@ -119,44 +142,45 @@ export const secureApi = {
     incrementRequestCount(endpoint);
     
     try {
+      // Sanitize input
       const sanitizedData = sanitizeInput(data);
       const sanitizedQuery = sanitizeInput(query);
       
+      // Validate table name
       if (!validateTableName(tableName)) {
         console.warn(`Warning: ${tableName} is not a recognized table name`);
         return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
-      // Type assertion after validation
+      // Use validated table name
       const validTableName = tableName as ValidTableName;
       
-      // Step 1: Build query without executing
-      const baseQuery = supabase.from(validTableName);
+      // Execute the update operation
+      const { data: resultData, error } = await supabase
+        .from(validTableName)
+        .update(sanitizedData)
+        .eq(sanitizedQuery.column, sanitizedQuery.value)
+        .select();
       
-      // Step 2: Add update operation
-      const updateOperation = baseQuery.update(sanitizedData);
-      
-      // Step 3: Add filter
-      const filteredOperation = updateOperation.eq(sanitizedQuery.column, sanitizedQuery.value);
-      
-      // Step 4: Execute and get raw response
-      const rawResponse = await filteredOperation;
-      
-      // Step 5: Return with explicit type casting to avoid inference chains
+      // Return the result with explicit type casting
       return {
-        data: rawResponse.data as unknown as T,
-        error: rawResponse.error
+        data: resultData as unknown as T,
+        error: error as Error | null
       };
     } catch (err: any) {
       return { data: null, error: err };
     }
   },
   
-  async delete<T = any>(
+  /**
+   * Deletes data securely from a table with rate limiting and validation
+   */
+  async delete<T>(
     tableName: string,
     query: { column: string; value: any },
     endpoint = 'update'
   ): Promise<ApiResponse<T>> {
+    // Check rate limiting
     if (!checkRateLimit(endpoint)) {
       return { data: null, error: new Error("Rate limit exceeded") };
     }
@@ -164,32 +188,29 @@ export const secureApi = {
     incrementRequestCount(endpoint);
     
     try {
+      // Sanitize query
       const sanitizedQuery = sanitizeInput(query);
       
+      // Validate table name
       if (!validateTableName(tableName)) {
         console.warn(`Warning: ${tableName} is not a recognized table name`);
         return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
       }
       
-      // Type assertion after validation
+      // Use validated table name
       const validTableName = tableName as ValidTableName;
       
-      // Step 1: Build base query
-      const baseQuery = supabase.from(validTableName);
+      // Execute the delete operation
+      const { data: resultData, error } = await supabase
+        .from(validTableName)
+        .delete()
+        .eq(sanitizedQuery.column, sanitizedQuery.value)
+        .select();
       
-      // Step 2: Add delete operation
-      const deleteOperation = baseQuery.delete();
-      
-      // Step 3: Add filter
-      const filteredOperation = deleteOperation.eq(sanitizedQuery.column, sanitizedQuery.value);
-      
-      // Step 4: Execute and get raw response
-      const rawResponse = await filteredOperation;
-      
-      // Step 5: Return with explicit type casting
+      // Return the result with explicit type casting
       return {
-        data: rawResponse.data as unknown as T,
-        error: rawResponse.error
+        data: resultData as unknown as T,
+        error: error as Error | null
       };
     } catch (err: any) {
       return { data: null, error: err };

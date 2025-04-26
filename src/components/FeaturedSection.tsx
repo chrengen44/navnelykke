@@ -23,7 +23,7 @@ const FeaturedSection = ({
   backgroundClass = "bg-gray-50",
 }: FeaturedSectionProps) => {
   return (
-    <section className={`py-12 ${backgroundClass}`}>
+    <section className={`py-12 ${backgroundClass} w-full`}>
       <div className="container mx-auto px-4">
         <div className="mb-8 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">{title}</h2>

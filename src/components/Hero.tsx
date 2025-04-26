@@ -18,7 +18,7 @@ const Hero = () => {
   };
 
   return (
-    <div className="relative bg-gradient-to-br from-babypink via-white to-babyblue py-16 md:py-24">
+    <div className="relative bg-gradient-to-br from-babypink via-white to-babyblue py-16 md:py-24 overflow-hidden">
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-3xl mx-auto text-center">
           <div className="mb-6 flex justify-center">
@@ -66,10 +66,10 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Decorative elements */}
-      <div className="absolute bottom-0 left-0 w-24 h-24 bg-babyyellow rounded-full opacity-40 transform -translate-x-1/2 translate-y-1/2"></div>
-      <div className="absolute top-0 right-0 w-32 h-32 bg-babypeach rounded-full opacity-40 transform translate-x-1/2 -translate-y-1/2"></div>
-      <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-babypurple rounded-full opacity-30 transform -translate-y-1/2 -translate-x-1/2"></div>
+      {/* Decorative elements - positioning adjusted to prevent overflow */}
+      <div className="absolute bottom-0 left-0 w-24 h-24 bg-babyyellow rounded-full opacity-40 transform translate-x-1/4 translate-y-1/2"></div>
+      <div className="absolute top-0 right-0 w-32 h-32 bg-babypeach rounded-full opacity-40 transform translate-x-0 -translate-y-1/2"></div>
+      <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-babypurple rounded-full opacity-30 transform -translate-y-1/2"></div>
     </div>
   );
 };

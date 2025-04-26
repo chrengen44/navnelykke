@@ -54,12 +54,12 @@ export async function fetchData<T>(
       if (Array.isArray(result.data)) {
         safeData = result.data.map(item => {
           if (item && typeof item === 'object') {
-            return { ...item };
+            return Object.assign({}, item);
           }
           return item;
         });
       } else if (result.data && typeof result.data === 'object') {
-        safeData = { ...result.data };
+        safeData = Object.assign({}, result.data);
       } else {
         safeData = result.data;
       }

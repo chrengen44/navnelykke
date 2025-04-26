@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
@@ -60,6 +61,7 @@ const Carousel = React.forwardRef<
       {
         ...opts,
         axis: orientation === "horizontal" ? "x" : "y",
+        containScroll: "trimSnaps",
       },
       plugins
     )
@@ -135,7 +137,7 @@ const Carousel = React.forwardRef<
         <div
           ref={ref}
           onKeyDownCapture={handleKeyDown}
-          className={cn("relative", className)}
+          className={cn("relative max-w-full", className)}
           role="region"
           aria-roledescription="carousel"
           {...props}
@@ -258,3 +260,4 @@ export {
   CarouselPrevious,
   CarouselNext,
 }
+

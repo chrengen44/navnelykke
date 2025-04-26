@@ -33,26 +33,24 @@ export async function updateData<T>(
       .eq(sanitizedQuery.column, sanitizedQuery.value)
       .select();
     
-    // Safely handle data without causing type recursion
     let safeData = null;
     if (result.data) {
       if (Array.isArray(result.data)) {
         safeData = result.data.map(item => {
           if (item && typeof item === 'object') {
-            return Object.assign({}, item);
+            return { ...item };
           }
           return item;
         });
       } else if (result.data && typeof result.data === 'object') {
-        safeData = Object.assign({}, result.data);
+        safeData = { ...result.data };
       } else {
         safeData = result.data;
       }
     }
       
-    // Use a direct type assertion without chaining
     return {
-      data: safeData as unknown as T,
+      data: safeData as T,
       error: result.error
     };
   } catch (err) {

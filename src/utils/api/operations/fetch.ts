@@ -10,7 +10,6 @@ export async function fetchData<T>(
   query: QueryOptions = {},
   endpoint = 'default'
 ): Promise<ApiResponse<T>> {
-  // Check rate limiting
   if (!checkRateLimit(endpoint)) {
     return { data: null, error: new Error("Rate limit exceeded") };
   }
@@ -18,8 +17,7 @@ export async function fetchData<T>(
   incrementRequestCount(endpoint);
   
   try {
-    // Handle auth-related endpoints
-    if (typeof tableName === 'string' && tableName.startsWith('auth.')) {
+    if (tableName.startsWith('auth.')) {
       if (tableName === 'auth.resetPasswordForEmail') {
         const sanitizedEmail = typeof query.eq?.[1] === 'string' ? sanitizeInput(query.eq[1]) : '';
         const options = {};
@@ -31,7 +29,6 @@ export async function fetchData<T>(
       return { data: null, error: new Error(`Unsupported auth method: ${tableName}`) };
     }
 
-    // Validate table name
     if (!validateTableName(tableName)) {
       console.warn(`Warning: ${tableName} is not a recognized table name`);
       return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
@@ -52,26 +49,24 @@ export async function fetchData<T>(
     
     const result = await queryBuilder;
     
-    // Safely handle data without causing type recursion
     let safeData = null;
     if (result.data) {
       if (Array.isArray(result.data)) {
         safeData = result.data.map(item => {
           if (item && typeof item === 'object') {
-            return Object.assign({}, item);
+            return { ...item };
           }
           return item;
         });
-      } else if (result.data && typeof item === 'object') {
-        safeData = Object.assign({}, result.data);
+      } else if (result.data && typeof result.data === 'object') {
+        safeData = { ...result.data };
       } else {
         safeData = result.data;
       }
     }
       
-    // Use a direct type assertion without chaining
     return {
-      data: safeData as unknown as T,
+      data: safeData as T,
       error: result.error
     };
   } catch (err) {

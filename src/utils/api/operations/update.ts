@@ -33,11 +33,14 @@ export async function updateData<T>(
       .eq(sanitizedQuery.column, sanitizedQuery.value)
       .select();
     
-    // Break the type chain by first casting to any, then to the generic type
-    const typedData = (result.data || null) as any as T;
+    // Create a completely new object with the data to break type dependency
+    let finalData: T | null = null;
+    if (result.data) {
+      finalData = JSON.parse(JSON.stringify(result.data)) as T;
+    }
     
     return {
-      data: typedData,
+      data: finalData,
       error: result.error
     };
   } catch (err) {

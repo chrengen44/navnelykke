@@ -52,6 +52,7 @@ export async function fetchData<T>(
     
     const result = await queryBuilder;
     
+    // Use simple type casting without complex nested generics
     return {
       data: result.data as T,
       error: result.error

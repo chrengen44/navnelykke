@@ -31,6 +31,7 @@ export async function deleteData<T>(
       .eq(sanitizedQuery.column, sanitizedQuery.value)
       .select();
     
+    // Use simple type casting without complex nested generics
     return {
       data: result.data as T,
       error: result.error

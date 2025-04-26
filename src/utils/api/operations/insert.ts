@@ -30,6 +30,7 @@ export async function insertData<T>(
       .insert([sanitizedData])
       .select();
     
+    // Use simple type casting without complex nested generics
     return {
       data: result.data as T,
       error: result.error

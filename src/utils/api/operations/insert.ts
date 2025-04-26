@@ -31,8 +31,8 @@ export async function insertData<T>(
       .select();
     
     return {
-      data: result.data as unknown as T,
-      error: result.error as Error | null
+      data: result.data as T,
+      error: result.error
     };
   } catch (err) {
     return { data: null, error: err instanceof Error ? err : new Error(String(err)) };

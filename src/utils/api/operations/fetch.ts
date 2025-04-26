@@ -50,11 +50,11 @@ export async function fetchData<T>(
       queryBuilder = queryBuilder.order('created_at', { ascending: false });
     }
     
-    const { data, error } = await queryBuilder;
+    const result = await queryBuilder;
     
     return {
-      data: data as unknown as T,
-      error: error as Error | null
+      data: result.data as T,
+      error: result.error
     };
   } catch (err) {
     return { data: null, error: err instanceof Error ? err : new Error(String(err)) };

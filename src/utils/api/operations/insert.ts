@@ -30,9 +30,15 @@ export async function insertData<T>(
       .insert([sanitizedData])
       .select();
     
-    // Return a cleanly typed response without recursive type issues
+    // Break the type reference chain completely
+    const safeData = result.data ? 
+      (Array.isArray(result.data) 
+        ? [...result.data].map(item => ({...item})) 
+        : {...result.data}) 
+      : null;
+      
     return {
-      data: result.data ? (result.data as unknown as T) : null,
+      data: safeData as any as T,
       error: result.error
     };
   } catch (err) {

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import AddFavoritesToPoll from "./AddFavoritesToPoll";
 
 const CreatePollForm = () => {
   const navigate = useNavigate();
@@ -17,6 +17,7 @@ const CreatePollForm = () => {
   const [description, setDescription] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [poll, setPoll] = useState(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,6 +43,7 @@ const CreatePollForm = () => {
 
       toast.success("Avstemningen ble opprettet!");
       navigate(`/poll/${poll.id}/edit`);
+      setPoll(poll);
     } catch (error) {
       console.error("Error creating poll:", error);
       toast.error("Kunne ikke opprette avstemningen");
@@ -86,6 +88,17 @@ const CreatePollForm = () => {
       <Button type="submit" disabled={isLoading}>
         {isLoading ? "Oppretter..." : "Opprett avstemning"}
       </Button>
+
+      {poll && (
+        <div className="mt-8">
+          <AddFavoritesToPoll 
+            pollId={poll.id} 
+            onNamesAdded={() => {
+              // Optionally refresh the poll data or update UI
+            }} 
+          />
+        </div>
+      )}
     </form>
   );
 };

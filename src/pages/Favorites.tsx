@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useFavorites } from "@/contexts/FavoritesContext";
 import { BabyName } from "@/data";
@@ -8,6 +7,7 @@ import NameGrid from "@/components/NameGrid";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { ArrowRight } from "lucide-react";
 
 const Favorites = () => {
   const [favoriteNames, setFavoriteNames] = useState<BabyName[]>([]);
@@ -47,7 +47,6 @@ const Favorites = () => {
           return;
         }
 
-        // Transform the data to match our BabyName interface
         const transformedNames: BabyName[] = names.map(name => ({
           id: name.id,
           name: name.name,
@@ -79,7 +78,18 @@ const Favorites = () => {
       <Header />
       <main className="flex-grow container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-3xl font-bold mb-6">Mine favoritter</h1>
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-3xl font-bold">Mine favoritter</h1>
+            {favoriteNames.length > 0 && (
+              <Button
+                onClick={() => navigate("/poll/create")}
+                className="flex items-center gap-2"
+              >
+                Opprett navneavstemning
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
           
           {loading ? (
             <div className="text-center py-12">

@@ -33,8 +33,7 @@ export async function updateData<T>(
       .eq(sanitizedQuery.column, sanitizedQuery.value)
       .select();
     
-    // Create a completely new object to break the reference chain
-    // without risking spread operator on non-objects
+    // Safely handle data without causing type recursion
     let safeData = null;
     if (result.data) {
       if (Array.isArray(result.data)) {
@@ -51,8 +50,9 @@ export async function updateData<T>(
       }
     }
       
+    // Use a direct type assertion without chaining
     return {
-      data: safeData as T,
+      data: safeData as unknown as T,
       error: result.error
     };
   } catch (err) {

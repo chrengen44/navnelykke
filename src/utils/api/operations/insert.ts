@@ -30,8 +30,8 @@ export async function insertData<T>(
       .insert([sanitizedData])
       .select();
     
-    // Explicitly cast to unknown first, then to T to break the deep type instantiation
-    const typedData = result.data as unknown as T;
+    // Break the type chain by first casting to any, then to the generic type
+    const typedData = (result.data || null) as any as T;
     
     return {
       data: typedData,

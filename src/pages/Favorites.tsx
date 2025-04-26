@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useFavorites } from "@/contexts/FavoritesContext";
 import { BabyName } from "@/data";
@@ -7,7 +8,7 @@ import NameGrid from "@/components/NameGrid";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Vote, List } from "lucide-react";
 
 const Favorites = () => {
   const [favoriteNames, setFavoriteNames] = useState<BabyName[]>([]);
@@ -78,16 +79,27 @@ const Favorites = () => {
       <Header />
       <main className="flex-grow container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <h1 className="text-3xl font-bold">Mine favoritter</h1>
             {favoriteNames.length > 0 && (
-              <Button
-                onClick={() => navigate("/poll/create")}
-                className="flex items-center gap-2"
-              >
-                Opprett navneavstemning
-                <ArrowRight className="h-4 w-4" />
-              </Button>
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  onClick={() => navigate("/poll/create")}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <Vote className="h-4 w-4" />
+                  Opprett navneavstemning
+                </Button>
+                <Button
+                  onClick={() => navigate("/name-lists")}
+                  variant="default"
+                  className="flex items-center gap-2"
+                >
+                  <List className="h-4 w-4" />
+                  Mine navnelister
+                </Button>
+              </div>
             )}
           </div>
           

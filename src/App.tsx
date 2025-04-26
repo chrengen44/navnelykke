@@ -32,6 +32,8 @@ import ViewPoll from './pages/ViewPoll';
 import Auth from './pages/Auth';
 import { AuthProvider } from "./hooks/useAuth";
 import SecuritySettings from './pages/SecuritySettings';
+import NameLists from './pages/NameLists';
+import NameListDetail from './pages/NameListDetail';
 
 const queryClient = new QueryClient();
 
@@ -71,6 +73,8 @@ export default function App() {
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/auth/:action" element={<Auth />} />
                 <Route path="/sikkerhet" element={<SecuritySettings />} />
+                <Route path="/name-lists" element={<NameLists />} />
+                <Route path="/name-list/:id" element={<NameListDetail />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

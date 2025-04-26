@@ -30,15 +30,26 @@ export async function insertData<T>(
       .insert([sanitizedData])
       .select();
     
-    // Break the type reference chain completely
-    const safeData = result.data ? 
-      (Array.isArray(result.data) 
-        ? [...result.data].map(item => ({...item})) 
-        : {...result.data}) 
-      : null;
+    // Create a completely new object to break the reference chain
+    // without risking spread operator on non-objects
+    let safeData = null;
+    if (result.data) {
+      if (Array.isArray(result.data)) {
+        safeData = result.data.map(item => {
+          if (item && typeof item === 'object') {
+            return Object.assign({}, item);
+          }
+          return item;
+        });
+      } else if (result.data && typeof result.data === 'object') {
+        safeData = Object.assign({}, result.data);
+      } else {
+        safeData = result.data;
+      }
+    }
       
     return {
-      data: safeData as any as T,
+      data: safeData as T,
       error: result.error
     };
   } catch (err) {

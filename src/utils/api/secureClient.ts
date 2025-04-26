@@ -51,33 +51,33 @@ export const secureApi = {
       // Use validated table name
       const validTableName = tableName as ValidTableName;
       
-      // Create the base query
-      let query_builder = supabase.from(validTableName).select(query.select || '*');
+      // Build query in steps to avoid complex type inference
+      let queryBuilder = supabase.from(validTableName).select(query.select || '*');
       
       // Add filters if provided
       if (query.eq) {
         const [column, value] = query.eq;
-        query_builder = query_builder.eq(column, value);
+        queryBuilder = queryBuilder.eq(column, value);
       }
       
       // Add ordering if provided
       if (query.orderBy) {
         const ascending = query.ascending !== undefined ? query.ascending : false;
-        query_builder = query_builder.order(query.orderBy, { ascending });
+        queryBuilder = queryBuilder.order(query.orderBy, { ascending });
       } else {
-        query_builder = query_builder.order('created_at', { ascending: false });
+        queryBuilder = queryBuilder.order('created_at', { ascending: false });
       }
       
-      // Execute the query
-      const { data, error } = await query_builder;
+      // Execute query
+      const { data, error } = await queryBuilder;
       
-      // Return the result with explicit type casting
-      return { 
-        data: data as unknown as T, 
+      // Return result with explicit casting to avoid complex type inference
+      return {
+        data: data as unknown as T,
         error: error as Error | null
       };
-    } catch (err: any) {
-      return { data: null, error: err };
+    } catch (err) {
+      return { data: null, error: err instanceof Error ? err : new Error(String(err)) };
     }
   },
   
@@ -109,19 +109,19 @@ export const secureApi = {
       // Use validated table name
       const validTableName = tableName as ValidTableName;
       
-      // Execute the insert operation
-      const { data: resultData, error } = await supabase
+      // Execute the insert operation separately to avoid complex type inference
+      const result = await supabase
         .from(validTableName)
         .insert([sanitizedData])
         .select();
       
       // Return the result with explicit type casting
-      return { 
-        data: resultData as unknown as T, 
-        error: error as Error | null
+      return {
+        data: result.data as unknown as T,
+        error: result.error as Error | null
       };
-    } catch (err: any) {
-      return { data: null, error: err };
+    } catch (err) {
+      return { data: null, error: err instanceof Error ? err : new Error(String(err)) };
     }
   },
   
@@ -142,7 +142,7 @@ export const secureApi = {
     incrementRequestCount(endpoint);
     
     try {
-      // Sanitize input
+      // Sanitize inputs
       const sanitizedData = sanitizeInput(data);
       const sanitizedQuery = sanitizeInput(query);
       
@@ -155,20 +155,20 @@ export const secureApi = {
       // Use validated table name
       const validTableName = tableName as ValidTableName;
       
-      // Execute the update operation
-      const { data: resultData, error } = await supabase
+      // Execute update in steps to avoid complex type inference
+      const result = await supabase
         .from(validTableName)
         .update(sanitizedData)
         .eq(sanitizedQuery.column, sanitizedQuery.value)
         .select();
       
-      // Return the result with explicit type casting
+      // Return result with explicit casting
       return {
-        data: resultData as unknown as T,
-        error: error as Error | null
+        data: result.data as unknown as T,
+        error: result.error as Error | null
       };
-    } catch (err: any) {
-      return { data: null, error: err };
+    } catch (err) {
+      return { data: null, error: err instanceof Error ? err : new Error(String(err)) };
     }
   },
   
@@ -200,20 +200,20 @@ export const secureApi = {
       // Use validated table name
       const validTableName = tableName as ValidTableName;
       
-      // Execute the delete operation
-      const { data: resultData, error } = await supabase
+      // Execute delete in steps to avoid complex type inference
+      const result = await supabase
         .from(validTableName)
         .delete()
         .eq(sanitizedQuery.column, sanitizedQuery.value)
         .select();
       
-      // Return the result with explicit type casting
+      // Return result with explicit casting
       return {
-        data: resultData as unknown as T,
-        error: error as Error | null
+        data: result.data as unknown as T,
+        error: result.error as Error | null
       };
-    } catch (err: any) {
-      return { data: null, error: err };
+    } catch (err) {
+      return { data: null, error: err instanceof Error ? err : new Error(String(err)) };
     }
   }
 };

@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import MobileMenu from './MobileMenu';
-import { Heart } from 'lucide-react';
+import { Heart, User } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { useAuth } from '@/hooks/useAuth';
@@ -31,19 +31,15 @@ const Header = () => {
             <Link to="/kategorier" className="text-gray-600 hover:text-pink-600">Kategorier</Link>
             <Link to="/inspirasjon" className="text-gray-600 hover:text-pink-600">Inspirasjon</Link>
             <Link to="/kontakt-oss" className="text-gray-600 hover:text-pink-600">Foreslå navn</Link>
+            {user && (
+              <Link to="/profil" className="text-gray-600 hover:text-pink-600 flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Min konto
+              </Link>
+            )}
           </div>
 
           <div className="flex items-center gap-4">
-            <Link to="/favoritter" className="flex items-center gap-2 text-gray-600 hover:text-pink-600">
-              <Heart className={`h-5 w-5 ${favoritesCount > 0 ? 'text-pink-500 fill-pink-500' : ''}`} />
-              <span className="hidden md:inline">Mine favoritter</span>
-              {favoritesCount > 0 && (
-                <span className="inline-flex items-center justify-center w-5 h-5 bg-pink-500 text-white text-xs font-bold rounded-full">
-                  {favoritesCount}
-                </span>
-              )}
-            </Link>
-            
             <UserMenu />
             
             <button

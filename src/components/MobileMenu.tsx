@@ -1,7 +1,8 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { X } from 'lucide-react';
+import { X, User } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -9,6 +10,8 @@ interface MobileMenuProps {
 }
 
 const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
+  const { user } = useAuth();
+
   if (!isOpen) return null;
 
   return (
@@ -59,6 +62,16 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
         >
           Foreslå navn
         </Link>
+        {user && (
+          <Link 
+            to="/profil" 
+            className="text-gray-600 hover:text-pink-600 py-2 border-b flex items-center gap-2"
+            onClick={onClose}
+          >
+            <User className="h-4 w-4" />
+            Min konto
+          </Link>
+        )}
       </nav>
     </div>
   );

@@ -52,14 +52,9 @@ export async function fetchData<T>(
     
     const result = await queryBuilder;
     
-    // Create a completely new object with the data to break type dependency
-    let finalData: T | null = null;
-    if (result.data) {
-      finalData = JSON.parse(JSON.stringify(result.data)) as T;
-    }
-    
+    // Return a cleanly typed response without recursive type issues
     return {
-      data: finalData,
+      data: result.data ? (result.data as unknown as T) : null,
       error: result.error
     };
   } catch (err) {

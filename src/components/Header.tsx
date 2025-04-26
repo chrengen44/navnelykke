@@ -2,15 +2,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import MobileMenu from './MobileMenu';
-import { Heart, User } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { useFavorites } from '@/contexts/FavoritesContext';
 import { useAuth } from '@/hooks/useAuth';
-import UserMenu from '@/UserMenu';
+import UserMenu from '@/components/UserMenu';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { favoritesCount } = useFavorites();
   const { user } = useAuth();
 
   return (
@@ -31,12 +27,6 @@ const Header = () => {
             <Link to="/kategorier" className="text-gray-600 hover:text-pink-600">Kategorier</Link>
             <Link to="/inspirasjon" className="text-gray-600 hover:text-pink-600">Inspirasjon</Link>
             <Link to="/kontakt-oss" className="text-gray-600 hover:text-pink-600">Foreslå navn</Link>
-            {user && (
-              <Link to="/profil" className="text-gray-600 hover:text-pink-600 flex items-center gap-2">
-                <User className="h-4 w-4" />
-                Min konto
-              </Link>
-            )}
           </div>
 
           <div className="flex items-center gap-4">

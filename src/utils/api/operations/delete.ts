@@ -31,7 +31,7 @@ export async function deleteData<T>(
       .eq(sanitizedQuery.column, sanitizedQuery.value)
       .select();
     
-    // Simplified type casting to avoid deep instantiation
+    // Simplify type casting to avoid deep instantiation
     const typedData = result.data as unknown as T;
     
     return {

@@ -49,7 +49,7 @@ export async function fetchData<T>(
     
     const result = await queryBuilder;
     
-    let safeData = null;
+    let safeData: any = null;
     if (result.data) {
       if (Array.isArray(result.data)) {
         safeData = result.data.map(item => {

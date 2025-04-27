@@ -1,3 +1,4 @@
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AdSpace from "@/components/AdSpace";
@@ -55,6 +56,14 @@ const Inspiration = () => {
       category: "Familie",
       background: "bg-babygreen",
       link: "/artikkel/søskennavn"
+    },
+    {
+      id: 7,
+      title: "Kombinere to navn: Moderne navnekombinasjoner",
+      excerpt: "Hvordan skape unike navn ved å kombinere to navn du elsker.",
+      category: "Trend",
+      background: "bg-babyyellow",
+      link: "/artikkel/navnekombinasjoner"
     }
   ];
   

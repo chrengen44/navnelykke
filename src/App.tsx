@@ -34,6 +34,7 @@ import SecuritySettings from './pages/SecuritySettings';
 import NameLists from './pages/NameLists';
 import NameListDetail from './pages/NameListDetail';
 import NameSelectionTips from './pages/NameSelectionTips';
+import NameTraditionsArticle from './pages/NameTraditionsArticle';
 
 const queryClient = new QueryClient();
 
@@ -76,6 +77,7 @@ export default function App() {
                 <Route path="/name-lists" element={<NameLists />} />
                 <Route path="/name-list/:id" element={<NameListDetail />} />
                 <Route path="/artikkel/5-tips-for-navnevalg" element={<NameSelectionTips />} />
+                <Route path="/artikkel/navnetradisjoner-i-norge" element={<NameTraditionsArticle />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

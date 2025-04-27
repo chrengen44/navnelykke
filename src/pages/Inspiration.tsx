@@ -21,7 +21,8 @@ const Inspiration = () => {
       title: "Navnetradisjoner i Norge gjennom tidene",
       excerpt: "Fra norrøne navn til moderne trender - hvordan navneskikker har endret seg i Norge.",
       category: "Historie",
-      background: "bg-babyblue"
+      background: "bg-babyblue",
+      link: "/artikkel/navnetradisjoner-i-norge"
     },
     {
       id: 3,

@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -34,6 +33,7 @@ import { AuthProvider } from "./hooks/useAuth";
 import SecuritySettings from './pages/SecuritySettings';
 import NameLists from './pages/NameLists';
 import NameListDetail from './pages/NameListDetail';
+import NameSelectionTips from './pages/NameSelectionTips';
 
 const queryClient = new QueryClient();
 
@@ -75,6 +75,7 @@ export default function App() {
                 <Route path="/sikkerhet" element={<SecuritySettings />} />
                 <Route path="/name-lists" element={<NameLists />} />
                 <Route path="/name-list/:id" element={<NameListDetail />} />
+                <Route path="/artikkel/5-tips-for-navnevalg" element={<NameSelectionTips />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

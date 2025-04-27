@@ -1,4 +1,3 @@
-
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AdSpace from "@/components/AdSpace";
@@ -14,7 +13,8 @@ const Inspiration = () => {
       title: "5 tips for å velge det perfekte navnet",
       excerpt: "Hvordan finne et navn som både du og barnet ditt vil elske gjennom livet.",
       category: "Navnetips",
-      background: "bg-babypink"
+      background: "bg-babypink",
+      link: "/artikkel/5-tips-for-navnevalg"
     },
     {
       id: 2,
@@ -34,7 +34,7 @@ const Inspiration = () => {
       id: 4,
       title: "Kombinere to navn: Moderne navnekombinasjoner",
       excerpt: "Hvordan skape unike navn ved å kombinere to navn du elsker.",
-      category: "Trender",
+      category: "Trend",
       background: "bg-babyyellow"
     },
     {
@@ -82,8 +82,8 @@ const Inspiration = () => {
                       </div>
                       <h3 className="text-xl font-semibold mb-2">{article.title}</h3>
                       <p className="text-gray-700 mb-4">{article.excerpt}</p>
-                      <Button variant="outline" className="bg-white/80 backdrop-blur-sm">
-                        Les mer
+                      <Button asChild variant="outline" className="bg-white/80 backdrop-blur-sm">
+                        <Link to={article.link}>Les mer</Link>
                       </Button>
                     </div>
                   </CardContent>

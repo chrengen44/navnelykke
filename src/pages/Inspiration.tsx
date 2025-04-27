@@ -29,7 +29,8 @@ const Inspiration = () => {
       title: "Nordiske navn og deres betydning",
       excerpt: "Utforsk de vakre betydningene bak tradisjonelle nordiske navn.",
       category: "Betydninger",
-      background: "bg-babypeach"
+      background: "bg-babypeach",
+      link: "/artikkel/nordiske-navn"
     },
     {
       id: 4,

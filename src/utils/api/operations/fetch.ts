@@ -49,7 +49,8 @@ export async function fetchData<T>(
     
     const result = await queryBuilder;
     
-    let safeData: any = null;
+    // Safely handle data without causing type recursion
+    let safeData = null;
     if (result.data) {
       if (Array.isArray(result.data)) {
         safeData = result.data.map(item => {
@@ -65,8 +66,9 @@ export async function fetchData<T>(
       }
     }
       
+    // Use a direct type assertion without chaining
     return {
-      data: safeData as T,
+      data: safeData as unknown as T,
       error: result.error
     };
   } catch (err) {

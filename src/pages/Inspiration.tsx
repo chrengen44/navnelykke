@@ -37,21 +37,24 @@ const Inspiration = () => {
       title: "Kombinere to navn: Moderne navnekombinasjoner",
       excerpt: "Hvordan skape unike navn ved å kombinere to navn du elsker.",
       category: "Trend",
-      background: "bg-babyyellow"
+      background: "bg-babyyellow",
+      link: "/artikkel/navnekombinasjoner"
     },
     {
       id: 5,
       title: "Internasjonale navn som fungerer godt på norsk",
       excerpt: "Internasjonale navn som er enkle å uttale og skrive på norsk.",
       category: "Internasjonalt",
-      background: "bg-babypurple"
+      background: "bg-babypurple",
+      link: "/artikkel/internasjonale-navn"
     },
     {
       id: 6,
       title: "Hvordan velge søskennavn som passer sammen",
       excerpt: "Tips for å finne navn som harmonerer for søsken.",
       category: "Familie",
-      background: "bg-babygreen"
+      background: "bg-babygreen",
+      link: "/artikkel/søskennavn"
     }
   ];
   

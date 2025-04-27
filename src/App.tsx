@@ -36,6 +36,7 @@ import NameListDetail from './pages/NameListDetail';
 import NameSelectionTips from './pages/NameSelectionTips';
 import NameTraditionsArticle from './pages/NameTraditionsArticle';
 import NordicNames from './pages/NordicNames';
+import NameCombinationsArticle from './pages/NameCombinationsArticle';
 
 const queryClient = new QueryClient();
 
@@ -80,6 +81,7 @@ export default function App() {
                 <Route path="/artikkel/nordiske-navn" element={<NordicNames />} />
                 <Route path="/artikkel/5-tips-for-navnevalg" element={<NameSelectionTips />} />
                 <Route path="/artikkel/navnetradisjoner-i-norge" element={<NameTraditionsArticle />} />
+                <Route path="/artikkel/navnekombinasjoner" element={<NameCombinationsArticle />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

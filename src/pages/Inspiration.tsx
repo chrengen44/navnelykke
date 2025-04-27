@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
+import ArtOfBabyNamingSlideshow from "@/components/ArtOfBabyNamingSlideshow";
 
 const Inspiration = () => {
   const articles = [
@@ -111,6 +112,10 @@ const Inspiration = () => {
           <AdSpace type="horizontal" />
         </div>
         
+        <section className="py-12 bg-gradient-to-br from-white via-purple-50 to-pink-50">
+          <ArtOfBabyNamingSlideshow />
+        </section>
+
         <section className="py-12 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="mb-8 text-center">

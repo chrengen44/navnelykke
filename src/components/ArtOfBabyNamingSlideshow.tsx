@@ -77,7 +77,7 @@ const ArtOfBabyNamingSlideshow = () => {
                 <CardContent className="p-0">
                   <div className="relative h-[400px] w-full">
                     <img
-                      src={`/art-of-baby-naming-${index + 1}.jpg`}
+                      src={`/art-of-baby-naming-${index + 1}.png`}
                       alt={slide.title}
                       className="w-full h-full object-cover"
                     />

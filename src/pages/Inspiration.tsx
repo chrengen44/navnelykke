@@ -34,11 +34,11 @@ const Inspiration = () => {
     },
     {
       id: 4,
-      title: "Kombinere to navn: Moderne navnekombinasjoner",
-      excerpt: "Hvordan skape unike navn ved å kombinere to navn du elsker.",
+      title: "Navngiving i den digitale tidsalderen",
+      excerpt: "Hvordan teknologi og sosiale medier påvirker våre navnevalg i dag.",
       category: "Trend",
-      background: "bg-babyyellow",
-      link: "/artikkel/navnekombinasjoner"
+      background: "bg-babygreen",
+      link: "/artikkel/navngiving-digital"
     },
     {
       id: 5,

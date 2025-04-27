@@ -11,7 +11,7 @@ export function SecurityHeaders() {
       "img-src 'self' data: https: blob:",
       "font-src 'self' https://fonts.gstatic.com",
       "connect-src 'self' https://rwxjdyudnkkehdjdcbtc.supabase.co https://googleapis.com",
-      "frame-src 'self' https://pagead2.googlesyndication.com",
+      "frame-src 'self' https://pagead2.googlesyndication.com https://gamma.app", // Added gamma.app
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",

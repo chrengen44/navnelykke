@@ -2,9 +2,10 @@
 import { supabase } from '@/integrations/supabase/client';
 import { FetchOptions } from './types';
 import { validateTable } from '../helpers';
+import { ValidTableName } from '../tableValidator';
 
 export const fetchData = async <T,>(
-  table: string,
+  table: ValidTableName,
   options: FetchOptions = {}
 ): Promise<T[]> => {
   try {
@@ -70,7 +71,7 @@ export const fetchData = async <T,>(
   }
 };
 
-export const fetchById = async <T>(table: string, id: string | number): Promise<T | null> => {
+export const fetchById = async <T>(table: ValidTableName, id: string | number): Promise<T | null> => {
   try {
     validateTable(table);
 

@@ -1,8 +1,9 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { validateTable, sanitizeData } from '../helpers';
+import { ValidTableName } from '../tableValidator';
 
-export const createData = async <T,>(table: string, data: T): Promise<T> => {
+export const createData = async <T,>(table: ValidTableName, data: T): Promise<T> => {
   try {
     validateTable(table);
     sanitizeData(data);
@@ -25,7 +26,7 @@ export const createData = async <T,>(table: string, data: T): Promise<T> => {
 };
 
 export const updateData = async <T,>(
-  table: string,
+  table: ValidTableName,
   id: string | number,
   data: Partial<T>
 ): Promise<T> => {
@@ -52,7 +53,7 @@ export const updateData = async <T,>(
   }
 };
 
-export const deleteData = async (table: string, id: string | number): Promise<void> => {
+export const deleteData = async (table: ValidTableName, id: string | number): Promise<void> => {
   try {
     validateTable(table);
 

@@ -1,4 +1,6 @@
 
+import { ValidTableName } from '../tableValidator';
+
 /**
  * Filter operator types for database queries
  */

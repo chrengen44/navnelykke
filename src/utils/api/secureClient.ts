@@ -3,12 +3,13 @@ import { fetchData, fetchById } from './operations/fetch';
 import { createData, updateData, deleteData } from './operations/update';
 import type { ApiResponse } from './types';
 import type { FetchOptions } from './operations/types';
+import type { ValidTableName } from './tableValidator';
 
 /**
  * Unified client for handling all secure API operations
  */
 const secureApi = {
-  fetch: async <T>(table: string, options?: FetchOptions, endpoint?: string): Promise<ApiResponse<T[]>> => {
+  fetch: async <T>(table: ValidTableName, options?: FetchOptions, endpoint?: string): Promise<ApiResponse<T[]>> => {
     try {
       const data = await fetchData<T>(table, options);
       return { data, error: null };
@@ -17,7 +18,7 @@ const secureApi = {
     }
   },
   
-  fetchById: async <T>(table: string, id: string | number): Promise<ApiResponse<T>> => {
+  fetchById: async <T>(table: ValidTableName, id: string | number): Promise<ApiResponse<T>> => {
     try {
       const data = await fetchById<T>(table, id);
       return { data, error: null };
@@ -26,7 +27,7 @@ const secureApi = {
     }
   },
   
-  create: async <T>(table: string, data: T): Promise<ApiResponse<T>> => {
+  create: async <T>(table: ValidTableName, data: T): Promise<ApiResponse<T>> => {
     try {
       const result = await createData<T>(table, data);
       return { data: result, error: null };
@@ -35,7 +36,7 @@ const secureApi = {
     }
   },
   
-  update: async <T>(table: string, id: string | number, data: Partial<T>): Promise<ApiResponse<T>> => {
+  update: async <T>(table: ValidTableName, id: string | number, data: Partial<T>): Promise<ApiResponse<T>> => {
     try {
       const result = await updateData<T>(table, id, data);
       return { data: result, error: null };
@@ -44,7 +45,7 @@ const secureApi = {
     }
   },
   
-  delete: async (table: string, id: string | number): Promise<ApiResponse<void>> => {
+  delete: async (table: ValidTableName, id: string | number): Promise<ApiResponse<void>> => {
     try {
       await deleteData(table, id);
       return { data: undefined, error: null };

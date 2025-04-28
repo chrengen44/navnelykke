@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
@@ -21,21 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
-interface PrivacySettings {
-  user_id: string;
-  show_email: boolean;
-  show_full_name: boolean;
-  allow_public_favorites: boolean;
-}
-
-interface Session {
-  id: string;
-  device_info: string | null;
-  ip_address: string | null;
-  last_active: string;
-  created_at: string;
-}
+import { Session, PrivacySettings } from "@/utils/api/types";
 
 export default function SecuritySettings() {
   const { user } = useAuth();

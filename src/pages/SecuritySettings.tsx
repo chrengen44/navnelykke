@@ -63,9 +63,13 @@ export default function SecuritySettings() {
       if (error) throw error;
       
       if (data && data.length > 0) {
-        // Use a specific item from the array to fix type mismatch
-        const settingsData = data[0];
-        setPrivacySettings(settingsData);
+        // Fix type mismatch by explicitly setting a single item
+        setPrivacySettings({
+          user_id: data[0].user_id,
+          show_email: data[0].show_email,
+          show_full_name: data[0].show_full_name,
+          allow_public_favorites: data[0].allow_public_favorites,
+        });
       }
     } catch (error: any) {
       toast({
@@ -93,7 +97,8 @@ export default function SecuritySettings() {
       
       if (data) {
         // Ensure we're setting an array of Session objects, not a nested array
-        setSessions(Array.isArray(data) ? data : []);
+        // Flatten if it's a nested array, otherwise use as is
+        setSessions(Array.isArray(data[0]) ? data[0] : data);
       }
     } catch (error: any) {
       toast({

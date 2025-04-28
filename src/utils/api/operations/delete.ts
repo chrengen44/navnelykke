@@ -31,12 +31,8 @@ export async function deleteData<T>(
       .eq(sanitizedQuery.column, sanitizedQuery.value)
       .select();
     
-    // Handle data without causing type recursion
-    let processedData = null;
-    if (result.data) {
-      // Simple conversion to avoid deep nesting/recursion in types
-      processedData = JSON.parse(JSON.stringify(result.data));
-    }
+    // Break the type recursion by converting to string and back
+    const processedData = result.data ? JSON.parse(JSON.stringify(result.data)) : null;
       
     return {
       data: processedData as T,

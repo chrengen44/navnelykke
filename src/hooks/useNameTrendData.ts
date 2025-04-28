@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
-import { fetchSSBNameData } from '@/utils/ssbApi';
+import { fetchNameTrendData } from '@/services/ssbApiService';
 import { getFallbackData, type NameTrendData } from '@/utils/nameTrendFallbackData';
 
 interface RankingData {
@@ -15,6 +15,7 @@ export const useNameTrendData = (gender: 'girl' | 'boy', namesToFetch: string[])
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Memoize names array to prevent unnecessary re-fetching
   const memoizedNames = useMemo(() => namesToFetch, [JSON.stringify(namesToFetch)]);
 
   const generateRankData = (data: NameTrendData[]): RankingData[] => {
@@ -38,18 +39,29 @@ export const useNameTrendData = (gender: 'girl' | 'boy', namesToFetch: string[])
   };
 
   useEffect(() => {
+    let isMounted = true;
+    
     const fetchData = async () => {
+      if (!isMounted) return;
+      
       setLoading(true);
       setError(null);
       
       try {
-        const data = await fetchSSBNameData(gender, memoizedNames);
+        console.log(`Fetching name trend data for ${gender}:`, memoizedNames);
+        const data = await fetchNameTrendData(gender, memoizedNames);
+        
+        if (!isMounted) return;
+        
         setChartData(data);
         setRankingData(generateRankData(data));
       } catch (err) {
+        if (!isMounted) return;
+        
         console.error(`Error fetching ${gender} name trend data:`, err);
         setError(`Kunne ikke hente navnedata fra SSB. Server utilgjengelig.`);
         
+        // Use fallback data in case of error
         const fallbackData = getFallbackData(gender, memoizedNames);
         setChartData(fallbackData);
         setRankingData(generateRankData(fallbackData));
@@ -58,11 +70,17 @@ export const useNameTrendData = (gender: 'girl' | 'boy', namesToFetch: string[])
           duration: 5000,
         });
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
     
     fetchData();
+    
+    return () => {
+      isMounted = false;
+    };
   }, [gender, memoizedNames]);
 
   return {

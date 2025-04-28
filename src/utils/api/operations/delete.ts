@@ -5,7 +5,7 @@ import { checkRateLimit, incrementRequestCount } from '../rateLimiter';
 import { sanitizeInput } from '../sanitizer';
 import { validateTableName, ValidTableName } from '../tableValidator';
 
-export async function deleteData<T>(
+export async function deleteData<T = Record<string, unknown>>(
   tableName: ValidTableName,
   query: { column: string; value: any },
   endpoint = 'update'
@@ -35,7 +35,6 @@ export async function deleteData<T>(
       return { data: null, error: new Error(result.error.message) };
     }
     
-    // Using unknown type to break recursion
     return { 
       data: null, 
       error: null 

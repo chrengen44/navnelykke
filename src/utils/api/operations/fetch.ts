@@ -7,7 +7,7 @@ import { validateTableName, ValidTableName } from '../tableValidator';
 /**
  * Fetches data from a table with optional filtering
  */
-export async function fetchData<T>(
+export async function fetchData<T = Record<string, unknown>>(
   table: ValidTableName,
   options: {
     columns?: string;
@@ -50,7 +50,7 @@ export async function fetchData<T>(
       throw new Error(`Error fetching data from ${table}: ${error.message}`);
     }
 
-    // Cast to unknown first, then to the expected type T[] to break type recursion
+    // Return the data as is without recursive casting
     return (data || []) as unknown as T[];
   } catch (error) {
     console.error('Error in fetchData:', error);
@@ -61,7 +61,7 @@ export async function fetchData<T>(
 /**
  * Fetches a single record by ID
  */
-export async function fetchById<T>(
+export async function fetchById<T = Record<string, unknown>>(
   table: ValidTableName,
   id: number | string,
   columns: string = '*',
@@ -92,7 +92,7 @@ export async function fetchById<T>(
       throw error;
     }
 
-    // Cast to unknown first, then to T to break type recursion
+    // Return the data as is without recursive casting
     return data as unknown as T;
   } catch (error) {
     console.error(`Error in fetchById for table ${table} with ID ${id}:`, error);

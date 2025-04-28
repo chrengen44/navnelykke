@@ -75,11 +75,11 @@ const ArtOfBabyNamingSlideshow = () => {
             <CarouselItem key={index}>
               <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-none overflow-hidden">
                 <CardContent className="p-0">
-                  <div className="relative h-[400px] w-full">
+                  <div className="relative w-full">
                     <img
                       src={`/art-of-baby-naming-${index + 1}.png`}
                       alt={slide.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-auto max-h-[600px] object-contain"
                     />
                   </div>
                 </CardContent>

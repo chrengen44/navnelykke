@@ -19,7 +19,7 @@ export const createData = async <T,>(table: ValidTableName, data: T): Promise<T>
     }
 
     // Use direct type casting to avoid deep recursion issues
-    return result as T;
+    return result as unknown as T;
   } catch (error) {
     console.error('Error in createData:', error);
     throw error;
@@ -47,7 +47,7 @@ export const updateData = async <T,>(
     }
 
     // Use direct type casting to avoid deep recursion issues
-    return result as T;
+    return result as unknown as T;
   } catch (error) {
     console.error('Error in updateData:', error);
     throw error;

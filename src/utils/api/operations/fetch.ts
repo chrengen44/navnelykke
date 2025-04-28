@@ -64,7 +64,7 @@ export const fetchData = async <T,>(
     }
 
     // Use a simple type cast to avoid deep type recursion issues
-    return (data || []) as T[];
+    return (data || []) as unknown as T[];
   } catch (error) {
     console.error('Error in fetchData:', error);
     throw error;
@@ -87,7 +87,7 @@ export const fetchById = async <T>(table: ValidTableName, id: string | number): 
     }
 
     // Use direct type casting to avoid deep recursion issues
-    return data as T | null;
+    return data as unknown as T;
   } catch (error) {
     console.error(`Error in fetchById for table ${table} with ID ${id}:`, error);
     return null;

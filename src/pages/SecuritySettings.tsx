@@ -61,9 +61,11 @@ export default function SecuritySettings() {
       );
 
       if (error) throw error;
-      // Fix the type mismatch by checking if data exists and taking the first item
+      
       if (data && data.length > 0) {
-        setPrivacySettings(data[0]);
+        // Use a specific item from the array to fix type mismatch
+        const settingsData = data[0];
+        setPrivacySettings(settingsData);
       }
     } catch (error: any) {
       toast({
@@ -88,9 +90,10 @@ export default function SecuritySettings() {
       );
 
       if (error) throw error;
-      // Fix the type mismatch by properly checking data
+      
       if (data) {
-        setSessions(data);
+        // Ensure we're setting an array of Session objects, not a nested array
+        setSessions(Array.isArray(data) ? data : []);
       }
     } catch (error: any) {
       toast({

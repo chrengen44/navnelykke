@@ -35,9 +35,9 @@ export async function deleteData<T>(
       return { data: null, error: new Error(result.error.message) };
     }
     
-    // Use proper type assertion
+    // Break type recursion with unknown
     return { 
-      data: null as T, 
+      data: null as unknown as T, 
       error: null 
     };
   } catch (err) {

@@ -50,8 +50,8 @@ export async function fetchData<T>(
       throw new Error(`Error fetching data from ${table}: ${error.message}`);
     }
 
-    // Fix type instantiation issue with a direct type assertion
-    return (data || []) as T[];
+    // Use a non-generic return to break the type recursion
+    return data as unknown as T[];
   } catch (error) {
     console.error('Error in fetchData:', error);
     throw error;
@@ -92,8 +92,8 @@ export async function fetchById<T>(
       throw error;
     }
 
-    // Fix type instantiation issue with a direct type assertion
-    return data as T;
+    // Use unknown as intermediate type to break recursion
+    return data as unknown as T;
   } catch (error) {
     console.error(`Error in fetchById for table ${table} with ID ${id}:`, error);
     return null;

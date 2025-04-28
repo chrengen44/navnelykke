@@ -51,6 +51,23 @@ const PopularNames = () => {
     fetchNames();
   }, [gender]);
 
+  // Set page metadata
+  useEffect(() => {
+    document.title = "Populære navn i Norge | Navnelykke";
+    
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.setAttribute('name', 'description');
+      document.head.appendChild(metaDescription);
+    }
+    metaDescription.setAttribute('content', "Se hvilke babynavn som er mest populære i Norge akkurat nå");
+    
+    return () => {
+      document.title = "Navnelykke"; // Reset to default
+    };
+  }, []);
+
   // Prepare SEO data
   const articleData = getArticleData(
     "Populære navn i Norge",
@@ -76,26 +93,6 @@ const PopularNames = () => {
 
   // Prepare all structured data as an array and filter out any nullish values
   const structuredDataArray = [articleData, breadcrumbData, listData].filter(Boolean);
-
-  // Setup page metadata
-  useEffect(() => {
-    // Set page title and description directly
-    document.title = "Populære navn i Norge | Navnelykke";
-    
-    // Find or create meta description tag
-    let metaDescription = document.querySelector('meta[name="description"]');
-    if (!metaDescription) {
-      metaDescription = document.createElement('meta');
-      metaDescription.setAttribute('name', 'description');
-      document.head.appendChild(metaDescription);
-    }
-    metaDescription.setAttribute('content', "Se hvilke babynavn som er mest populære i Norge akkurat nå");
-    
-    // Cleanup function
-    return () => {
-      document.title = "Navnelykke"; // Reset to default
-    };
-  }, []);
 
   return (
     <Layout>

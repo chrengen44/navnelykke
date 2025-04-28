@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
@@ -62,11 +63,13 @@ export default function SecuritySettings() {
       if (error) throw error;
       
       if (data && data.length > 0) {
+        // Access the first item from the array
+        const settings = data[0];
         setPrivacySettings({
-          user_id: data[0].user_id,
-          show_email: data[0].show_email,
-          show_full_name: data[0].show_full_name,
-          allow_public_favorites: data[0].allow_public_favorites,
+          user_id: settings.user_id,
+          show_email: settings.show_email,
+          show_full_name: settings.show_full_name,
+          allow_public_favorites: settings.allow_public_favorites,
         });
       }
     } catch (error: any) {
@@ -94,7 +97,8 @@ export default function SecuritySettings() {
       if (error) throw error;
       
       if (data) {
-        setSessions(data);
+        // Ensure we're setting an array of Sessions
+        setSessions(Array.isArray(data) ? data : []);
       }
     } catch (error: any) {
       toast({

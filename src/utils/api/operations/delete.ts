@@ -35,9 +35,9 @@ export async function deleteData<T>(
       return { data: null, error: new Error(result.error.message) };
     }
     
-    // Completely avoid TS2589 error by using a more explicit approach
+    // Use a more explicit type cast to avoid TypeScript's excessive instantiation
     return { 
-      data: null as unknown as T, 
+      data: null as any as T, 
       error: null 
     };
   } catch (err) {

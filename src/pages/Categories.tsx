@@ -33,8 +33,8 @@ const Categories = () => {
     { name: "Kategorier", url: "/kategorier" }
   ]);
 
-  // Combine structured data in an array
-  const structuredDataArray = [collectionData, breadcrumbData];
+  // Combine structured data in an array and filter out any nullish values
+  const structuredDataArray = [collectionData, breadcrumbData].filter(Boolean);
 
   return (
     <Layout>
@@ -43,7 +43,7 @@ const Categories = () => {
         <meta name="description" content="Utforsk navn basert på ulike kategorier og stiler" />
       </Helmet>
       
-      <StructuredData data={structuredDataArray} />
+      {structuredDataArray.length > 0 && <StructuredData data={structuredDataArray} />}
       
       <div className="container mx-auto px-4 py-8">
         {/* Name Categories Section */}

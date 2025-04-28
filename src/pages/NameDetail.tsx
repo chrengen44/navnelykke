@@ -108,8 +108,8 @@ const NameDetail = () => {
     { name: name.name, url: `/navn/${name.id}` }
   ]);
   
-  // Combine structured data in an array
-  const structuredDataArray = [nameDetailData, breadcrumbData];
+  // Combine structured data in an array and filter out any nullish values
+  const structuredDataArray = [nameDetailData, breadcrumbData].filter(Boolean);
   
   return (
     <Layout>
@@ -118,7 +118,7 @@ const NameDetail = () => {
         <meta name="description" content={`Les mer om navnet ${name.name}, dets betydning (${name.meaning}) og ${name.origin} opprinnelse.`} />
       </Helmet>
       
-      <StructuredData data={structuredDataArray} />
+      {structuredDataArray.length > 0 && <StructuredData data={structuredDataArray} />}
       
       <main className="flex-grow">
         <NameHeader 

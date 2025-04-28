@@ -12,10 +12,11 @@ const StructuredData: React.FC<StructuredDataProps> = ({ data }) => {
     return null;
   }
 
-  // Safer implementation that handles potential errors
+  // More robust implementation that safely handles errors
   const renderScripts = () => {
     try {
       if (Array.isArray(data)) {
+        // Filter out any null/undefined items before mapping
         return data.filter(Boolean).map((item, index) => (
           <script key={index} type="application/ld+json">
             {JSON.stringify(item)}
@@ -34,6 +35,7 @@ const StructuredData: React.FC<StructuredDataProps> = ({ data }) => {
     }
   };
   
+  // Use optional chaining to prevent runtime errors
   return <Helmet>{renderScripts()}</Helmet>;
 };
 

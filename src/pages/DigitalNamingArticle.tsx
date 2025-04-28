@@ -20,12 +20,13 @@ const DigitalNamingArticle = () => {
     { name: title, url: path }
   ]);
 
-  // Combine structured data safely
+  // Combine structured data safely and filter out any nullish values
   const structuredData = [articleData, breadcrumbData].filter(Boolean);
 
   return (
     <BlogPostLayout title={title}>
-      <StructuredData data={structuredData} />
+      {/* Only render StructuredData if we have valid data */}
+      {structuredData.length > 0 && <StructuredData data={structuredData} />}
       
       <article className="prose prose-lg lg:prose-xl max-w-4xl mx-auto">
         {/* Hero section */}

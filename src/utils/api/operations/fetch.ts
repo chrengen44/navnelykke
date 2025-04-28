@@ -1,99 +1,101 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { FetchOptions } from './types';
-import { validateTable } from '../helpers';
-import { ValidTableName } from '../tableValidator';
+import { supabase } from "@/integrations/supabase/client";
+import { checkRateLimit, incrementRequestCount } from '../rateLimiter';
+import { sanitizeInput } from '../sanitizer';
+import { validateTableName, ValidTableName } from '../tableValidator';
 
-export const fetchData = async <T>(
+/**
+ * Fetches data from a table with optional filtering
+ */
+export async function fetchData<T>(
   table: ValidTableName,
-  options: FetchOptions = {}
-): Promise<T[]> => {
+  options: {
+    columns?: string;
+    filter?: { column: string; value: any };
+    limit?: number;
+    orderBy?: { column: string; ascending: boolean };
+  } = {},
+  endpoint = 'fetch'
+): Promise<T[]> {
+  if (!checkRateLimit(endpoint)) {
+    throw new Error("Rate limit exceeded");
+  }
+  
+  incrementRequestCount(endpoint);
+  
   try {
-    validateTable(table);
-
+    if (!validateTableName(table)) {
+      console.warn(`Warning: ${table} is not a recognized table name`);
+      throw new Error(`Invalid table name: ${table}`);
+    }
+    
     let query = supabase.from(table).select(options.columns || '*');
-
-    if (options.filters) {
-      options.filters.forEach(filter => {
-        const { column, operator, value } = filter;
-        
-        switch (operator) {
-          case 'eq':
-            query = query.eq(column, value);
-            break;
-          case 'neq':
-            query = query.neq(column, value);
-            break;
-          case 'gt':
-            query = query.gt(column, value);
-            break;
-          case 'lt':
-            query = query.lt(column, value);
-            break;
-          case 'gte':
-            query = query.gte(column, value);
-            break;
-          case 'lte':
-            query = query.lte(column, value);
-            break;
-          case 'like':
-            query = query.like(column, `%${value}%`);
-            break;
-          case 'ilike':
-            query = query.ilike(column, `%${value}%`);
-            break;
-          case 'in':
-            query = query.in(column, value as any[]);
-            break;
-        }
-      });
+    
+    if (options.filter) {
+      const sanitizedFilter = sanitizeInput(options.filter);
+      query = query.eq(sanitizedFilter.column, sanitizedFilter.value);
     }
-
-    if (options.orderBy) {
-      query = query.order(options.orderBy.column, { ascending: options.orderBy.ascending });
-    }
-
+    
     if (options.limit) {
       query = query.limit(options.limit);
     }
-
+    
+    if (options.orderBy) {
+      query = query.order(options.orderBy.column, { ascending: options.orderBy.ascending });
+    }
+    
     const { data, error } = await query;
-
+    
     if (error) {
       throw new Error(`Error fetching data from ${table}: ${error.message}`);
     }
 
-    // Completely avoid TS2589 error by using an explicit type assertion
-    const safeData = data || [];
-    return safeData as any as T[];
+    // Use a direct type cast to avoid TS2589 error
+    return (data || []) as any as T[];
   } catch (error) {
     console.error('Error in fetchData:', error);
     throw error;
   }
-};
+}
 
-export const fetchById = async <T>(
-  table: ValidTableName, 
-  id: string | number
-): Promise<T | null> => {
+/**
+ * Fetches a single record by ID
+ */
+export async function fetchById<T>(
+  table: ValidTableName,
+  id: number | string,
+  columns: string = '*',
+  endpoint = 'fetch'
+): Promise<T | null> {
+  if (!checkRateLimit(endpoint)) {
+    throw new Error("Rate limit exceeded");
+  }
+  
+  incrementRequestCount(endpoint);
+  
   try {
-    validateTable(table);
-
+    if (!validateTableName(table)) {
+      console.warn(`Warning: ${table} is not a recognized table name`);
+      throw new Error(`Invalid table name: ${table}`);
+    }
+    
     const { data, error } = await supabase
       .from(table)
-      .select('*')
+      .select(columns)
       .eq('id', id)
       .single();
-
+    
     if (error) {
-      console.error(`Error fetching data from ${table} with ID ${id}:`, error.message);
-      return null;
+      if (error.code === 'PGRST116') {
+        return null; // No rows returned
+      }
+      throw error;
     }
 
-    // Use an explicit type assertion to avoid TS2589
+    // Use a direct type cast to avoid TS2589 error
     return data as any as T;
   } catch (error) {
     console.error(`Error in fetchById for table ${table} with ID ${id}:`, error);
     return null;
   }
-};
+}

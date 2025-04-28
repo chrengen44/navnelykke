@@ -74,11 +74,8 @@ const PopularNames = () => {
   
   const listData = names.length > 0 ? getListData(listItems) : null;
 
-  // Prepare all structured data as an array
-  const structuredDataArray = [articleData, breadcrumbData];
-  if (listData) {
-    structuredDataArray.push(listData);
-  }
+  // Prepare all structured data as an array and filter out any nullish values
+  const structuredDataArray = [articleData, breadcrumbData, listData].filter(Boolean);
 
   return (
     <Layout>

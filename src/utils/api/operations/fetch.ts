@@ -63,8 +63,9 @@ export const fetchData = async <T>(
       throw new Error(`Error fetching data from ${table}: ${error.message}`);
     }
 
-    // Use a more direct type assertion to fix excessive type instantiation
-    return (data || []) as T[];
+    // Break the type chain to prevent excessive instantiation
+    const resultData = data || [];
+    return resultData as unknown as T[];
   } catch (error) {
     console.error('Error in fetchData:', error);
     throw error;
@@ -89,8 +90,8 @@ export const fetchById = async <T>(
       return null;
     }
 
-    // Use a more direct type assertion to fix excessive type instantiation
-    return data as T;
+    // Break the type chain to prevent excessive instantiation
+    return data as unknown as T;
   } catch (error) {
     console.error(`Error in fetchById for table ${table} with ID ${id}:`, error);
     return null;

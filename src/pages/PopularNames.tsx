@@ -64,11 +64,13 @@ const PopularNames = () => {
   ]);
   
   // Create list data only if we have names
-  const listItems = names.map((name, index) => ({
-    name: name.name,
-    position: index + 1,
-    item: `/navn/${name.id}`
-  }));
+  const listItems = names.length > 0 
+    ? names.map((name, index) => ({
+        name: name.name,
+        position: index + 1,
+        item: `/navn/${name.id}`
+      }))
+    : [];
   
   const listData = names.length > 0 ? getListData(listItems) : null;
 

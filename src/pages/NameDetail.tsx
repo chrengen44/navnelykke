@@ -100,6 +100,7 @@ const NameDetail = () => {
     return <ErrorState error={error} />;
   }
 
+  // Create structured data
   const nameDetailData = getNameDetailData(name);
   const breadcrumbData = getBreadcrumbData([
     { name: "Hjem", url: "/" },

@@ -12,14 +12,14 @@ const DigitalNamingArticle = () => {
   const description = "En utforskning av moderne navngiving og hvordan teknologi påvirker våre valg";
   const path = "/artikkel/navngiving-digital";
 
-  const structuredData = [
-    getArticleData(title, description, path),
-    getBreadcrumbData([
-      { name: "Hjem", url: "/" },
-      { name: "Inspirasjon", url: "/inspirasjon" },
-      { name: title, url: path }
-    ])
-  ];
+  const articleData = getArticleData(title, description, path);
+  const breadcrumbData = getBreadcrumbData([
+    { name: "Hjem", url: "/" },
+    { name: "Inspirasjon", url: "/inspirasjon" },
+    { name: title, url: path }
+  ]);
+
+  const structuredData = [articleData, breadcrumbData];
 
   return (
     <BlogPostLayout title={title}>

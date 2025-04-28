@@ -11,6 +11,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Create a properly initialized helmetContext object
   const helmetContext = {};
 
   return (

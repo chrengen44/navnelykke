@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
@@ -63,7 +62,6 @@ export default function SecuritySettings() {
       if (error) throw error;
       
       if (data && data.length > 0) {
-        // Fix type mismatch by explicitly setting a single item
         setPrivacySettings({
           user_id: data[0].user_id,
           show_email: data[0].show_email,
@@ -96,9 +94,7 @@ export default function SecuritySettings() {
       if (error) throw error;
       
       if (data) {
-        // Ensure we're setting an array of Session objects, not a nested array
-        // Flatten if it's a nested array, otherwise use as is
-        setSessions(Array.isArray(data[0]) ? data[0] : data);
+        setSessions(data);
       }
     } catch (error: any) {
       toast({

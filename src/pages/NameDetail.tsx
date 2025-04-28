@@ -1,17 +1,15 @@
+
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { BabyName } from "@/data/types";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { BabyName } from "@/data/types";
-import RelatedNames from "@/components/RelatedNames";
-import AdSpace from "@/components/AdSpace";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import { trackNameVisit, fetchNameById } from "@/integrations/supabase/name-queries";
 import { toast } from "sonner";
 import NameHeader from "@/components/name-detail/NameHeader";
-import NameInfo from "@/components/name-detail/NameInfo";
-import NameInspiration from "@/components/name-detail/NameInspiration";
+import { LoadingState } from "@/components/name-detail/LoadingState";
+import { ErrorState } from "@/components/name-detail/ErrorState";
+import { NameContent } from "@/components/name-detail/NameContent";
 import StructuredData from "@/components/SEO/StructuredData";
 import { useStructuredData } from "@/hooks/useStructuredData";
 
@@ -43,16 +41,12 @@ const NameDetail = () => {
           return;
         }
         
-        console.log("Fetching name with ID:", parsedId);
         const nameData = await fetchNameById(parsedId);
         
         if (nameData) {
-          console.log("Name data retrieved:", nameData);
           setName(nameData);
-          
           trackNameVisit(nameData.id);
         } else {
-          console.error("No name data returned for ID:", id);
           setError(`Kunne ikke finne navnet med ID ${id}`);
           toast.error("Kunne ikke finne navnet");
         }
@@ -97,7 +91,15 @@ const NameDetail = () => {
         return "";
     }
   };
+
+  if (loading) {
+    return <LoadingState />;
+  }
   
+  if (!name || error) {
+    return <ErrorState error={error} />;
+  }
+
   const structuredData = [
     getNameDetailData(name),
     getBreadcrumbData([
@@ -106,36 +108,6 @@ const NameDetail = () => {
       { name: name.name, url: `/navn/${name.id}` }
     ])
   ];
-
-  if (loading) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <main className="flex-grow container mx-auto px-4 py-12 flex justify-center items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-  
-  if (!name || error) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <main className="flex-grow container mx-auto px-4 py-12">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-2xl font-bold mb-4">Navn ikke funnet</h1>
-            <p className="mb-6">{error || "Beklager, vi kunne ikke finne navnet du leter etter."}</p>
-            <Button asChild>
-              <Link to="/populære-navn">Se populære navn</Link>
-            </Button>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
   
   return (
     <div className="flex flex-col min-h-screen">
@@ -149,22 +121,10 @@ const NameDetail = () => {
           getGenderLabel={getGenderLabel} 
           getGenderColorClass={getGenderColorClass} 
         />
-        
-        <section className="py-8">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto">
-              <NameInfo name={name} getGenderLabel={getGenderLabel} />
-              
-              <div className="mb-8">
-                <AdSpace type="horizontal" />
-              </div>
-              
-              <NameInspiration name={name} />
-              
-              <RelatedNames currentName={name} />
-            </div>
-          </div>
-        </section>
+        <NameContent 
+          name={name}
+          getGenderLabel={getGenderLabel}
+        />
       </main>
       <Footer />
     </div>

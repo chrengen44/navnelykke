@@ -11,6 +11,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const helmetContext = {};
+
   return (
     <html lang="no" suppressHydrationWarning>
       <head>
@@ -20,7 +22,7 @@ export default function RootLayout({
         <meta name="description" content="Finn det perfekte navnet til din baby" />
       </head>
       <body>
-        <HelmetProvider>
+        <HelmetProvider context={helmetContext}>
           <SecurityHeaders />
           <div>
             {children}

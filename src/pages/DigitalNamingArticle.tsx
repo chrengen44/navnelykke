@@ -23,9 +23,7 @@ const DigitalNamingArticle = () => {
 
   return (
     <BlogPostLayout title={title}>
-      {structuredData.map((data, index) => (
-        <StructuredData key={index} data={data} />
-      ))}
+      <StructuredData data={structuredData} />
       
       <article className="prose prose-lg lg:prose-xl max-w-4xl mx-auto">
         {/* Hero section */}

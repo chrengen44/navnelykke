@@ -35,8 +35,8 @@ export async function deleteData<T>(
       return { data: null, error: new Error(result.error.message) };
     }
     
-    // Use explicit type assertion to avoid recursive type chain
-    return { data: null as T, error: null };
+    // Use explicit type assertion to fix excessive type instantiation
+    return { data: null as unknown as T, error: null };
   } catch (err) {
     return { data: null, error: err instanceof Error ? err : new Error(String(err)) };
   }

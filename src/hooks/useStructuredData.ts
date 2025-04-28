@@ -1,3 +1,4 @@
+
 import { BabyName } from "@/data/types";
 
 export const useStructuredData = () => {
@@ -89,14 +90,15 @@ export const useStructuredData = () => {
     }
   });
 
-  const getListData = (items: Array<{ name: string; url: string; position: number }>) => ({
+  // Updated to correctly use 'item' instead of 'url' for compatibility
+  const getListData = (items: Array<{ name: string; item: string; position: number }>) => ({
     "@context": "https://schema.org",
     "@type": "ItemList",
     "itemListElement": items.map(item => ({
       "@type": "ListItem",
       "position": item.position,
       "name": item.name,
-      "url": `${getOrigin()}${item.url}`
+      "item": `${getOrigin()}${item.item}`
     }))
   });
 

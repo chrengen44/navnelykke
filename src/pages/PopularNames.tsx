@@ -63,11 +63,13 @@ const PopularNames = () => {
     { name: "Populære navn", url: "/populære-navn" }
   ]);
   
+  // Fix the list data structure to match expected format
   const listData = names.length > 0 ? getListData(
     names.map((name, index) => ({
       name: name.name,
-      url: `/navn/${name.id}`,
-      position: index + 1
+      position: index + 1,
+      // Change url to item to match expected interface
+      item: `/navn/${name.id}`
     }))
   ) : null;
 

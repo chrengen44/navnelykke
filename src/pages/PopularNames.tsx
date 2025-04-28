@@ -1,12 +1,11 @@
+
 import { useState, useEffect } from "react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { useSearchParams } from "react-router-dom";
+import { BabyName } from "@/data/types";
 import { getPopularNames } from "@/data";
 import NameGrid from "@/components/NameGrid";
-import { BabyName } from "@/data/types";
-import { useSearchParams } from "react-router-dom";
 import AdSpace from "@/components/AdSpace";
-import GenderFilter from "@/components/search/GenderFilter";
+import { GenderFilter } from "@/components/search/filters/GenderFilter";
 import StructuredData from "@/components/SEO/StructuredData";
 import { useStructuredData } from "@/hooks/useStructuredData";
 import { Layout } from "@/components/Layout";
@@ -14,16 +13,32 @@ import { Layout } from "@/components/Layout";
 const PopularNames = () => {
   const [names, setNames] = useState<BabyName[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { getArticleData, getBreadcrumbData, getListData } = useStructuredData();
 
   const gender = searchParams.get("gender") || "all";
+
+  // Handle filter changes
+  const handleFilterChange = (key: string, value: string) => {
+    setSearchParams(prev => {
+      if (value === "all") {
+        prev.delete(key);
+      } else {
+        prev.set(key, value);
+      }
+      return prev;
+    });
+  };
 
   useEffect(() => {
     const fetchNames = async () => {
       setLoading(true);
       try {
-        const fetchedNames = await getPopularNames(gender);
+        // Convert string to expected gender type or undefined for "all"
+        const genderParam = gender === "all" ? undefined : 
+          (gender === "boy" || gender === "girl" || gender === "unisex" ? gender : undefined);
+        
+        const fetchedNames = await getPopularNames(genderParam);
         setNames(fetchedNames);
       } catch (error) {
         console.error("Error fetching popular names:", error);
@@ -75,7 +90,7 @@ const PopularNames = () => {
 
           <section className="py-8">
             <div className="container mx-auto px-4">
-              <GenderFilter />
+              <GenderFilter onFilterChange={handleFilterChange} />
 
               {loading ? (
                 <div className="flex justify-center py-12">

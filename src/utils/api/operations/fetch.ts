@@ -49,26 +49,15 @@ export async function fetchData<T>(
     
     const result = await queryBuilder;
     
-    // Safely handle data without causing type recursion
-    let safeData = null;
+    // Handle data without causing type recursion
+    let processedData = null;
     if (result.data) {
-      if (Array.isArray(result.data)) {
-        safeData = result.data.map(item => {
-          if (item && typeof item === 'object') {
-            return Object.assign({}, item);
-          }
-          return item;
-        });
-      } else if (result.data && typeof result.data === 'object') {
-        safeData = Object.assign({}, result.data);
-      } else {
-        safeData = result.data;
-      }
+      // Simple conversion to avoid deep nesting/recursion in types
+      processedData = JSON.parse(JSON.stringify(result.data));
     }
       
-    // Use a direct type assertion without chaining
     return {
-      data: safeData as unknown as T,
+      data: processedData as T,
       error: result.error
     };
   } catch (err) {

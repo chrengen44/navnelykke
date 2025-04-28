@@ -63,15 +63,14 @@ const PopularNames = () => {
     { name: "Populære navn", url: "/populære-navn" }
   ]);
   
-  // Fix the list data structure to match expected format
-  const listData = names.length > 0 ? getListData(
-    names.map((name, index) => ({
-      name: name.name,
-      position: index + 1,
-      // Change url to item to match expected interface
-      item: `/navn/${name.id}`
-    }))
-  ) : null;
+  // Create list data only if we have names
+  const listItems = names.map((name, index) => ({
+    name: name.name,
+    position: index + 1,
+    item: `/navn/${name.id}`
+  }));
+  
+  const listData = names.length > 0 ? getListData(listItems) : null;
 
   // Prepare all structured data as an array
   const structuredDataArray = [articleData, breadcrumbData];
@@ -86,7 +85,6 @@ const PopularNames = () => {
         <meta name="description" content="Se hvilke babynavn som er mest populære i Norge akkurat nå" />
       </Helmet>
       
-      {/* Use the updated StructuredData component with all data in an array */}
       <StructuredData data={structuredDataArray} />
       
       <div className="flex flex-col min-h-screen">

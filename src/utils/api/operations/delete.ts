@@ -35,8 +35,8 @@ export async function deleteData<T>(
       return { data: null, error: new Error(result.error.message) };
     }
     
-    // Use explicit type assertion to fix excessive type instantiation
-    return { data: null as unknown as T, error: null };
+    // Fix the excessive type instantiation by using a more direct type assertion
+    return { data: null as T, error: null };
   } catch (err) {
     return { data: null, error: err instanceof Error ? err : new Error(String(err)) };
   }

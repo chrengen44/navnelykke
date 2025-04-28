@@ -6,7 +6,7 @@ import { sanitizeInput } from '../sanitizer';
 import { validateTableName, ValidTableName } from '../tableValidator';
 
 export async function deleteData<T>(
-  tableName: string,
+  tableName: ValidTableName,
   query: { column: string; value: any },
   endpoint = 'update'
 ): Promise<ApiResponse<T>> {
@@ -24,13 +24,13 @@ export async function deleteData<T>(
       return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
     }
     
-    const validTableName = tableName as ValidTableName;
+    // Use the validated table name directly
     const result = await supabase
-      .from(validTableName)
+      .from(tableName)
       .delete()
       .eq(sanitizedQuery.column, sanitizedQuery.value);
     
-    // Simple version to avoid recursion
+    // Handle error case
     if (result.error) {
       return { data: null, error: new Error(result.error.message) };
     }

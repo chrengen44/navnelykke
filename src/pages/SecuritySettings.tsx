@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
@@ -60,7 +61,10 @@ export default function SecuritySettings() {
       );
 
       if (error) throw error;
-      if (data && data.length > 0) setPrivacySettings(data[0]);
+      // Fix the type mismatch by checking if data exists and taking the first item
+      if (data && data.length > 0) {
+        setPrivacySettings(data[0]);
+      }
     } catch (error: any) {
       toast({
         title: "Feil ved lasting av innstillinger",
@@ -84,7 +88,10 @@ export default function SecuritySettings() {
       );
 
       if (error) throw error;
-      if (data) setSessions(data);
+      // Fix the type mismatch by properly checking data
+      if (data) {
+        setSessions(data);
+      }
     } catch (error: any) {
       toast({
         title: "Feil ved lasting av økter",

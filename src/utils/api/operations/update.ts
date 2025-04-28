@@ -18,8 +18,8 @@ export const createData = async <T,>(table: ValidTableName, data: T): Promise<T>
       throw new Error(`Error creating data in ${table}: ${error.message}`);
     }
 
-    // Use a simple JSON clone to break type recursion
-    return result ? JSON.parse(JSON.stringify(result)) : null;
+    // Use direct type casting to avoid deep recursion issues
+    return result as T;
   } catch (error) {
     console.error('Error in createData:', error);
     throw error;
@@ -46,8 +46,8 @@ export const updateData = async <T,>(
       throw new Error(`Error updating data in ${table}: ${error.message}`);
     }
 
-    // Use a simple JSON clone to break type recursion
-    return result ? JSON.parse(JSON.stringify(result)) : null;
+    // Use direct type casting to avoid deep recursion issues
+    return result as T;
   } catch (error) {
     console.error('Error in updateData:', error);
     throw error;

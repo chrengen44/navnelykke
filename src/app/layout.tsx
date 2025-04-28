@@ -11,8 +11,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Create a proper helmetContext object
-  const helmetContext = {};
+  // Create a proper helmetContext object with required structure
+  const helmetContext = { helmet: {} };
 
   return (
     <html lang="no" suppressHydrationWarning>

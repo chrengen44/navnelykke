@@ -1,47 +1,86 @@
 
 import React from 'react';
-import { Helmet } from 'react-helmet-async';
 
 interface StructuredDataProps {
   data: object | object[] | null;
 }
 
+/**
+ * A component that renders structured data for SEO purposes using plain script tags 
+ * instead of react-helmet-async which is causing issues
+ */
 const StructuredData: React.FC<StructuredDataProps> = ({ data }) => {
   // If no data or empty array is provided, return null
   if (!data || (Array.isArray(data) && data.length === 0)) {
     return null;
   }
 
-  // More robust implementation that safely handles errors
-  try {
-    if (Array.isArray(data)) {
-      // Filter out any null/undefined items before rendering
-      const validData = data.filter(Boolean);
-      
-      if (validData.length === 0) return null;
-      
-      return (
-        <Helmet>
-          {validData.map((item, index) => (
-            <script key={index} type="application/ld+json">
-              {JSON.stringify(item)}
-            </script>
-          ))}
-        </Helmet>
-      );
-    } else {
-      return (
-        <Helmet>
-          <script type="application/ld+json">
-            {JSON.stringify(data)}
-          </script>
-        </Helmet>
-      );
+  // Generate a unique ID for each script tag
+  const generateId = (index: number) => `structured-data-${index}`;
+
+  // Insert script tags into document head on mount and remove on unmount
+  React.useEffect(() => {
+    try {
+      if (Array.isArray(data)) {
+        // Filter out any null/undefined items
+        const validData = data.filter(Boolean);
+        
+        if (validData.length === 0) return;
+        
+        // Add script tags for each item in the array
+        validData.forEach((item, index) => {
+          const scriptId = generateId(index);
+          const existingScript = document.getElementById(scriptId);
+          if (existingScript) {
+            document.head.removeChild(existingScript);
+          }
+          
+          const scriptTag = document.createElement('script');
+          scriptTag.id = scriptId;
+          scriptTag.type = 'application/ld+json';
+          scriptTag.textContent = JSON.stringify(item);
+          document.head.appendChild(scriptTag);
+        });
+        
+        // Cleanup function to remove scripts when component unmounts
+        return () => {
+          validData.forEach((_, index) => {
+            const scriptId = generateId(index);
+            const scriptTag = document.getElementById(scriptId);
+            if (scriptTag) {
+              document.head.removeChild(scriptTag);
+            }
+          });
+        };
+      } else {
+        // Handle single object case
+        const scriptId = 'structured-data-single';
+        const existingScript = document.getElementById(scriptId);
+        if (existingScript) {
+          document.head.removeChild(existingScript);
+        }
+        
+        const scriptTag = document.createElement('script');
+        scriptTag.id = scriptId;
+        scriptTag.type = 'application/ld+json';
+        scriptTag.textContent = JSON.stringify(data);
+        document.head.appendChild(scriptTag);
+        
+        // Cleanup function
+        return () => {
+          const scriptTag = document.getElementById(scriptId);
+          if (scriptTag) {
+            document.head.removeChild(scriptTag);
+          }
+        };
+      }
+    } catch (error) {
+      console.error('Error rendering structured data:', error);
     }
-  } catch (error) {
-    console.error('Error rendering structured data:', error);
-    return null;
-  }
+  }, [data]);
+
+  // This component doesn't render anything to the DOM
+  return null;
 };
 
 export default StructuredData;

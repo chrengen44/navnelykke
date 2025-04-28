@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BookOpen } from "lucide-react";
 import BlogPostLayout from '@/components/BlogPostLayout';
 import StructuredData from '@/components/SEO/StructuredData';
@@ -23,9 +23,25 @@ const DigitalNamingArticle = () => {
   // Combine structured data safely and filter out any nullish values
   const structuredData = [articleData, breadcrumbData].filter(Boolean);
 
+  // Set page metadata
+  useEffect(() => {
+    document.title = `${title} | Navnelykke`;
+    
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.setAttribute('name', 'description');
+      document.head.appendChild(metaDescription);
+    }
+    metaDescription.setAttribute('content', description);
+    
+    return () => {
+      document.title = "Navnelykke"; // Reset to default
+    };
+  }, [title, description]);
+
   return (
     <BlogPostLayout title={title}>
-      {/* Only render StructuredData if we have valid data */}
       {structuredData.length > 0 && (
         <StructuredData data={structuredData} />
       )}

@@ -9,7 +9,6 @@ import NameHeader from "@/components/name-detail/NameHeader";
 import { LoadingState } from "@/components/name-detail/LoadingState";
 import { ErrorState } from "@/components/name-detail/ErrorState";
 import { NameContent } from "@/components/name-detail/NameContent";
-import { Helmet } from "react-helmet-async";
 import { useStructuredData } from "@/hooks/useStructuredData";
 import StructuredData from "@/components/SEO/StructuredData";
 
@@ -62,6 +61,25 @@ const NameDetail = () => {
     getNameDetails();
   }, [id]);
   
+  // Set page metadata
+  useEffect(() => {
+    if (name) {
+      document.title = `${name.name} - Betydning og opprinnelse | Navnelykke`;
+      
+      let metaDescription = document.querySelector('meta[name="description"]');
+      if (!metaDescription) {
+        metaDescription = document.createElement('meta');
+        metaDescription.setAttribute('name', 'description');
+        document.head.appendChild(metaDescription);
+      }
+      metaDescription.setAttribute('content', `Les mer om navnet ${name.name}, dets betydning (${name.meaning}) og ${name.origin} opprinnelse.`);
+    }
+    
+    return () => {
+      document.title = "Navnelykke"; // Reset to default
+    };
+  }, [name]);
+  
   const getGenderColorClass = () => {
     if (!name) return "bg-gray-100";
     
@@ -113,11 +131,6 @@ const NameDetail = () => {
   
   return (
     <Layout>
-      <Helmet>
-        <title>{`${name.name} - Betydning og opprinnelse | Navnelykke`}</title>
-        <meta name="description" content={`Les mer om navnet ${name.name}, dets betydning (${name.meaning}) og ${name.origin} opprinnelse.`} />
-      </Helmet>
-      
       {structuredDataArray.length > 0 && <StructuredData data={structuredDataArray} />}
       
       <main className="flex-grow">

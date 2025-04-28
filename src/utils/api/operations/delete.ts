@@ -35,9 +35,10 @@ export async function deleteData<T>(
       return { data: null, error: new Error(result.error.message) };
     }
     
-    // Use explicit null with type assertion to avoid excessive type instantiation
+    // Use proper type casting to avoid excessive instantiation
     return { 
-      data: null as unknown as T, 
+      // Cast to any first to break the deep instantiation chain
+      data: null as any as T, 
       error: null 
     };
   } catch (err) {

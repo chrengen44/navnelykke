@@ -3,7 +3,6 @@ import React from "react";
 import "../index.css";
 import ConsentBannerWrapper from "@/components/ConsentBannerWrapper";
 import AdSenseScript from "@/components/AdSenseScript";
-import { HelmetProvider } from "react-helmet-async";
 import SecurityHeaders from "@/components/SecurityHeaders";
 
 export default function RootLayout({
@@ -11,21 +10,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Create a properly initialized helmetContext object
-  const helmetContext = { 
-    helmet: {
-      base: { toComponent: () => null },
-      bodyAttributes: { toComponent: () => null },
-      htmlAttributes: { toComponent: () => null },
-      link: { toComponent: () => null },
-      meta: { toComponent: () => null },
-      noscript: { toComponent: () => null },
-      script: { toComponent: () => null },
-      style: { toComponent: () => null },
-      title: { toComponent: () => null }
-    }
-  };
-
   return (
     <html lang="no" suppressHydrationWarning>
       <head>
@@ -35,14 +19,12 @@ export default function RootLayout({
         <meta name="description" content="Finn det perfekte navnet til din baby" />
       </head>
       <body>
-        <HelmetProvider context={helmetContext}>
-          <SecurityHeaders />
-          <div>
-            {children}
-            <ConsentBannerWrapper />
-            <AdSenseScript />
-          </div>
-        </HelmetProvider>
+        <SecurityHeaders />
+        <div>
+          {children}
+          <ConsentBannerWrapper />
+          <AdSenseScript />
+        </div>
       </body>
     </html>
   );

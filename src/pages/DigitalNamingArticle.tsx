@@ -2,10 +2,31 @@
 import React from 'react';
 import { BookOpen } from "lucide-react";
 import BlogPostLayout from '@/components/BlogPostLayout';
+import StructuredData from '@/components/SEO/StructuredData';
+import { useStructuredData } from '@/hooks/useStructuredData';
 
 const DigitalNamingArticle = () => {
+  const { getArticleData, getBreadcrumbData } = useStructuredData();
+
+  const title = "Navngiving i den digitale tidsalderen";
+  const description = "En utforskning av moderne navngiving og hvordan teknologi påvirker våre valg";
+  const path = "/artikkel/navngiving-digital";
+
+  const structuredData = [
+    getArticleData(title, description, path),
+    getBreadcrumbData([
+      { name: "Hjem", url: "/" },
+      { name: "Inspirasjon", url: "/inspirasjon" },
+      { name: title, url: path }
+    ])
+  ];
+
   return (
-    <BlogPostLayout title="Navngiving i den digitale tidsalderen">
+    <BlogPostLayout title={title}>
+      {structuredData.map((data, index) => (
+        <StructuredData key={index} data={data} />
+      ))}
+      
       <article className="prose prose-lg lg:prose-xl max-w-4xl mx-auto">
         {/* Hero section */}
         <div className="mb-12 text-center">

@@ -3,12 +3,16 @@ import React from "react";
 import "../index.css";
 import ConsentBannerWrapper from "@/components/ConsentBannerWrapper";
 import AdSenseScript from "@/components/AdSenseScript";
+import StructuredData from "@/components/SEO/StructuredData";
+import { useStructuredData } from "@/hooks/useStructuredData";
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { getWebsiteData } = useStructuredData();
+
   return (
     <html lang="no" suppressHydrationWarning>
       <head>
@@ -19,6 +23,7 @@ export default function RootLayout({
       </head>
       <body>
         <div>
+          <StructuredData data={getWebsiteData()} />
           {children}
           <ConsentBannerWrapper />
           <AdSenseScript />

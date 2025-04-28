@@ -11,8 +11,20 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Create a proper helmetContext object with required structure
-  const helmetContext = { helmet: {} };
+  // Create a properly initialized helmetContext object
+  const helmetContext = { 
+    helmet: {
+      base: { toComponent: () => null },
+      bodyAttributes: { toComponent: () => null },
+      htmlAttributes: { toComponent: () => null },
+      link: { toComponent: () => null },
+      meta: { toComponent: () => null },
+      noscript: { toComponent: () => null },
+      script: { toComponent: () => null },
+      style: { toComponent: () => null },
+      title: { toComponent: () => null }
+    }
+  };
 
   return (
     <html lang="no" suppressHydrationWarning>

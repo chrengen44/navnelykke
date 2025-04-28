@@ -43,7 +43,9 @@ const Categories = () => {
         <meta name="description" content="Utforsk navn basert på ulike kategorier og stiler" />
       </Helmet>
       
-      {structuredDataArray.length > 0 && <StructuredData data={structuredDataArray} />}
+      {structuredDataArray.length > 0 && (
+        <StructuredData data={structuredDataArray} />
+      )}
       
       <div className="container mx-auto px-4 py-8">
         {/* Name Categories Section */}

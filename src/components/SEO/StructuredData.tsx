@@ -13,33 +13,35 @@ const StructuredData: React.FC<StructuredDataProps> = ({ data }) => {
   }
 
   // More robust implementation that safely handles errors
-  const renderScripts = () => {
-    try {
-      if (Array.isArray(data)) {
-        // Filter out any null/undefined items before mapping
-        return data.filter(Boolean).map((item, index) => (
-          <script key={index} type="application/ld+json">
-            {JSON.stringify(item)}
-          </script>
-        ));
-      } else {
-        return (
+  try {
+    if (Array.isArray(data)) {
+      // Filter out any null/undefined items before rendering
+      const validData = data.filter(Boolean);
+      
+      if (validData.length === 0) return null;
+      
+      return (
+        <Helmet>
+          {validData.map((item, index) => (
+            <script key={index} type="application/ld+json">
+              {JSON.stringify(item)}
+            </script>
+          ))}
+        </Helmet>
+      );
+    } else {
+      return (
+        <Helmet>
           <script type="application/ld+json">
             {JSON.stringify(data)}
           </script>
-        );
-      }
-    } catch (error) {
-      console.error('Error rendering structured data:', error);
-      return null;
+        </Helmet>
+      );
     }
-  };
-  
-  // Return null if renderScripts returns null
-  const scripts = renderScripts();
-  if (!scripts) return null;
-  
-  return <Helmet>{scripts}</Helmet>;
+  } catch (error) {
+    console.error('Error rendering structured data:', error);
+    return null;
+  }
 };
 
 export default StructuredData;

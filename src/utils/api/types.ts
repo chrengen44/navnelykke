@@ -1,12 +1,15 @@
 
 /**
- * A simplified response type to use throughout the API
+ * A unified response type for API operations
  */
 export type ApiResponse<T = unknown> = {
   data: T | null;
   error: Error | null;
 };
 
+/**
+ * Generic query options for fetching data
+ */
 export type QueryOptions = {
   select?: string;
   eq?: [string, any];

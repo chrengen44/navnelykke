@@ -1,6 +1,7 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { FetchOptions } from './types';
-import { validateTable, sanitizeData } from './utils';
+import { validateTable } from '../helpers';
 
 export const fetchData = async <T,>(
   table: string,

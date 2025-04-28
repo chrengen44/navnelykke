@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
-import { secureApi, sanitizeInput } from "@/utils/api";
+import { secureApi } from "@/utils/api";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Shield, Trash2, AlertCircle } from "lucide-react";
 import {
@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 interface PrivacySettings {
+  user_id: string;
   show_email: boolean;
   show_full_name: boolean;
   allow_public_favorites: boolean;
@@ -41,6 +42,7 @@ export default function SecuritySettings() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [privacySettings, setPrivacySettings] = useState<PrivacySettings>({
+    user_id: '',
     show_email: false,
     show_full_name: false,
     allow_public_favorites: false,
@@ -66,8 +68,10 @@ export default function SecuritySettings() {
     setLoadingSettings(true);
     try {
       const { data, error } = await secureApi.fetch<PrivacySettings[]>(
-        "user_privacy_settings",
-        { select: "*", eq: ["user_id", user?.id] }
+        "user_privacy_settings", 
+        {
+          filters: [{ column: "user_id", operator: "eq", value: user?.id }]
+        }
       );
 
       if (error) throw error;
@@ -89,12 +93,9 @@ export default function SecuritySettings() {
       const { data, error } = await secureApi.fetch<Session[]>(
         "user_sessions",
         {
-          select: "*",
-          eq: ["user_id", user?.id],
-          orderBy: "last_active",
-          ascending: false
-        },
-        "default"
+          filters: [{ column: "user_id", operator: "eq", value: user?.id }],
+          orderBy: { column: "last_active", ascending: false }
+        }
       );
 
       if (error) throw error;
@@ -121,9 +122,9 @@ export default function SecuritySettings() {
       }
 
       const settings = { ...privacySettings, [key]: value };
-      const { error } = await secureApi.update(
-        "user_privacy_settings",
-        { column: "user_id", value: user?.id },
+      const { error } = await secureApi.update<PrivacySettings>(
+        "user_privacy_settings", 
+        user?.id as string,
         { [key]: value }
       );
 
@@ -152,7 +153,7 @@ export default function SecuritySettings() {
       }
 
       const { error } = await supabase.auth.resetPasswordForEmail(
-        sanitizeInput(user.email),
+        user.email,
         { redirectTo: `${window.location.origin}/auth/reset` }
       );
 
@@ -176,7 +177,7 @@ export default function SecuritySettings() {
     try {
       const { error } = await secureApi.delete(
         "user_sessions", 
-        { column: "id", value: sessionId }
+        sessionId
       );
 
       if (error) throw error;

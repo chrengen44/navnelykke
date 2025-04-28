@@ -12,12 +12,15 @@ import { toast } from "sonner";
 import NameHeader from "@/components/name-detail/NameHeader";
 import NameInfo from "@/components/name-detail/NameInfo";
 import NameInspiration from "@/components/name-detail/NameInspiration";
+import StructuredData from "@/components/SEO/StructuredData";
+import { useStructuredData } from "@/hooks/useStructuredData";
 
 const NameDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [name, setName] = useState<BabyName | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { getNameDetailData, getBreadcrumbData } = useStructuredData();
   
   useEffect(() => {
     const getNameDetails = async () => {
@@ -95,6 +98,15 @@ const NameDetail = () => {
     }
   };
   
+  const structuredData = [
+    getNameDetailData(name),
+    getBreadcrumbData([
+      { name: "Hjem", url: "/" },
+      { name: "Navn", url: "/populære-navn" },
+      { name: name.name, url: `/navn/${name.id}` }
+    ])
+  ];
+
   if (loading) {
     return (
       <div className="flex flex-col min-h-screen">
@@ -129,6 +141,9 @@ const NameDetail = () => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow">
+        {structuredData.map((data, index) => (
+          <StructuredData key={index} data={data} />
+        ))}
         <NameHeader 
           name={name} 
           getGenderLabel={getGenderLabel} 

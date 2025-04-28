@@ -1,4 +1,3 @@
-
 import { BabyName } from "@/data/types";
 
 export const useStructuredData = () => {
@@ -78,10 +77,62 @@ export const useStructuredData = () => {
     "dateModified": new Date().toISOString()
   });
 
+  const getCollectionPageData = (title: string, description: string, path: string) => ({
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": title,
+    "description": description,
+    "url": `${getOrigin()}${path}`,
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListElement": []
+    }
+  });
+
+  const getListData = (items: Array<{ name: string; url: string; position: number }>) => ({
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": items.map(item => ({
+      "@type": "ListItem",
+      "position": item.position,
+      "name": item.name,
+      "url": `${getOrigin()}${item.url}`
+    }))
+  });
+
+  const getNameDetailData = (name: BabyName) => ({
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": name.name,
+    "description": `${name.name} er et ${name.gender === 'boy' ? 'guttenavn' : name.gender === 'girl' ? 'jentenavn' : 'unisex navn'} med ${name.origin} opprinnelse. Betydning: ${name.meaning}`,
+    "category": name.categories?.join(", ") || "",
+    "url": `${getOrigin()}/navn/${name.id}`,
+    "additionalProperty": [
+      {
+        "@type": "PropertyValue",
+        "name": "gender",
+        "value": name.gender
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "origin",
+        "value": name.origin
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "meaning",
+        "value": name.meaning
+      }
+    ]
+  });
+
   return {
     getWebsiteData,
     getNameData,
     getBreadcrumbData,
-    getArticleData
+    getArticleData,
+    getCollectionPageData,
+    getListData,
+    getNameDetailData
   };
 };

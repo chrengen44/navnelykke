@@ -1,13 +1,15 @@
-
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { nameCategories } from "@/data";
 import CategoryCard from "@/components/CategoryCard";
 import OriginCategoryCard from "@/components/OriginCategoryCard";
 import { getOriginCounts } from "@/integrations/supabase/analytics-queries";
+import StructuredData from "@/components/SEO/StructuredData";
+import { useStructuredData } from "@/hooks/useStructuredData";
 
 const Categories = () => {
   const [originCounts, setOriginCounts] = useState<{origin: string, name_count: number}[]>([]);
+  const { getCollectionPageData, getBreadcrumbData } = useStructuredData();
 
   useEffect(() => {
     const fetchOriginCounts = async () => {
@@ -18,8 +20,23 @@ const Categories = () => {
     fetchOriginCounts();
   }, []);
 
+  const structuredData = [
+    getCollectionPageData(
+      "Navnekategorier",
+      "Utforsk navn basert på ulike kategorier og stiler",
+      "/kategorier"
+    ),
+    getBreadcrumbData([
+      { name: "Hjem", url: "/" },
+      { name: "Kategorier", url: "/kategorier" }
+    ])
+  ];
+
   return (
     <Layout>
+      {structuredData.map((data, index) => (
+        <StructuredData key={index} data={data} />
+      ))}
       <div className="container mx-auto px-4 py-8">
         {/* Name Categories Section */}
         <section className="mb-16">

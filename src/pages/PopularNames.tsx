@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { BabyName } from "@/data/types";
 import { getPopularNames } from "@/data";
@@ -18,8 +18,8 @@ const PopularNames = () => {
 
   const gender = searchParams.get("gender") || "all";
 
-  // Handle filter changes
-  const handleFilterChange = (key: string, value: string) => {
+  // Handle filter changes with memoized callback
+  const handleFilterChange = useCallback((key: string, value: string) => {
     setSearchParams(prev => {
       if (value === "all") {
         prev.delete(key);
@@ -28,8 +28,9 @@ const PopularNames = () => {
       }
       return prev;
     });
-  };
+  }, [setSearchParams]);
 
+  // Fetch names with error handling
   useEffect(() => {
     const fetchNames = async () => {
       setLoading(true);
@@ -68,31 +69,46 @@ const PopularNames = () => {
     };
   }, []);
 
-  // Prepare SEO data
-  const articleData = getArticleData(
-    "Populære navn i Norge",
-    "Se hvilke babynavn som er mest populære i Norge akkurat nå",
-    "/populære-navn"
+  // Prepare SEO data with memoization
+  const articleData = useMemo(() => 
+    getArticleData(
+      "Populære navn i Norge",
+      "Se hvilke babynavn som er mest populære i Norge akkurat nå",
+      "/populære-navn"
+    ),
+    [getArticleData]
   );
   
-  const breadcrumbData = getBreadcrumbData([
-    { name: "Hjem", url: "/" },
-    { name: "Populære navn", url: "/populære-navn" }
-  ]);
+  const breadcrumbData = useMemo(() => 
+    getBreadcrumbData([
+      { name: "Hjem", url: "/" },
+      { name: "Populære navn", url: "/populære-navn" }
+    ]),
+    [getBreadcrumbData]
+  );
   
   // Create list data only if we have names
-  const listItems = names.length > 0 
-    ? names.map((name, index) => ({
-        name: name.name,
-        position: index + 1,
-        item: `/navn/${name.id}`
-      }))
-    : [];
+  const listItems = useMemo(() => 
+    names.length > 0 
+      ? names.map((name, index) => ({
+          name: name.name,
+          position: index + 1,
+          item: `/navn/${name.id}`
+        }))
+      : [],
+    [names]
+  );
   
-  const listData = names.length > 0 ? getListData(listItems) : null;
+  const listData = useMemo(() => 
+    names.length > 0 ? getListData(listItems) : null,
+    [names, listItems, getListData]
+  );
 
   // Prepare all structured data as an array and filter out any nullish values
-  const structuredDataArray = [articleData, breadcrumbData, listData].filter(Boolean);
+  const structuredDataArray = useMemo(() => 
+    [articleData, breadcrumbData, listData].filter(Boolean),
+    [articleData, breadcrumbData, listData]
+  );
 
   return (
     <Layout>

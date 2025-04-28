@@ -1,5 +1,6 @@
 
 import { BabyName } from "@/data/types";
+import { useMemo } from "react";
 
 export const useStructuredData = () => {
   // Helper function to safely get the origin in both client and server environments
@@ -10,17 +11,20 @@ export const useStructuredData = () => {
     return 'https://navnelykke.no'; // Fallback or your default domain
   };
 
+  // Memoize the origin to avoid recalculation
+  const origin = useMemo(() => getOrigin(), []);
+
   const getWebsiteData = () => ({
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "Navnelykke",
-    "url": getOrigin(),
+    "url": origin,
     "description": "Finn det perfekte navnet til din baby",
     "potentialAction": {
       "@type": "SearchAction",
       "target": {
         "@type": "EntryPoint",
-        "urlTemplate": `${getOrigin()}/søk?q={search_term_string}`
+        "urlTemplate": `${origin}/søk?q={search_term_string}`
       },
       "query-input": "required name=search_term_string"
     }
@@ -33,7 +37,7 @@ export const useStructuredData = () => {
     "description": `Les mer om navnet ${name.name}, dets betydning (${name.meaning}) og ${name.origin} opprinnelse.`,
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `${getOrigin()}/navn/${name.id}`
+      "@id": `${origin}/navn/${name.id}`
     },
     "about": {
       "@type": "Thing",
@@ -49,7 +53,7 @@ export const useStructuredData = () => {
       "@type": "ListItem",
       "position": index + 1,
       "name": item.name,
-      "item": `${getOrigin()}${item.url}`
+      "item": `${origin}${item.url}`
     }))
   });
 
@@ -67,12 +71,12 @@ export const useStructuredData = () => {
       "name": "Navnelykke",
       "logo": {
         "@type": "ImageObject",
-        "url": `${getOrigin()}/og-image.png`
+        "url": `${origin}/og-image.png`
       }
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `${getOrigin()}${path}`
+      "@id": `${origin}${path}`
     },
     "datePublished": "2024-01-01",
     "dateModified": new Date().toISOString()
@@ -83,7 +87,7 @@ export const useStructuredData = () => {
     "@type": "CollectionPage",
     "name": title,
     "description": description,
-    "url": `${getOrigin()}${path}`,
+    "url": `${origin}${path}`,
     "mainEntity": {
       "@type": "ItemList",
       "itemListElement": []
@@ -98,7 +102,7 @@ export const useStructuredData = () => {
       "@type": "ListItem",
       "position": item.position,
       "name": item.name,
-      "item": `${getOrigin()}${item.item}`
+      "item": `${origin}${item.item}`
     }))
   });
 
@@ -108,7 +112,7 @@ export const useStructuredData = () => {
     "name": name.name,
     "description": `${name.name} er et ${name.gender === 'boy' ? 'guttenavn' : name.gender === 'girl' ? 'jentenavn' : 'unisex navn'} med ${name.origin} opprinnelse. Betydning: ${name.meaning}`,
     "category": name.categories?.join(", ") || "",
-    "url": `${getOrigin()}/navn/${name.id}`,
+    "url": `${origin}/navn/${name.id}`,
     "additionalProperty": [
       {
         "@type": "PropertyValue",

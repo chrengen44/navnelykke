@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Layout } from "@/components/Layout";
 import { nameCategories } from "@/data";
 import CategoryCard from "@/components/CategoryCard";
@@ -12,15 +12,22 @@ const Categories = () => {
   const [originCounts, setOriginCounts] = useState<{origin: string, name_count: number}[]>([]);
   const { getCollectionPageData, getBreadcrumbData } = useStructuredData();
 
+  // Fetch origin counts with error handling
   useEffect(() => {
     const fetchOriginCounts = async () => {
-      const counts = await getOriginCounts();
-      setOriginCounts(counts);
+      try {
+        const counts = await getOriginCounts();
+        setOriginCounts(counts);
+      } catch (error) {
+        console.error("Error fetching origin counts:", error);
+        setOriginCounts([]);
+      }
     };
 
     fetchOriginCounts();
   }, []);
 
+  // Set page metadata
   useEffect(() => {
     document.title = "Navnekategorier | Navnelykke";
     
@@ -37,19 +44,29 @@ const Categories = () => {
     };
   }, []);
 
-  const collectionData = getCollectionPageData(
-    "Navnekategorier",
-    "Utforsk navn basert på ulike kategorier og stiler",
-    "/kategorier"
+  // Create structured data with memoization
+  const collectionData = useMemo(() => 
+    getCollectionPageData(
+      "Navnekategorier",
+      "Utforsk navn basert på ulike kategorier og stiler",
+      "/kategorier"
+    ),
+    [getCollectionPageData]
   );
   
-  const breadcrumbData = getBreadcrumbData([
-    { name: "Hjem", url: "/" },
-    { name: "Kategorier", url: "/kategorier" }
-  ]);
+  const breadcrumbData = useMemo(() => 
+    getBreadcrumbData([
+      { name: "Hjem", url: "/" },
+      { name: "Kategorier", url: "/kategorier" }
+    ]),
+    [getBreadcrumbData]
+  );
 
   // Combine structured data in an array and filter out any nullish values
-  const structuredDataArray = [collectionData, breadcrumbData].filter(Boolean);
+  const structuredDataArray = useMemo(() => 
+    [collectionData, breadcrumbData].filter(Boolean),
+    [collectionData, breadcrumbData]
+  );
 
   return (
     <Layout>

@@ -10,6 +10,25 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Set default metadata
+  React.useEffect(() => {
+    if (typeof document === 'undefined') return;
+    
+    // Set default title if not already set
+    if (!document.title) {
+      document.title = "Navnelykke";
+    }
+    
+    // Set default description if not already set
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.setAttribute('name', 'description');
+      metaDescription.setAttribute('content', "Finn det perfekte navnet til din baby");
+      document.head.appendChild(metaDescription);
+    }
+  }, []);
+  
   return (
     <html lang="no" suppressHydrationWarning>
       <head>

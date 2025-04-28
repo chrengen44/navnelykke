@@ -50,8 +50,8 @@ export async function fetchData<T>(
       throw new Error(`Error fetching data from ${table}: ${error.message}`);
     }
 
-    // Use a non-generic return to break the type recursion
-    return data as unknown as T[];
+    // Cast to unknown first, then to the expected type T[] to break type recursion
+    return (data || []) as unknown as T[];
   } catch (error) {
     console.error('Error in fetchData:', error);
     throw error;
@@ -92,7 +92,7 @@ export async function fetchById<T>(
       throw error;
     }
 
-    // Use unknown as intermediate type to break recursion
+    // Cast to unknown first, then to T to break type recursion
     return data as unknown as T;
   } catch (error) {
     console.error(`Error in fetchById for table ${table} with ID ${id}:`, error);

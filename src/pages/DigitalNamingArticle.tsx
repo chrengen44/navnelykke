@@ -12,16 +12,26 @@ const DigitalNamingArticle = () => {
   const description = "En utforskning av moderne navngiving og hvordan teknologi påvirker våre valg";
   const path = "/artikkel/navngiving-digital";
 
-  // Create individual data objects
-  const articleData = getArticleData(title, description, path);
-  const breadcrumbData = getBreadcrumbData([
-    { name: "Hjem", url: "/" },
-    { name: "Inspirasjon", url: "/inspirasjon" },
-    { name: title, url: path }
-  ]);
+  // Create structured data safely 
+  const articleData = React.useMemo(() => 
+    getArticleData(title, description, path), 
+    [title, description, path, getArticleData]
+  );
+  
+  const breadcrumbData = React.useMemo(() => 
+    getBreadcrumbData([
+      { name: "Hjem", url: "/" },
+      { name: "Inspirasjon", url: "/inspirasjon" },
+      { name: title, url: path }
+    ]), 
+    [title, path, getBreadcrumbData]
+  );
 
   // Combine structured data safely and filter out any nullish values
-  const structuredData = [articleData, breadcrumbData].filter(Boolean);
+  const structuredData = React.useMemo(() => 
+    [articleData, breadcrumbData].filter(Boolean),
+    [articleData, breadcrumbData]
+  );
 
   // Set page metadata
   useEffect(() => {

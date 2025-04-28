@@ -46,7 +46,7 @@ const DigitalNamingArticle = () => {
           <div className="aspect-video w-full">
             <iframe 
               src="https://gamma.app/embed/jh4zszoozgg9lsq" 
-              className="w-full h-[600px] rounded-lg shadow-lg" // Made iframe larger and added some styling
+              className="w-full h-[600px] rounded-lg shadow-lg"
               allow="fullscreen" 
               title="The Art of Baby Naming in the Digital Age">
             </iframe>

@@ -2,17 +2,25 @@
 import { BabyName } from "@/data/types";
 
 export const useStructuredData = () => {
+  // Helper function to safely get the origin in both client and server environments
+  const getOrigin = () => {
+    if (typeof window !== 'undefined') {
+      return window.location.origin;
+    }
+    return 'https://navnelykke.no'; // Fallback or your default domain
+  };
+
   const getWebsiteData = () => ({
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "Navnelykke",
-    "url": window.location.origin,
+    "url": getOrigin(),
     "description": "Finn det perfekte navnet til din baby",
     "potentialAction": {
       "@type": "SearchAction",
       "target": {
         "@type": "EntryPoint",
-        "urlTemplate": `${window.location.origin}/søk?q={search_term_string}`
+        "urlTemplate": `${getOrigin()}/søk?q={search_term_string}`
       },
       "query-input": "required name=search_term_string"
     }
@@ -25,7 +33,7 @@ export const useStructuredData = () => {
     "description": `Les mer om navnet ${name.name}, dets betydning (${name.meaning}) og ${name.origin} opprinnelse.`,
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `${window.location.origin}/navn/${name.id}`
+      "@id": `${getOrigin()}/navn/${name.id}`
     },
     "about": {
       "@type": "Thing",
@@ -41,7 +49,7 @@ export const useStructuredData = () => {
       "@type": "ListItem",
       "position": index + 1,
       "name": item.name,
-      "item": `${window.location.origin}${item.url}`
+      "item": `${getOrigin()}${item.url}`
     }))
   });
 
@@ -59,12 +67,12 @@ export const useStructuredData = () => {
       "name": "Navnelykke",
       "logo": {
         "@type": "ImageObject",
-        "url": `${window.location.origin}/og-image.png`
+        "url": `${getOrigin()}/og-image.png`
       }
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `${window.location.origin}${path}`
+      "@id": `${getOrigin()}${path}`
     },
     "datePublished": "2024-01-01",
     "dateModified": new Date().toISOString()

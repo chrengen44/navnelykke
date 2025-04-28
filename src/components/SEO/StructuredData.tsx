@@ -12,30 +12,38 @@ const StructuredData: React.FC<StructuredDataProps> = ({ data }) => {
     return null;
   }
 
+  // Convert data to string outside of render for better error handling
+  let jsonString: string | string[];
+  
   try {
-    // Check if data is an array and handle accordingly
     if (Array.isArray(data)) {
-      return (
-        <Helmet>
-          {data.filter(Boolean).map((item, index) => (
-            <script key={index} type="application/ld+json">
-              {JSON.stringify(item)}
-            </script>
-          ))}
-        </Helmet>
-      );
+      jsonString = data.map(item => JSON.stringify(item));
+    } else {
+      jsonString = JSON.stringify(data);
     }
-    
-    // Handle single object case
-    return (
-      <Helmet>
-        <script type="application/ld+json">{JSON.stringify(data)}</script>
-      </Helmet>
-    );
   } catch (error) {
-    console.error('Error rendering structured data:', error);
+    console.error('Error stringifying structured data:', error);
     return null;
   }
+
+  // Render scripts with pre-stringified data
+  if (Array.isArray(jsonString)) {
+    return (
+      <Helmet>
+        {jsonString.map((item, index) => (
+          <script key={index} type="application/ld+json">
+            {item}
+          </script>
+        ))}
+      </Helmet>
+    );
+  }
+  
+  return (
+    <Helmet>
+      <script type="application/ld+json">{jsonString}</script>
+    </Helmet>
+  );
 };
 
 export default StructuredData;

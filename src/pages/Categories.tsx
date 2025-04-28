@@ -7,6 +7,7 @@ import OriginCategoryCard from "@/components/OriginCategoryCard";
 import { getOriginCounts } from "@/integrations/supabase/analytics-queries";
 import { Helmet } from "react-helmet-async";
 import { useStructuredData } from "@/hooks/useStructuredData";
+import StructuredData from "@/components/SEO/StructuredData";
 
 const Categories = () => {
   const [originCounts, setOriginCounts] = useState<{origin: string, name_count: number}[]>([]);
@@ -32,17 +33,17 @@ const Categories = () => {
     { name: "Kategorier", url: "/kategorier" }
   ]);
 
+  // Combine structured data in an array
+  const structuredDataArray = [collectionData, breadcrumbData];
+
   return (
     <Layout>
-      {/* Use Helmet directly instead of StructuredData component */}
       <Helmet>
-        <script type="application/ld+json">
-          {JSON.stringify(collectionData)}
-        </script>
-        <script type="application/ld+json">
-          {JSON.stringify(breadcrumbData)}
-        </script>
+        <title>Navnekategorier | Navnelykke</title>
+        <meta name="description" content="Utforsk navn basert på ulike kategorier og stiler" />
       </Helmet>
+      
+      <StructuredData data={structuredDataArray} />
       
       <div className="container mx-auto px-4 py-8">
         {/* Name Categories Section */}

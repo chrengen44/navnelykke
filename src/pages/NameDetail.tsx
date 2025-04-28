@@ -2,8 +2,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { BabyName } from "@/data/types";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { Layout } from "@/components/Layout";
 import { trackNameVisit, fetchNameById } from "@/integrations/supabase/name-queries";
 import { toast } from "sonner";
 import NameHeader from "@/components/name-detail/NameHeader";
@@ -12,6 +11,7 @@ import { ErrorState } from "@/components/name-detail/ErrorState";
 import { NameContent } from "@/components/name-detail/NameContent";
 import { Helmet } from "react-helmet-async";
 import { useStructuredData } from "@/hooks/useStructuredData";
+import StructuredData from "@/components/SEO/StructuredData";
 
 const NameDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -107,20 +107,19 @@ const NameDetail = () => {
     { name: name.name, url: `/navn/${name.id}` }
   ]);
   
+  // Combine structured data in an array
+  const structuredDataArray = [nameDetailData, breadcrumbData];
+  
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
+    <Layout>
+      <Helmet>
+        <title>{`${name.name} - Betydning og opprinnelse | Navnelykke`}</title>
+        <meta name="description" content={`Les mer om navnet ${name.name}, dets betydning (${name.meaning}) og ${name.origin} opprinnelse.`} />
+      </Helmet>
+      
+      <StructuredData data={structuredDataArray} />
+      
       <main className="flex-grow">
-        {/* Use Helmet directly instead of StructuredData component */}
-        <Helmet>
-          <script type="application/ld+json">
-            {JSON.stringify(nameDetailData)}
-          </script>
-          <script type="application/ld+json">
-            {JSON.stringify(breadcrumbData)}
-          </script>
-        </Helmet>
-        
         <NameHeader 
           name={name} 
           getGenderLabel={getGenderLabel} 
@@ -131,8 +130,7 @@ const NameDetail = () => {
           getGenderLabel={getGenderLabel}
         />
       </main>
-      <Footer />
-    </div>
+    </Layout>
   );
 };
 

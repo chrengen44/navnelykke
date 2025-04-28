@@ -9,6 +9,7 @@ import { GenderFilter } from "@/components/search/filters/GenderFilter";
 import { Helmet } from "react-helmet-async";
 import { useStructuredData } from "@/hooks/useStructuredData";
 import { Layout } from "@/components/Layout";
+import StructuredData from "@/components/SEO/StructuredData";
 
 const PopularNames = () => {
   const [names, setNames] = useState<BabyName[]>([]);
@@ -70,22 +71,21 @@ const PopularNames = () => {
     }))
   ) : null;
 
+  // Prepare all structured data as an array
+  const structuredDataArray = [articleData, breadcrumbData];
+  if (listData) {
+    structuredDataArray.push(listData);
+  }
+
   return (
     <Layout>
-      {/* Use Helmet directly instead of StructuredData component */}
       <Helmet>
-        <script type="application/ld+json">
-          {JSON.stringify(articleData)}
-        </script>
-        <script type="application/ld+json">
-          {JSON.stringify(breadcrumbData)}
-        </script>
-        {listData && (
-          <script type="application/ld+json">
-            {JSON.stringify(listData)}
-          </script>
-        )}
+        <title>Populære navn i Norge | Navnelykke</title>
+        <meta name="description" content="Se hvilke babynavn som er mest populære i Norge akkurat nå" />
       </Helmet>
+      
+      {/* Use the updated StructuredData component with all data in an array */}
+      <StructuredData data={structuredDataArray} />
       
       <div className="flex flex-col min-h-screen">
         <main className="flex-grow">

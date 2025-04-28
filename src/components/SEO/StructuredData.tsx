@@ -6,8 +6,7 @@ interface StructuredDataProps {
 }
 
 /**
- * A component that renders structured data for SEO purposes using plain script tags 
- * instead of react-helmet-async which is causing issues
+ * A component that renders structured data for SEO purposes
  */
 const StructuredData: React.FC<StructuredDataProps> = ({ data }) => {
   // If no data or empty array is provided, return null

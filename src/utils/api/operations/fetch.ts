@@ -50,8 +50,8 @@ export async function fetchData<T>(
       throw new Error(`Error fetching data from ${table}: ${error.message}`);
     }
 
-    // Break the deep type instantiation with an intermediate any cast
-    return (data || []) as any as T[];
+    // Fix type instantiation issue with a direct type assertion
+    return (data || []) as T[];
   } catch (error) {
     console.error('Error in fetchData:', error);
     throw error;
@@ -92,8 +92,8 @@ export async function fetchById<T>(
       throw error;
     }
 
-    // Break the deep type instantiation with an intermediate any cast
-    return data as any as T;
+    // Fix type instantiation issue with a direct type assertion
+    return data as T;
   } catch (error) {
     console.error(`Error in fetchById for table ${table} with ID ${id}:`, error);
     return null;

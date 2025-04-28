@@ -5,7 +5,6 @@ import { nameCategories } from "@/data";
 import CategoryCard from "@/components/CategoryCard";
 import OriginCategoryCard from "@/components/OriginCategoryCard";
 import { getOriginCounts } from "@/integrations/supabase/analytics-queries";
-import { Helmet } from "react-helmet-async";
 import { useStructuredData } from "@/hooks/useStructuredData";
 import StructuredData from "@/components/SEO/StructuredData";
 
@@ -20,6 +19,22 @@ const Categories = () => {
     };
 
     fetchOriginCounts();
+  }, []);
+
+  useEffect(() => {
+    document.title = "Navnekategorier | Navnelykke";
+    
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.setAttribute('name', 'description');
+      document.head.appendChild(metaDescription);
+    }
+    metaDescription.setAttribute('content', "Utforsk navn basert på ulike kategorier og stiler");
+    
+    return () => {
+      document.title = "Navnelykke";
+    };
   }, []);
 
   const collectionData = getCollectionPageData(
@@ -38,11 +53,6 @@ const Categories = () => {
 
   return (
     <Layout>
-      <Helmet>
-        <title>Navnekategorier | Navnelykke</title>
-        <meta name="description" content="Utforsk navn basert på ulike kategorier og stiler" />
-      </Helmet>
-      
       {structuredDataArray.length > 0 && (
         <StructuredData data={structuredDataArray} />
       )}

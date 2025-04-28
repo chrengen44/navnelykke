@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
@@ -53,7 +52,7 @@ export default function SecuritySettings() {
   const loadSettings = async () => {
     setLoadingSettings(true);
     try {
-      const { data, error } = await secureApi.fetch<PrivacySettings[]>(
+      const { data, error } = await secureApi.fetch<PrivacySettings>(
         "user_privacy_settings", 
         {
           filters: [{ column: "user_id", operator: "eq", value: user?.id }]
@@ -62,8 +61,7 @@ export default function SecuritySettings() {
 
       if (error) throw error;
       
-      if (data && data.length > 0) {
-        // Make sure we're getting the first item from the array
+      if (data && Array.isArray(data) && data.length > 0) {
         const settings = data[0];
         setPrivacySettings({
           user_id: settings.user_id,
@@ -86,7 +84,7 @@ export default function SecuritySettings() {
   const loadSessions = async () => {
     setLoadingSessions(true);
     try {
-      const { data, error } = await secureApi.fetch<Session[]>(
+      const { data, error } = await secureApi.fetch<Session>(
         "user_sessions",
         {
           filters: [{ column: "user_id", operator: "eq", value: user?.id }],
@@ -96,9 +94,8 @@ export default function SecuritySettings() {
 
       if (error) throw error;
       
-      if (data) {
-        // Ensure we're setting an array of Session objects
-        setSessions(Array.isArray(data) ? data : []);
+      if (data && Array.isArray(data)) {
+        setSessions(data);
       }
     } catch (error: any) {
       toast({

@@ -1,3 +1,4 @@
+
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { BabyName } from "@/data/types";
@@ -9,7 +10,7 @@ import NameHeader from "@/components/name-detail/NameHeader";
 import { LoadingState } from "@/components/name-detail/LoadingState";
 import { ErrorState } from "@/components/name-detail/ErrorState";
 import { NameContent } from "@/components/name-detail/NameContent";
-import StructuredData from "@/components/SEO/StructuredData";
+import { Helmet } from "react-helmet-async";
 import { useStructuredData } from "@/hooks/useStructuredData";
 
 const NameDetail = () => {
@@ -110,8 +111,16 @@ const NameDetail = () => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow">
-        <StructuredData data={nameDetailData} />
-        <StructuredData data={breadcrumbData} />
+        {/* Use Helmet directly instead of StructuredData component */}
+        <Helmet>
+          <script type="application/ld+json">
+            {JSON.stringify(nameDetailData)}
+          </script>
+          <script type="application/ld+json">
+            {JSON.stringify(breadcrumbData)}
+          </script>
+        </Helmet>
+        
         <NameHeader 
           name={name} 
           getGenderLabel={getGenderLabel} 

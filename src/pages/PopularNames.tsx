@@ -6,7 +6,7 @@ import { getPopularNames } from "@/data";
 import NameGrid from "@/components/NameGrid";
 import AdSpace from "@/components/AdSpace";
 import { GenderFilter } from "@/components/search/filters/GenderFilter";
-import StructuredData from "@/components/SEO/StructuredData";
+import { Helmet } from "react-helmet-async";
 import { useStructuredData } from "@/hooks/useStructuredData";
 import { Layout } from "@/components/Layout";
 
@@ -51,30 +51,42 @@ const PopularNames = () => {
     fetchNames();
   }, [gender]);
 
-  const structuredData = [
-    getArticleData(
-      "Populære navn i Norge",
-      "Se hvilke babynavn som er mest populære i Norge akkurat nå",
-      "/populære-navn"
-    ),
-    getBreadcrumbData([
-      { name: "Hjem", url: "/" },
-      { name: "Populære navn", url: "/populære-navn" }
-    ]),
-    names.length > 0 && getListData(
-      names.map((name, index) => ({
-        name: name.name,
-        url: `/navn/${name.id}`,
-        position: index + 1
-      }))
-    )
-  ].filter(Boolean);
+  const articleData = getArticleData(
+    "Populære navn i Norge",
+    "Se hvilke babynavn som er mest populære i Norge akkurat nå",
+    "/populære-navn"
+  );
+  
+  const breadcrumbData = getBreadcrumbData([
+    { name: "Hjem", url: "/" },
+    { name: "Populære navn", url: "/populære-navn" }
+  ]);
+  
+  const listData = names.length > 0 ? getListData(
+    names.map((name, index) => ({
+      name: name.name,
+      url: `/navn/${name.id}`,
+      position: index + 1
+    }))
+  ) : null;
 
   return (
     <Layout>
-      {structuredData.map((data, index) => (
-        <StructuredData key={index} data={data} />
-      ))}
+      {/* Use Helmet directly instead of StructuredData component */}
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify(articleData)}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbData)}
+        </script>
+        {listData && (
+          <script type="application/ld+json">
+            {JSON.stringify(listData)}
+          </script>
+        )}
+      </Helmet>
+      
       <div className="flex flex-col min-h-screen">
         <main className="flex-grow">
           <div className="bg-gradient-to-br from-babyblue via-white to-babypink py-12">

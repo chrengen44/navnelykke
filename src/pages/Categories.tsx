@@ -5,7 +5,7 @@ import { nameCategories } from "@/data";
 import CategoryCard from "@/components/CategoryCard";
 import OriginCategoryCard from "@/components/OriginCategoryCard";
 import { getOriginCounts } from "@/integrations/supabase/analytics-queries";
-import StructuredData from "@/components/SEO/StructuredData";
+import { Helmet } from "react-helmet-async";
 import { useStructuredData } from "@/hooks/useStructuredData";
 
 const Categories = () => {
@@ -34,8 +34,15 @@ const Categories = () => {
 
   return (
     <Layout>
-      {/* Remove multiple StructuredData components and merge them */}
-      <StructuredData data={[collectionData, breadcrumbData]} />
+      {/* Use Helmet directly instead of StructuredData component */}
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify(collectionData)}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbData)}
+        </script>
+      </Helmet>
       
       <div className="container mx-auto px-4 py-8">
         {/* Name Categories Section */}

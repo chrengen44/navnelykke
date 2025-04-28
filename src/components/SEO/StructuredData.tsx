@@ -7,25 +7,35 @@ interface StructuredDataProps {
 }
 
 const StructuredData: React.FC<StructuredDataProps> = ({ data }) => {
-  // Check if data is an array and handle accordingly
-  if (Array.isArray(data)) {
+  if (!data) {
+    console.warn('No structured data provided to StructuredData component');
+    return null;
+  }
+
+  try {
+    // Check if data is an array and handle accordingly
+    if (Array.isArray(data)) {
+      return (
+        <Helmet>
+          {data.filter(Boolean).map((item, index) => (
+            <script key={index} type="application/ld+json">
+              {JSON.stringify(item)}
+            </script>
+          ))}
+        </Helmet>
+      );
+    }
+    
+    // Handle single object case
     return (
       <Helmet>
-        {data.map((item, index) => (
-          <script key={index} type="application/ld+json">
-            {JSON.stringify(item)}
-          </script>
-        ))}
+        <script type="application/ld+json">{JSON.stringify(data)}</script>
       </Helmet>
     );
+  } catch (error) {
+    console.error('Error rendering structured data:', error);
+    return null;
   }
-  
-  // Handle single object case
-  return (
-    <Helmet>
-      <script type="application/ld+json">{JSON.stringify(data)}</script>
-    </Helmet>
-  );
 };
 
 export default StructuredData;

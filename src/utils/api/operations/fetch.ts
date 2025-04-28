@@ -63,7 +63,7 @@ export const fetchData = async <T,>(
       throw new Error(`Error fetching data from ${table}: ${error.message}`);
     }
 
-    // Use explicit type casting to break the recursive type chain
+    // Break recursive type chain with type casting
     return (data || []) as unknown as T[];
   } catch (error) {
     console.error('Error in fetchData:', error);
@@ -71,7 +71,10 @@ export const fetchData = async <T,>(
   }
 };
 
-export const fetchById = async <T>(table: ValidTableName, id: string | number): Promise<T | null> => {
+export const fetchById = async <T>(
+  table: ValidTableName, 
+  id: string | number
+): Promise<T | null> => {
   try {
     validateTable(table);
 
@@ -86,7 +89,7 @@ export const fetchById = async <T>(table: ValidTableName, id: string | number): 
       return null;
     }
 
-    // Use explicit type casting to break the recursive type chain
+    // Break recursive type chain with type casting
     return data as unknown as T;
   } catch (error) {
     console.error(`Error in fetchById for table ${table} with ID ${id}:`, error);

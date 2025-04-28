@@ -7,10 +7,12 @@ interface StructuredDataProps {
 }
 
 const StructuredData: React.FC<StructuredDataProps> = ({ data }) => {
+  const jsonString = JSON.stringify(data);
+
   return (
     <Helmet>
       <script type="application/ld+json">
-        {JSON.stringify(data)}
+        {jsonString}
       </script>
     </Helmet>
   );

@@ -1,4 +1,3 @@
-
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { BabyName } from "@/data/types";
@@ -100,22 +99,19 @@ const NameDetail = () => {
     return <ErrorState error={error} />;
   }
 
-  const structuredData = [
-    getNameDetailData(name),
-    getBreadcrumbData([
-      { name: "Hjem", url: "/" },
-      { name: "Navn", url: "/populære-navn" },
-      { name: name.name, url: `/navn/${name.id}` }
-    ])
-  ];
+  const nameDetailData = getNameDetailData(name);
+  const breadcrumbData = getBreadcrumbData([
+    { name: "Hjem", url: "/" },
+    { name: "Navn", url: "/populære-navn" },
+    { name: name.name, url: `/navn/${name.id}` }
+  ]);
   
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow">
-        {structuredData.map((data, index) => (
-          <StructuredData key={index} data={data} />
-        ))}
+        <StructuredData data={nameDetailData} />
+        <StructuredData data={breadcrumbData} />
         <NameHeader 
           name={name} 
           getGenderLabel={getGenderLabel} 

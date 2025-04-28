@@ -12,11 +12,11 @@ const StructuredData: React.FC<StructuredDataProps> = ({ data }) => {
     return null;
   }
 
-  // Convert data to string outside of render for better error handling
-  const getScripts = () => {
+  // Safer implementation that handles potential errors
+  const renderScripts = () => {
     try {
       if (Array.isArray(data)) {
-        return data.map((item, index) => (
+        return data.filter(Boolean).map((item, index) => (
           <script key={index} type="application/ld+json">
             {JSON.stringify(item)}
           </script>
@@ -29,12 +29,12 @@ const StructuredData: React.FC<StructuredDataProps> = ({ data }) => {
         );
       }
     } catch (error) {
-      console.error('Error stringifying structured data:', error);
+      console.error('Error rendering structured data:', error);
       return null;
     }
   };
   
-  return <Helmet>{getScripts()}</Helmet>;
+  return <Helmet>{renderScripts()}</Helmet>;
 };
 
 export default StructuredData;

@@ -11,8 +11,21 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Create a properly initialized helmetContext object
-  const helmetContext = {};
+  // Create a properly initialized helmetContext object with a default empty arrays
+  // This is critical for react-helmet-async to work correctly
+  const helmetContext = {
+    helmet: {
+      base: { toComponent: () => null, toString: () => '' },
+      bodyAttributes: { toComponent: () => null, toString: () => '' },
+      htmlAttributes: { toComponent: () => null, toString: () => '' },
+      link: { toComponent: () => null, toString: () => '' },
+      meta: { toComponent: () => null, toString: () => '' },
+      noscript: { toComponent: () => null, toString: () => '' },
+      script: { toComponent: () => null, toString: () => '' },
+      style: { toComponent: () => null, toString: () => '' },
+      title: { toComponent: () => null, toString: () => '' },
+    }
+  };
 
   return (
     <html lang="no" suppressHydrationWarning>

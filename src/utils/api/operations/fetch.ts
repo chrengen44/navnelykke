@@ -63,9 +63,9 @@ export const fetchData = async <T>(
       throw new Error(`Error fetching data from ${table}: ${error.message}`);
     }
 
-    // Break the type chain to prevent excessive instantiation
-    const resultData = data || [];
-    return resultData as unknown as T[];
+    // Completely avoid TS2589 error by using an explicit type assertion
+    const safeData = data || [];
+    return safeData as any as T[];
   } catch (error) {
     console.error('Error in fetchData:', error);
     throw error;
@@ -90,8 +90,8 @@ export const fetchById = async <T>(
       return null;
     }
 
-    // Break the type chain to prevent excessive instantiation
-    return data as unknown as T;
+    // Use an explicit type assertion to avoid TS2589
+    return data as any as T;
   } catch (error) {
     console.error(`Error in fetchById for table ${table} with ID ${id}:`, error);
     return null;

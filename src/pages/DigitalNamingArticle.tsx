@@ -12,6 +12,7 @@ const DigitalNamingArticle = () => {
   const description = "En utforskning av moderne navngiving og hvordan teknologi påvirker våre valg";
   const path = "/artikkel/navngiving-digital";
 
+  // Create individual data objects
   const articleData = getArticleData(title, description, path);
   const breadcrumbData = getBreadcrumbData([
     { name: "Hjem", url: "/" },
@@ -19,7 +20,8 @@ const DigitalNamingArticle = () => {
     { name: title, url: path }
   ]);
 
-  const structuredData = [articleData, breadcrumbData];
+  // Combine structured data safely
+  const structuredData = [articleData, breadcrumbData].filter(Boolean);
 
   return (
     <BlogPostLayout title={title}>

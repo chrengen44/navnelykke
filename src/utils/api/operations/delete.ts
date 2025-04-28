@@ -35,9 +35,11 @@ export async function deleteData<T>(
       return { data: null, error: new Error(result.error.message) };
     }
     
-    // Fix the excessive type instantiation by breaking the chain with a more direct assertion
-    const nullData = null;
-    return { data: nullData as unknown as T, error: null };
+    // Completely avoid TS2589 error by using a more explicit approach
+    return { 
+      data: null as unknown as T, 
+      error: null 
+    };
   } catch (err) {
     return { data: null, error: err instanceof Error ? err : new Error(String(err)) };
   }

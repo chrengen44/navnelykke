@@ -34,8 +34,8 @@ const Categories = () => {
 
   return (
     <Layout>
-      <StructuredData data={collectionData} />
-      <StructuredData data={breadcrumbData} />
+      {/* Remove multiple StructuredData components and merge them */}
+      <StructuredData data={[collectionData, breadcrumbData]} />
       
       <div className="container mx-auto px-4 py-8">
         {/* Name Categories Section */}

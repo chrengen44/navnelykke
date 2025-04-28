@@ -63,7 +63,7 @@ export default function SecuritySettings() {
       if (error) throw error;
       
       if (data && data.length > 0) {
-        // Access the first item from the array
+        // Make sure we're getting the first item from the array
         const settings = data[0];
         setPrivacySettings({
           user_id: settings.user_id,
@@ -97,7 +97,7 @@ export default function SecuritySettings() {
       if (error) throw error;
       
       if (data) {
-        // Ensure we're setting an array of Sessions
+        // Ensure we're setting an array of Session objects
         setSessions(Array.isArray(data) ? data : []);
       }
     } catch (error: any) {

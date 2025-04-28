@@ -35,7 +35,7 @@ export async function deleteData<T>(
       return { data: null, error: new Error(result.error.message) };
     }
     
-    // Cast to unknown first, then to T to break the recursive type chain
+    // Use explicit type casting to avoid deep recursion
     return { data: null as unknown as T, error: null };
   } catch (err) {
     return { data: null, error: err instanceof Error ? err : new Error(String(err)) };

@@ -4,6 +4,7 @@ import "../index.css";
 import ConsentBannerWrapper from "@/components/ConsentBannerWrapper";
 import AdSenseScript from "@/components/AdSenseScript";
 import { HelmetProvider } from "react-helmet-async";
+import SecurityHeaders from "@/components/SecurityHeaders";
 
 export default function RootLayout({
   children,
@@ -20,6 +21,7 @@ export default function RootLayout({
       </head>
       <body>
         <HelmetProvider>
+          <SecurityHeaders />
           <div>
             {children}
             <ConsentBannerWrapper />

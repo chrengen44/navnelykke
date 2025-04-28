@@ -3,20 +3,24 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { searchNames, BabyName } from "@/data";
+import { searchNames } from "@/integrations/supabase/search";
+import { BabyName } from "@/data/types";
 import AdvancedNameFilters from "@/components/search/AdvancedNameFilters";
 import { AdvancedFilterState } from "@/components/search/filters/types";
 import AdSpace from "@/components/AdSpace";
 import SearchResults from "@/components/search/SearchResults";
 import SearchTips from "@/components/search/SearchTips";
+import { AutocompleteSearch } from "@/components/search/Autocomplete";
+import { toast } from "sonner";
 
 const Search = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
   
   const [allResults, setAllResults] = useState<BabyName[]>([]);
   const [filteredResults, setFilteredResults] = useState<BabyName[]>([]);
   const [loading, setLoading] = useState(true);
+  const [useFuzzySearch, setUseFuzzySearch] = useState(true);
   
   useEffect(() => {
     const fetchSearchResults = async () => {
@@ -29,18 +33,32 @@ const Search = () => {
       
       setLoading(true);
       try {
-        const results = await searchNames(query);
+        const results = await searchNames(query, { fuzzy: useFuzzySearch });
         setAllResults(results);
         setFilteredResults(results);
+        
+        // Notify user if fuzzy search found results that might not match exactly
+        if (useFuzzySearch && results.length > 0 && !results.some(n => 
+          n.name.toLowerCase().includes(query.toLowerCase()))) {
+          toast.info("Vi viser lignende resultater siden ingen eksakte treff ble funnet.");
+        }
+        
       } catch (error) {
         console.error("Error searching names:", error);
+        toast.error("Det oppstod en feil under søket. Vennligst prøv igjen.");
       } finally {
         setLoading(false);
       }
     };
     
     fetchSearchResults();
-  }, [query]);
+  }, [query, useFuzzySearch]);
+  
+  const handleSearch = (newQuery: string) => {
+    if (newQuery.trim()) {
+      setSearchParams({ q: newQuery });
+    }
+  };
   
   const handleFilter = (filters: AdvancedFilterState) => {
     let filtered = [...allResults];
@@ -104,6 +122,10 @@ const Search = () => {
     setFilteredResults(filtered);
   };
   
+  const toggleFuzzySearch = () => {
+    setUseFuzzySearch(!useFuzzySearch);
+  };
+  
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -112,11 +134,25 @@ const Search = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center">
               <h1 className="text-3xl md:text-4xl font-bold mb-4">Søkeresultater</h1>
-              {query && (
-                <p className="text-lg text-gray-700">
-                  Resultater for "{query}"
-                </p>
-              )}
+              <div className="mb-6">
+                <AutocompleteSearch 
+                  onSearch={handleSearch}
+                  placeholder="Søk etter navn, betydning eller opprinnelse..."
+                  inputClassName="max-w-md mx-auto"
+                />
+              </div>
+              <div className="flex items-center justify-center gap-2 text-sm">
+                <input 
+                  type="checkbox" 
+                  id="fuzzySearch"
+                  checked={useFuzzySearch}
+                  onChange={toggleFuzzySearch}
+                  className="rounded text-pink-500 focus:ring-pink-500"
+                />
+                <label htmlFor="fuzzySearch">
+                  Inkluder lignende resultater (fikser stavefeil)
+                </label>
+              </div>
             </div>
           </div>
         </div>

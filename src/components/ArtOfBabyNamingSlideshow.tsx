@@ -66,7 +66,7 @@ const ArtOfBabyNamingSlideshow = () => {
   return (
     <div className="w-full max-w-5xl mx-auto px-4">
       <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
-        Kunsten å velge navn: En presentasjon
+        Les mer om "The Art of Baby Naming: Trends, Influences and Digital Tools"
       </h2>
       
       <Carousel className="w-full">

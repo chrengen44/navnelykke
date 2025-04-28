@@ -3,12 +3,12 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
 interface StructuredDataProps {
-  data: object | object[];
+  data: object | object[] | null;
 }
 
 const StructuredData: React.FC<StructuredDataProps> = ({ data }) => {
-  if (!data) {
-    console.warn('No structured data provided to StructuredData component');
+  // If no data or empty array is provided, return null
+  if (!data || (Array.isArray(data) && data.length === 0)) {
     return null;
   }
 
@@ -35,8 +35,11 @@ const StructuredData: React.FC<StructuredDataProps> = ({ data }) => {
     }
   };
   
-  // Use optional chaining to prevent runtime errors
-  return <Helmet>{renderScripts()}</Helmet>;
+  // Return null if renderScripts returns null
+  const scripts = renderScripts();
+  if (!scripts) return null;
+  
+  return <Helmet>{scripts}</Helmet>;
 };
 
 export default StructuredData;

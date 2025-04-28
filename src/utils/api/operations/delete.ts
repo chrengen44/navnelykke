@@ -35,9 +35,9 @@ export async function deleteData<T>(
       return { data: null, error: new Error(result.error.message) };
     }
     
-    // Use a more explicit type cast to avoid TypeScript's excessive instantiation
+    // Use a more explicit type assertion to avoid excessive type instantiation
     return { 
-      data: null as any as T, 
+      data: null as unknown as T, 
       error: null 
     };
   } catch (err) {

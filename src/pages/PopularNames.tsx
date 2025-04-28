@@ -84,7 +84,7 @@ const PopularNames = () => {
         <meta name="description" content="Se hvilke babynavn som er mest populære i Norge akkurat nå" />
       </Helmet>
       
-      <StructuredData data={structuredDataArray} />
+      {structuredDataArray.length > 0 && <StructuredData data={structuredDataArray} />}
       
       <div className="flex flex-col min-h-screen">
         <main className="flex-grow">

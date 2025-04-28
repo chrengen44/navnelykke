@@ -1,46 +1,70 @@
+import { supabase } from '@/integrations/supabase/client';
+import { validateTable, sanitizeData } from '../helpers';
 
-import { supabase } from "@/integrations/supabase/client";
-import { ApiResponse } from "../types";
-import { checkRateLimit, incrementRequestCount } from '../rateLimiter';
-import { sanitizeInput } from '../sanitizer';
-import { validateTableName, type ValidTableName } from '../tableValidator';
-
-export async function updateData<T>(
-  tableName: string,
-  query: { column: string; value: any },
-  data: Record<string, any>,
-  endpoint = 'update'
-): Promise<ApiResponse<T>> {
-  if (!checkRateLimit(endpoint)) {
-    return { data: null, error: new Error("Rate limit exceeded") };
-  }
-  
-  incrementRequestCount(endpoint);
-  
+export const createData = async <T,>(table: string, data: T): Promise<T> => {
   try {
-    const sanitizedData = sanitizeInput(data);
-    const sanitizedQuery = sanitizeInput(query);
-    
-    if (!validateTableName(tableName)) {
-      console.warn(`Warning: ${tableName} is not a recognized table name`);
-      return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
+    validateTable(table);
+    sanitizeData(data);
+
+    const { data: result, error } = await supabase
+      .from(table)
+      .insert([data])
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(`Error creating data in ${table}: ${error.message}`);
     }
-    
-    const validTableName = tableName as ValidTableName;
-    const result = await supabase
-      .from(validTableName)
-      .update(sanitizedData)
-      .eq(sanitizedQuery.column, sanitizedQuery.value)
-      .select();
-    
-    // Break the type recursion by converting to string and back
-    const processedData = result.data ? JSON.parse(JSON.stringify(result.data)) : null;
-      
-    return {
-      data: processedData as T,
-      error: result.error
-    };
-  } catch (err) {
-    return { data: null, error: err instanceof Error ? err : new Error(String(err)) };
+
+    return JSON.parse(JSON.stringify(result)) as T;
+  } catch (error) {
+    console.error('Error in createData:', error);
+    throw error;
   }
-}
+};
+
+export const updateData = async <T,>(
+  table: string,
+  id: string | number,
+  data: Partial<T>
+): Promise<T> => {
+  try {
+    validateTable(table);
+    sanitizeData(data);
+
+    const { data: result, error } = await supabase
+      .from(table)
+      .update(data)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(`Error updating data in ${table}: ${error.message}`);
+    }
+
+    // Break the type recursion by stringifying and parsing
+    return JSON.parse(JSON.stringify(result)) as T;
+  } catch (error) {
+    console.error('Error in updateData:', error);
+    throw error;
+  }
+};
+
+export const deleteData = async (table: string, id: string | number): Promise<void> => {
+  try {
+    validateTable(table);
+
+    const { error } = await supabase
+      .from(table)
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      throw new Error(`Error deleting data from ${table}: ${error.message}`);
+    }
+  } catch (error) {
+    console.error('Error in deleteData:', error);
+    throw error;
+  }
+};

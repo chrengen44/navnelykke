@@ -13,6 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const { getWebsiteData } = useStructuredData();
+  const websiteData = getWebsiteData();
 
   return (
     <html lang="no" suppressHydrationWarning>
@@ -25,7 +26,7 @@ export default function RootLayout({
       <body>
         <HelmetProvider>
           <div>
-            <StructuredData data={getWebsiteData()} />
+            <StructuredData data={websiteData} />
             {children}
             <ConsentBannerWrapper />
             <AdSenseScript />

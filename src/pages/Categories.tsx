@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { nameCategories } from "@/data";
@@ -20,23 +21,22 @@ const Categories = () => {
     fetchOriginCounts();
   }, []);
 
-  const structuredData = [
-    getCollectionPageData(
-      "Navnekategorier",
-      "Utforsk navn basert på ulike kategorier og stiler",
-      "/kategorier"
-    ),
-    getBreadcrumbData([
-      { name: "Hjem", url: "/" },
-      { name: "Kategorier", url: "/kategorier" }
-    ])
-  ];
+  const collectionData = getCollectionPageData(
+    "Navnekategorier",
+    "Utforsk navn basert på ulike kategorier og stiler",
+    "/kategorier"
+  );
+  
+  const breadcrumbData = getBreadcrumbData([
+    { name: "Hjem", url: "/" },
+    { name: "Kategorier", url: "/kategorier" }
+  ]);
 
   return (
     <Layout>
-      {structuredData.map((data, index) => (
-        <StructuredData key={index} data={data} />
-      ))}
+      <StructuredData data={collectionData} />
+      <StructuredData data={breadcrumbData} />
+      
       <div className="container mx-auto px-4 py-8">
         {/* Name Categories Section */}
         <section className="mb-16">

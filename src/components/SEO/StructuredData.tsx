@@ -7,13 +7,12 @@ interface StructuredDataProps {
 }
 
 const StructuredData: React.FC<StructuredDataProps> = ({ data }) => {
+  // Create the JSON string outside the JSX for better reliability
   const jsonString = JSON.stringify(data);
-
+  
   return (
     <Helmet>
-      <script type="application/ld+json">
-        {jsonString}
-      </script>
+      <script type="application/ld+json">{`${jsonString}`}</script>
     </Helmet>
   );
 };

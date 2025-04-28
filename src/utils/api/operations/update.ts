@@ -6,11 +6,11 @@ import { ValidTableName } from '../tableValidator';
 export const createData = async <T,>(table: ValidTableName, data: T): Promise<T> => {
   try {
     validateTable(table);
-    sanitizeData(data);
+    const sanitizedData = sanitizeData(data);
 
     const { data: result, error } = await supabase
       .from(table)
-      .insert([data])
+      .insert([sanitizedData])
       .select()
       .single();
 
@@ -18,7 +18,8 @@ export const createData = async <T,>(table: ValidTableName, data: T): Promise<T>
       throw new Error(`Error creating data in ${table}: ${error.message}`);
     }
 
-    return JSON.parse(JSON.stringify(result)) as T;
+    // Use a simple JSON clone to break type recursion
+    return result ? JSON.parse(JSON.stringify(result)) : null;
   } catch (error) {
     console.error('Error in createData:', error);
     throw error;
@@ -32,11 +33,11 @@ export const updateData = async <T,>(
 ): Promise<T> => {
   try {
     validateTable(table);
-    sanitizeData(data);
+    const sanitizedData = sanitizeData(data);
 
     const { data: result, error } = await supabase
       .from(table)
-      .update(data)
+      .update(sanitizedData)
       .eq('id', id)
       .select()
       .single();
@@ -45,8 +46,8 @@ export const updateData = async <T,>(
       throw new Error(`Error updating data in ${table}: ${error.message}`);
     }
 
-    // Break the type recursion by stringifying and parsing
-    return JSON.parse(JSON.stringify(result)) as T;
+    // Use a simple JSON clone to break type recursion
+    return result ? JSON.parse(JSON.stringify(result)) : null;
   } catch (error) {
     console.error('Error in updateData:', error);
     throw error;

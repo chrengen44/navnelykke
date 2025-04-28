@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ApiResponse } from "../types";
 import { checkRateLimit, incrementRequestCount } from '../rateLimiter';
 import { sanitizeInput } from '../sanitizer';
-import { validateTableName, type ValidTableName } from '../tableValidator';
+import { validateTableName, ValidTableName } from '../tableValidator';
 
 export async function deleteData<T>(
   tableName: string,
@@ -28,16 +28,14 @@ export async function deleteData<T>(
     const result = await supabase
       .from(validTableName)
       .delete()
-      .eq(sanitizedQuery.column, sanitizedQuery.value)
-      .select();
+      .eq(sanitizedQuery.column, sanitizedQuery.value);
     
-    // Break the type recursion by converting to string and back
-    const processedData = result.data ? JSON.parse(JSON.stringify(result.data)) : null;
-      
-    return {
-      data: processedData as T,
-      error: result.error
-    };
+    // Simple version to avoid recursion
+    if (result.error) {
+      return { data: null, error: new Error(result.error.message) };
+    }
+    
+    return { data: null, error: null };
   } catch (err) {
     return { data: null, error: err instanceof Error ? err : new Error(String(err)) };
   }

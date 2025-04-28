@@ -3,8 +3,6 @@ import React from "react";
 import "../index.css";
 import ConsentBannerWrapper from "@/components/ConsentBannerWrapper";
 import AdSenseScript from "@/components/AdSenseScript";
-import StructuredData from "@/components/SEO/StructuredData";
-import { useStructuredData } from "@/hooks/useStructuredData";
 import { HelmetProvider } from "react-helmet-async";
 
 export default function RootLayout({
@@ -12,9 +10,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { getWebsiteData } = useStructuredData();
-  const websiteData = getWebsiteData();
-
   return (
     <html lang="no" suppressHydrationWarning>
       <head>
@@ -26,7 +21,6 @@ export default function RootLayout({
       <body>
         <HelmetProvider>
           <div>
-            <StructuredData data={websiteData} />
             {children}
             <ConsentBannerWrapper />
             <AdSenseScript />

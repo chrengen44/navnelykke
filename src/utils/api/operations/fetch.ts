@@ -63,8 +63,8 @@ export const fetchData = async <T,>(
       throw new Error(`Error fetching data from ${table}: ${error.message}`);
     }
 
-    // Break the type recursion by stringifying and parsing
-    return JSON.parse(JSON.stringify(data)) as T[];
+    // Use a simple JSON clone to break type recursion
+    return data ? JSON.parse(JSON.stringify(data)) : [];
   } catch (error) {
     console.error('Error in fetchData:', error);
     throw error;
@@ -86,8 +86,8 @@ export const fetchById = async <T>(table: ValidTableName, id: string | number): 
       return null;
     }
 
-    // Break the type recursion by stringifying and parsing
-    return JSON.parse(JSON.stringify(data)) as T;
+    // Use a simple JSON clone to break type recursion
+    return data ? JSON.parse(JSON.stringify(data)) : null;
   } catch (error) {
     console.error(`Error in fetchById for table ${table} with ID ${id}:`, error);
     return null;

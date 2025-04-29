@@ -1,6 +1,6 @@
 
 import { toast } from 'sonner';
-import { nameTrendFallbackData } from '@/utils/nameTrendFallbackData';
+import { getFallbackData } from '@/utils/nameTrendFallbackData';
 
 interface SSBResponse {
   value: number[];
@@ -29,7 +29,7 @@ const API_TIMEOUT = 8000; // 8 seconds timeout
 // Simple cache implementation
 const trendDataCache = new Map<string, { data: NameTrendData[]; timestamp: number }>();
 
-export const fetchPopularityTrendData = async (gender: 'girl' | 'boy', namesToFetch: string[]): Promise<NameTrendData[]> => {
+export const fetchNameTrendData = async (gender: 'girl' | 'boy', namesToFetch: string[]): Promise<NameTrendData[]> => {
   const cacheKey = `${gender}-${namesToFetch.join(',')}`;
   const now = Date.now();
   const cachedData = trendDataCache.get(cacheKey);
@@ -46,20 +46,13 @@ export const fetchPopularityTrendData = async (gender: 'girl' | 'boy', namesToFe
   } catch (error) {
     console.error(`Error fetching ${gender} name trend data:`, error);
     // Return appropriate fallback data based on gender
-    const fallbackData = gender === 'girl' ? 
-      nameTrendFallbackData.girl : 
-      nameTrendFallbackData.boy;
+    const fallbackData = getFallbackData(gender, namesToFetch);
     
-    // Filter the fallback data to only include requested names
-    return fallbackData.map(yearData => {
-      const filteredYearData: NameTrendData = { year: yearData.year };
-      namesToFetch.forEach(name => {
-        if (name in yearData) {
-          filteredYearData[name] = yearData[name];
-        }
-      });
-      return filteredYearData;
+    toast.error(`Kunne ikke hente ${gender === 'girl' ? 'jente' : 'gutte'}navnedata fra SSB. Viser reservedata.`, {
+      duration: 5000,
     });
+    
+    return fallbackData;
   }
 };
 
@@ -142,3 +135,6 @@ export const fetchSSBNameData = async (gender: 'girl' | 'boy', namesToFetch: str
     throw error;
   }
 };
+
+// For backward compatibility
+export const fetchPopularityTrendData = fetchNameTrendData;

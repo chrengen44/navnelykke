@@ -4,13 +4,13 @@ import { checkRateLimit, incrementRequestCount } from '../rateLimiter';
 import { sanitizeInput } from '../sanitizer';
 import { validateTableName, ValidTableName } from '../tableValidator';
 
-// Define a base type for fetch results to avoid excessive type instantiation depth
-type FetchResult<T = unknown> = T[];
+// Use a simpler non-recursive type for the fetch results
+export type FetchResult<T = unknown> = Array<T>;
 
 /**
  * Fetches data from a table with optional filtering
  */
-export async function fetchData<T = Record<string, any>>(
+export async function fetchData<T>(
   table: ValidTableName,
   options: {
     columns?: string;
@@ -53,7 +53,7 @@ export async function fetchData<T = Record<string, any>>(
       throw new Error(`Error fetching data from ${table}: ${error.message}`);
     }
 
-    return (data || []) as unknown as FetchResult<T>;
+    return data || [];
   } catch (error) {
     console.error('Error in fetchData:', error);
     throw error;
@@ -63,7 +63,7 @@ export async function fetchData<T = Record<string, any>>(
 /**
  * Fetches a single record by ID
  */
-export async function fetchById<T = Record<string, any>>(
+export async function fetchById<T>(
   table: ValidTableName,
   id: number | string,
   columns: string = '*',
@@ -94,7 +94,7 @@ export async function fetchById<T = Record<string, any>>(
       throw error;
     }
 
-    return data as unknown as T;
+    return data as T;
   } catch (error) {
     console.error(`Error in fetchById for table ${table} with ID ${id}:`, error);
     return null;

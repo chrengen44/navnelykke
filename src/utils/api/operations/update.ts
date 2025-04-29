@@ -2,7 +2,11 @@
 import { supabase } from '@/integrations/supabase/client';
 import { validateTable, sanitizeData } from '../helpers';
 import { ValidTableName } from '../tableValidator';
+import { ApiResponse } from '../types';
 
+/**
+ * Creates a new record in the specified table
+ */
 export const createData = async <T,>(table: ValidTableName, data: T): Promise<T> => {
   try {
     validateTable(table);
@@ -18,7 +22,6 @@ export const createData = async <T,>(table: ValidTableName, data: T): Promise<T>
       throw new Error(`Error creating data in ${table}: ${error.message}`);
     }
 
-    // Break recursive type chain with type casting
     return result as unknown as T;
   } catch (error) {
     console.error('Error in createData:', error);
@@ -26,6 +29,9 @@ export const createData = async <T,>(table: ValidTableName, data: T): Promise<T>
   }
 };
 
+/**
+ * Updates a record in the specified table by ID
+ */
 export const updateData = async <T,>(
   table: ValidTableName,
   id: string | number,
@@ -46,7 +52,6 @@ export const updateData = async <T,>(
       throw new Error(`Error updating data in ${table}: ${error.message}`);
     }
 
-    // Break recursive type chain with type casting
     return result as unknown as T;
   } catch (error) {
     console.error('Error in updateData:', error);
@@ -54,20 +59,5 @@ export const updateData = async <T,>(
   }
 };
 
-export const deleteData = async (table: ValidTableName, id: string | number): Promise<void> => {
-  try {
-    validateTable(table);
-
-    const { error } = await supabase
-      .from(table)
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      throw new Error(`Error deleting data from ${table}: ${error.message}`);
-    }
-  } catch (error) {
-    console.error('Error in deleteData:', error);
-    throw error;
-  }
-};
+// Note: The deleteData function has been removed from this file to avoid duplication.
+// It now exists solely in operations/delete.ts and is re-exported from index.ts as deleteDataV2.

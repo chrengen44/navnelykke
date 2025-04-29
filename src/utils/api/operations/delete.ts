@@ -5,10 +5,13 @@ import { checkRateLimit, incrementRequestCount } from '../rateLimiter';
 import { sanitizeInput } from '../sanitizer';
 import { validateTableName, ValidTableName } from '../tableValidator';
 
+/**
+ * Deletes data from a table with improved error handling and validation
+ */
 export async function deleteData<T = Record<string, unknown>>(
   tableName: ValidTableName,
   query: { column: string; value: any },
-  endpoint = 'update'
+  endpoint = 'delete'
 ): Promise<ApiResponse<T>> {
   if (!checkRateLimit(endpoint)) {
     return { data: null, error: new Error("Rate limit exceeded") };
@@ -32,6 +35,7 @@ export async function deleteData<T = Record<string, unknown>>(
     
     // Handle error case
     if (result.error) {
+      console.error(`Error deleting data from ${tableName}:`, result.error);
       return { data: null, error: new Error(result.error.message) };
     }
     
@@ -40,6 +44,7 @@ export async function deleteData<T = Record<string, unknown>>(
       error: null 
     };
   } catch (err) {
+    console.error(`Error in deleteData for table ${tableName}:`, err);
     return { data: null, error: err instanceof Error ? err : new Error(String(err)) };
   }
 }

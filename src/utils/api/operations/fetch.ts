@@ -5,7 +5,7 @@ import { sanitizeInput } from '../sanitizer';
 import { validateTableName, ValidTableName } from '../tableValidator';
 
 // Define a simple flat type for fetch results
-export type FetchResult<T = unknown> = T[];
+export type FetchResult<T = any> = T[];
 
 /**
  * Fetches data from a table with optional filtering

@@ -15,6 +15,9 @@ export type ApiResponse<T = unknown> = {
  * Note: Extended from Error class to be compatible with PostgrestError
  */
 export class GenericStringError extends Error {
+  details?: string;
+  hint?: string;
+  code?: string;
   constructor(message: string) {
     super(message);
     this.name = 'GenericStringError';

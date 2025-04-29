@@ -7,7 +7,7 @@ import { ApiResponse } from '../types';
 /**
  * Creates a new record in the specified table
  */
-export const createData = async <T,>(table: ValidTableName, data: T): Promise<T> => {
+export const createData = async <T,>(table: ValidTableName, data: T): Promise<ApiResponse<T>> => {
   try {
     validateTable(table);
     const sanitizedData = sanitizeData(data);
@@ -19,13 +19,16 @@ export const createData = async <T,>(table: ValidTableName, data: T): Promise<T>
       .single();
 
     if (error) {
-      throw new Error(`Error creating data in ${table}: ${error.message}`);
+      return { data: null, error: error };
     }
 
-    return result as T;
+    return { data: result as T, error: null };
   } catch (error) {
     console.error('Error in createData:', error);
-    throw error;
+    return { 
+      data: null, 
+      error: error instanceof Error ? error : new Error('Unexpected error occurred')
+    };
   }
 };
 
@@ -36,7 +39,7 @@ export const updateData = async <T,>(
   table: ValidTableName,
   id: string | number,
   data: Partial<T>
-): Promise<T> => {
+): Promise<ApiResponse<T>> => {
   try {
     validateTable(table);
     const sanitizedData = sanitizeData(data);
@@ -49,12 +52,15 @@ export const updateData = async <T,>(
       .single();
 
     if (error) {
-      throw new Error(`Error updating data in ${table}: ${error.message}`);
+      return { data: null, error: error };
     }
 
-    return result as T;
+    return { data: result as T, error: null };
   } catch (error) {
     console.error('Error in updateData:', error);
-    throw error;
+    return { 
+      data: null, 
+      error: error instanceof Error ? error : new Error('Unexpected error occurred')
+    };
   }
 };

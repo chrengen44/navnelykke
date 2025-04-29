@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import type { PostgrestError } from "@supabase/supabase-js";
 import { checkRateLimit, incrementRequestCount } from '../rateLimiter';

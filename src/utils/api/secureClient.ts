@@ -61,10 +61,24 @@ export const secureClient = {
    */
   async update<T = any>(table: ValidTableName, id: string | number, data: Partial<T>): Promise<ApiResponse<T>> {
     try {
-      const result = await updateData<T>(table, id, data);
-      return { data: result, error: null };
+      return await updateData<T>(table, id, data);
     } catch (error) {
       console.error('Unexpected error in secureClient.update:', error);
+      return {
+        data: null,
+        error: error instanceof Error ? error : new Error('Unexpected error occurred')
+      };
+    }
+  },
+
+  /**
+   * Safely create data with proper error handling
+   */
+  async create<T = any>(table: ValidTableName, data: T): Promise<ApiResponse<T>> {
+    try {
+      return await createData<T>(table, data);
+    } catch (error) {
+      console.error('Unexpected error in secureClient.create:', error);
       return {
         data: null,
         error: error instanceof Error ? error : new Error('Unexpected error occurred')

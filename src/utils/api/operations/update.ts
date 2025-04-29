@@ -22,7 +22,7 @@ export const createData = async <T,>(table: ValidTableName, data: T): Promise<T>
       throw new Error(`Error creating data in ${table}: ${error.message}`);
     }
 
-    return result as unknown as T;
+    return result as T;
   } catch (error) {
     console.error('Error in createData:', error);
     throw error;
@@ -52,12 +52,9 @@ export const updateData = async <T,>(
       throw new Error(`Error updating data in ${table}: ${error.message}`);
     }
 
-    return result as unknown as T;
+    return result as T;
   } catch (error) {
     console.error('Error in updateData:', error);
     throw error;
   }
 };
-
-// Note: The deleteData function has been removed from this file to avoid duplication.
-// It now exists solely in operations/delete.ts and is re-exported from index.ts as deleteDataV2.

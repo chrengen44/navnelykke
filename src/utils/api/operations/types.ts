@@ -1,11 +1,12 @@
 
 import type { Database } from "@/integrations/supabase/types";
+import type { ValidTableName } from "../tableValidator";
 
 type Tables = Database["public"]["Tables"];
 export type TableNames = keyof Tables;
 
 export interface FetchOptions<T = any> {
-  table: TableNames;
+  table: ValidTableName;
   select?: string;
   limit?: number;
   order?: {
@@ -22,8 +23,4 @@ export interface FetchOptions<T = any> {
     table: string;
     foreignKey: string;
   }[];
-}
-
-export interface GenericStringError {
-  message: string;
 }

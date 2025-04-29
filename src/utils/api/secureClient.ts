@@ -2,13 +2,11 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { PostgrestError } from "@supabase/supabase-js";
 import { fetchData, fetchById } from "./operations/fetch";
-import { updateData } from "./operations/update";
+import { updateData, createData } from "./operations/update";
 import { deleteData } from "./operations/delete";
 import type { FetchOptions } from "./operations/types";
-import type { Database } from "@/integrations/supabase/types";
-
-type Tables = Database["public"]["Tables"];
-type TableNames = keyof Tables;
+import type { ApiResponse } from "./types";
+import type { ValidTableName } from "./tableValidator";
 
 /**
  * Secure client with built-in error handling and validation
@@ -17,7 +15,7 @@ export const secureClient = {
   /**
    * Safely fetch data with proper error handling
    */
-  async get<T = any>(options: FetchOptions<T>) {
+  async get<T = any>(options: FetchOptions<T>): Promise<ApiResponse<T>> {
     try {
       const result = await fetchData<T>(options);
       
@@ -31,7 +29,7 @@ export const secureClient = {
       console.error('Unexpected error in secureClient.get:', error);
       return { 
         data: null, 
-        error: { message: 'Unexpected error occurred' } as PostgrestError 
+        error: error instanceof Error ? error : new Error('Unexpected error occurred')
       };
     }
   },
@@ -39,7 +37,7 @@ export const secureClient = {
   /**
    * Safely fetch a single item by ID
    */
-  async getById<T = any>(table: TableNames, id: string | number) {
+  async getById<T = any>(table: ValidTableName, id: string | number): Promise<ApiResponse<T>> {
     try {
       const result = await fetchById<T>(table, id);
       
@@ -53,7 +51,7 @@ export const secureClient = {
       console.error('Unexpected error in secureClient.getById:', error);
       return { 
         data: null, 
-        error: { message: 'Unexpected error occurred' } as PostgrestError 
+        error: error instanceof Error ? error : new Error('Unexpected error occurred')
       };
     }
   },
@@ -61,7 +59,7 @@ export const secureClient = {
   /**
    * Safely update data with proper error handling
    */
-  async update<T = any>(table: TableNames, id: string | number, data: Partial<T>) {
+  async update<T = any>(table: ValidTableName, id: string | number, data: Partial<T>): Promise<ApiResponse<T>> {
     try {
       const result = await updateData<T>(table, id, data);
       return { data: result, error: null };
@@ -69,7 +67,7 @@ export const secureClient = {
       console.error('Unexpected error in secureClient.update:', error);
       return {
         data: null,
-        error: error instanceof Error ? error : { message: 'Unexpected error occurred' } as PostgrestError
+        error: error instanceof Error ? error : new Error('Unexpected error occurred')
       };
     }
   },
@@ -77,7 +75,7 @@ export const secureClient = {
   /**
    * Safely delete data with proper error handling
    */
-  async delete(table: TableNames, id: string | number) {
+  async delete(table: ValidTableName, id: string | number): Promise<{ success: boolean; error: Error | PostgrestError | null }> {
     try {
       const result = await deleteData(table, { column: 'id', value: id });
       
@@ -91,7 +89,7 @@ export const secureClient = {
       console.error('Unexpected error in secureClient.delete:', error);
       return {
         success: false,
-        error: error instanceof Error ? error : { message: 'Unexpected error occurred' } as PostgrestError
+        error: error instanceof Error ? error : new Error('Unexpected error occurred')
       };
     }
   }

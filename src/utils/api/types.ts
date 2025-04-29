@@ -1,19 +1,24 @@
 
 import type { ValidTableName } from './tableValidator';
+import type { PostgrestError } from '@supabase/supabase-js';
 
 /**
  * A unified response type for API operations
  */
 export type ApiResponse<T = unknown> = {
   data: T | null;
-  error: Error | null;
+  error: Error | PostgrestError | null;
 };
 
 /**
  * Generic error with string message
+ * Note: Extended from Error class to be compatible with PostgrestError
  */
-export interface GenericStringError {
-  message: string;
+export class GenericStringError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'GenericStringError';
+  }
 }
 
 /**

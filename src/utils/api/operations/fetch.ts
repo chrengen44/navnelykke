@@ -5,12 +5,7 @@ import { checkRateLimit, incrementRequestCount } from '../rateLimiter';
 import { sanitizeInput } from '../sanitizer';
 import type { FetchOptions } from "./types";
 import { validateTableName, type ValidTableName } from '../tableValidator';
-import { GenericStringError } from "../types";
-
-export interface ApiResponse<T> {
-  data: T | null;
-  error: PostgrestError | Error | null;
-}
+import { ApiResponse, GenericStringError } from "../types";
 
 /**
  * Fetch data based on options
@@ -103,13 +98,12 @@ export async function fetchData<T>(
       return { data: null, error: result.error };
     }
     
-    // Handle no data case with better typing
+    // Handle no data case
     if (!result.data || result.data.length === 0) {
-      const noDataError: GenericStringError = { message: "No data found" };
-      return { data: null as unknown as T, error: noDataError };
+      return { data: null, error: new GenericStringError("No data found") };
     }
     
-    return { data: result.data as unknown as T, error: null };
+    return { data: result.data as T, error: null };
     
   } catch (err) {
     return { 

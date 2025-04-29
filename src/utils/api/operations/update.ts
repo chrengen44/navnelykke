@@ -12,7 +12,6 @@ export const createData = async <T>(table: ValidTableName, data: T): Promise<Api
     validateTable(table);
     const sanitizedData = sanitizeData(data);
 
-    // Use type assertion to avoid excessive type instantiation
     const { data: responseData, error } = await supabase
       .from(table)
       .insert([sanitizedData])
@@ -23,8 +22,9 @@ export const createData = async <T>(table: ValidTableName, data: T): Promise<Api
     }
 
     // Handle the data safely
+    const result = responseData?.[0] || null;
     return { 
-      data: (responseData?.[0] as T) || null, 
+      data: result as T, 
       error: null 
     };
   } catch (error) {
@@ -48,7 +48,6 @@ export const updateData = async <T>(
     validateTable(table);
     const sanitizedData = sanitizeData(data);
 
-    // Use type assertion to avoid excessive type instantiation
     const { data: responseData, error } = await supabase
       .from(table)
       .update(sanitizedData)
@@ -60,8 +59,9 @@ export const updateData = async <T>(
     }
 
     // Handle the data safely
+    const result = responseData?.[0] || null;
     return { 
-      data: (responseData?.[0] as T) || null, 
+      data: result as T, 
       error: null 
     };
   } catch (error) {

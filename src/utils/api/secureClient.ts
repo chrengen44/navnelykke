@@ -15,7 +15,7 @@ export const secureClient = {
   /**
    * Safely fetch data with proper error handling
    */
-  async get<T = any>(options: FetchOptions<T>): Promise<ApiResponse<T>> {
+  async get<T = any>(options: FetchOptions): Promise<ApiResponse<T>> {
     try {
       const result = await fetchData<T>(options);
       

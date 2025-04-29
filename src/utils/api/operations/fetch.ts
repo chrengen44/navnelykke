@@ -108,7 +108,7 @@ export async function fetchData<T>(
     }
     
     // Execute the query
-    const { data, error } = await query as { data: T | null, error: PostgrestError | null };
+    const { data, error } = await query;
     
     if (error) {
       return { data: null, error };
@@ -124,7 +124,7 @@ export async function fetchData<T>(
       return { data: null, error: noDataError as unknown as PostgrestError };
     }
     
-    return { data, error: null };
+    return { data: data as T, error: null };
     
   } catch (err) {
     return { 

@@ -1,9 +1,6 @@
 
-import type { ValidTableName } from "../tableValidator";
-
-// Simplified interface to avoid excessive type instantiation
 export interface FetchOptions {
-  table: ValidTableName;
+  table: string;
   select?: string;
   limit?: number;
   order?: {

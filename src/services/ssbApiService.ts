@@ -18,16 +18,21 @@ interface SSBResponse {
   };
 }
 
-interface NameTrendData {
+export interface NameTrendData {
   year: string;
   [name: string]: number | string;
 }
 
 const CACHE_TTL = 3600000; // 1 hour cache TTL
-const API_TIMEOUT = 8000; // 8 seconds timeout
+const API_TIMEOUT = 12000; // 12 seconds timeout - extended for slow connections
+const MAX_RETRIES = 2;
+const RETRY_DELAY = 2000; // 2 seconds between retries
 
 // Simple cache implementation
 const trendDataCache = new Map<string, { data: NameTrendData[]; timestamp: number }>();
+
+// Helper function to delay execution
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const fetchNameTrendData = async (gender: 'girl' | 'boy', namesToFetch: string[]): Promise<NameTrendData[]> => {
   const cacheKey = `${gender}-${namesToFetch.join(',')}`;
@@ -39,21 +44,37 @@ export const fetchNameTrendData = async (gender: 'girl' | 'boy', namesToFetch: s
     return cachedData.data;
   }
   
-  try {
-    const data = await fetchSSBNameData(gender, namesToFetch);
-    trendDataCache.set(cacheKey, { data, timestamp: now });
-    return data;
-  } catch (error) {
-    console.error(`Error fetching ${gender} name trend data:`, error);
-    // Return appropriate fallback data based on gender
-    const fallbackData = getFallbackData(gender, namesToFetch);
-    
-    toast.error(`Kunne ikke hente ${gender === 'girl' ? 'jente' : 'gutte'}navnedata fra SSB. Viser reservedata.`, {
-      duration: 5000,
-    });
-    
-    return fallbackData;
+  // Retry logic
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      if (attempt > 0) {
+        console.log(`Retry attempt ${attempt} for ${gender} data`);
+        await delay(RETRY_DELAY);
+      }
+      
+      const data = await fetchSSBNameData(gender, namesToFetch);
+      trendDataCache.set(cacheKey, { data, timestamp: now });
+      return data;
+    } catch (error) {
+      console.error(`Error fetching ${gender} name trend data (attempt ${attempt + 1}/${MAX_RETRIES + 1}):`, error);
+      
+      if (attempt === MAX_RETRIES) {
+        // All retries failed, use fallback data
+        const fallbackData = getFallbackData(gender, namesToFetch);
+        
+        toast.error(`Kunne ikke hente ${gender === 'girl' ? 'jente' : 'gutte'}navnedata fra SSB. Viser reservedata.`, {
+          duration: 5000,
+          id: `ssb-error-${gender}`, // Prevents duplicate toasts
+        });
+        
+        return fallbackData;
+      }
+    }
   }
+  
+  // This should never be reached due to the retry logic above,
+  // but TypeScript needs a return statement
+  return getFallbackData(gender, namesToFetch);
 };
 
 export const fetchSSBNameData = async (gender: 'girl' | 'boy', namesToFetch: string[]): Promise<NameTrendData[]> => {
@@ -63,6 +84,7 @@ export const fetchSSBNameData = async (gender: 'girl' | 'boy', namesToFetch: str
   try {
     console.log('Fetching name data from SSB API for:', namesToFetch);
     
+    // Use CORS proxy or direct API call
     const response = await fetch('https://data.ssb.no/api/v0/no/table/10467', {
       method: 'POST',
       headers: {
@@ -106,6 +128,11 @@ export const fetchSSBNameData = async (gender: 'girl' | 'boy', namesToFetch: str
     }
     
     const result: SSBResponse = await response.json();
+    
+    // Validate response format
+    if (!result.dimension?.Tid?.category?.label || !result.dimension?.Fornavn?.category?.label || !result.value) {
+      throw new Error('Invalid response format from SSB API');
+    }
     
     const years = result.dimension.Tid.category.label;
     const names = result.dimension.Fornavn.category.label;

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { nameColors } from '@/components/name-trends/trendingNamesData';
 import { fetchPopularityTrendData } from '@/services/ssbApiService';
 import { toast } from 'sonner';
+import { getFallbackData } from '@/utils/nameTrendFallbackData';
 
 export interface NameTrendData {
   year: string;
@@ -55,7 +56,14 @@ export const usePopularityTrends = (gender: 'girl' | 'boy') => {
         }
         
         setError(`Kunne ikke hente navnedata fra SSB. Server utilgjengelig.`);
-        toast.error(`Kunne ikke hente trenddata for ${gender === 'girl' ? 'jente' : 'gutte'}navn.`);
+        
+        // Use fallback data when all retries fail
+        const fallbackData = getFallbackData(gender, nameKeys);
+        setData(fallbackData);
+        
+        toast.error(`Kunne ikke hente trenddata for ${gender === 'girl' ? 'jente' : 'gutte'}navn. Viser reservedata.`, {
+          id: `trend-error-${gender}`, // Prevents duplicate toasts
+        });
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -68,7 +76,7 @@ export const usePopularityTrends = (gender: 'girl' | 'boy') => {
     return () => {
       isMounted = false;
     };
-  }, [gender, nameKeys.join(','), retryCount]);
+  }, [gender, nameKeys, retryCount]);
 
   return {
     data,

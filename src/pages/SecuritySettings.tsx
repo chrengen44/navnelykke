@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
@@ -6,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
-import { secureApi } from "@/utils/api";
+import { secureClient } from "@/utils/api";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Shield, Trash2, AlertCircle } from "lucide-react";
 import {
@@ -52,9 +53,9 @@ export default function SecuritySettings() {
   const loadSettings = async () => {
     setLoadingSettings(true);
     try {
-      const { data, error } = await secureApi.fetch<PrivacySettings>(
-        "user_privacy_settings", 
+      const { data, error } = await secureClient.get<PrivacySettings[]>(
         {
+          table: "user_privacy_settings", 
           filters: [{ column: "user_id", operator: "eq", value: user?.id }]
         }
       );
@@ -84,11 +85,11 @@ export default function SecuritySettings() {
   const loadSessions = async () => {
     setLoadingSessions(true);
     try {
-      const { data, error } = await secureApi.fetch<Session>(
-        "user_sessions",
+      const { data, error } = await secureClient.get<Session[]>(
         {
+          table: "user_sessions",
           filters: [{ column: "user_id", operator: "eq", value: user?.id }],
-          orderBy: { column: "last_active", ascending: false }
+          order: { column: "last_active", ascending: false }
         }
       );
 
@@ -119,7 +120,7 @@ export default function SecuritySettings() {
       }
 
       const settings = { ...privacySettings, [key]: value };
-      const { error } = await secureApi.update<PrivacySettings>(
+      const { error } = await secureClient.update<PrivacySettings>(
         "user_privacy_settings", 
         user?.id as string,
         { [key]: value }
@@ -172,7 +173,7 @@ export default function SecuritySettings() {
   const handleSessionTermination = async (sessionId: string) => {
     setTerminatingSessionId(sessionId);
     try {
-      const { error } = await secureApi.delete(
+      const { success, error } = await secureClient.delete(
         "user_sessions", 
         sessionId
       );

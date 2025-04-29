@@ -4,8 +4,8 @@ import type { PostgrestError } from "@supabase/supabase-js";
 import { checkRateLimit, incrementRequestCount } from '../rateLimiter';
 import { sanitizeInput } from '../sanitizer';
 import type { FetchOptions } from "./types";
-import type { GenericStringError } from "../types";
 import { validateTableName, type ValidTableName } from '../tableValidator';
+import { GenericStringError } from "../types";
 
 export interface ApiResponse<T> {
   data: T | null;
@@ -123,7 +123,7 @@ export async function fetchData<T>(
  * Fetch a single record by ID
  */
 export async function fetchById<T>(
-  tableName: string,
+  tableName: ValidTableName,
   id: string | number,
   endpoint = 'fetch'
 ): Promise<ApiResponse<T>> {

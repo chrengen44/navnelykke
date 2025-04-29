@@ -10,6 +10,13 @@ export type ApiResponse<T = unknown> = {
 };
 
 /**
+ * Generic error with string message
+ */
+export interface GenericStringError {
+  message: string;
+}
+
+/**
  * Generic query options for fetching data
  */
 export type QueryOptions = {

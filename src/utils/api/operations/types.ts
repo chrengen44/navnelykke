@@ -1,34 +1,29 @@
 
-import { ValidTableName } from '../tableValidator';
+import type { Database } from "@/integrations/supabase/types";
 
-/**
- * Filter operator types for database queries
- */
-export type FilterOperator = 'eq' | 'neq' | 'gt' | 'lt' | 'gte' | 'lte' | 'like' | 'ilike' | 'in';
+type Tables = Database["public"]["Tables"];
+export type TableNames = keyof Tables;
 
-/**
- * Filter definition for database queries
- */
-export interface Filter {
-  column: string;
-  operator: FilterOperator;
-  value: any;
-}
-
-/**
- * Sort order configuration
- */
-export interface OrderBy {
-  column: string;
-  ascending: boolean;
-}
-
-/**
- * Options for fetch operations
- */
-export interface FetchOptions {
-  columns?: string;
-  filters?: Filter[];
-  orderBy?: OrderBy;
+export interface FetchOptions<T = any> {
+  table: TableNames;
+  select?: string;
   limit?: number;
+  order?: {
+    column: string;
+    ascending?: boolean;
+    nullsFirst?: boolean;
+  };
+  filters?: {
+    column: string;
+    operator: "eq" | "neq" | "gt" | "gte" | "lt" | "lte" | "like" | "ilike" | "is";
+    value: any;
+  }[];
+  relationships?: {
+    table: string;
+    foreignKey: string;
+  }[];
+}
+
+export interface GenericStringError {
+  message: string;
 }

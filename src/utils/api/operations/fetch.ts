@@ -3,9 +3,13 @@
 // by limiting the depth of type instantiation
 import { supabase } from "@/integrations/supabase/client";
 import type { PostgrestError } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
+
+type Tables = Database["public"]["Tables"];
+type TableNames = keyof Tables;
 
 interface FetchOptions<T = any> {
-  table: string;
+  table: TableNames;
   select?: string;
   limit?: number;
   order?: {
@@ -98,7 +102,7 @@ export async function fetchData<T = any>(
 }
 
 export async function fetchById<T = any>(
-  table: string, 
+  table: TableNames, 
   id: string | number,
   select: string = "*"
 ): Promise<{ data: T | null; error: PostgrestError | null }> {

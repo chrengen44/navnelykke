@@ -2,13 +2,14 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { BabyName } from "@/data/types";
-import { getPopularNames } from "@/data";
+import { fetchPopularNames } from "@/integrations/supabase/popular-names";
 import NameGrid from "@/components/NameGrid";
 import AdSpace from "@/components/AdSpace";
 import { GenderFilter } from "@/components/search/filters/GenderFilter";
 import { useStructuredData } from "@/hooks/useStructuredData";
 import { Layout } from "@/components/Layout";
 import StructuredData from "@/components/SEO/StructuredData";
+import { toast } from "sonner";
 
 const PopularNames = () => {
   const [names, setNames] = useState<BabyName[]>([]);
@@ -39,10 +40,11 @@ const PopularNames = () => {
         const genderParam = gender === "all" ? undefined : 
           (gender === "boy" || gender === "girl" || gender === "unisex" ? gender : undefined);
         
-        const fetchedNames = await getPopularNames(genderParam);
-        setNames(fetchedNames);
+        const fetchedNames = await fetchPopularNames(genderParam);
+        setNames(fetchedNames || []);
       } catch (error) {
         console.error("Error fetching popular names:", error);
+        toast.error("Could not load popular names");
         setNames([]);
       } finally {
         setLoading(false);

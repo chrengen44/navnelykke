@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { nameColors } from '@/components/name-trends/trendingNamesData';
 import { fetchPopularityTrendData } from '@/services/ssbApiService';
+import { toast } from 'sonner';
 
 export interface NameTrendData {
   year: string;
@@ -32,12 +33,13 @@ export const usePopularityTrends = (gender: 'girl' | 'boy') => {
         
         if (!isMounted) return;
         
-        setData(result);
+        setData(result || []);
       } catch (err) {
         if (!isMounted) return;
         
         console.error(`Error in usePopularityTrends for ${gender}:`, err);
         setError(`Kunne ikke hente navnedata fra SSB. Server utilgjengelig.`);
+        toast.error(`Kunne ikke hente trenddata for ${gender === 'girl' ? 'jente' : 'gutte'}navn.`);
       } finally {
         if (isMounted) {
           setLoading(false);

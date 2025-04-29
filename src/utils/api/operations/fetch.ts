@@ -4,10 +4,13 @@ import { checkRateLimit, incrementRequestCount } from '../rateLimiter';
 import { sanitizeInput } from '../sanitizer';
 import { validateTableName, ValidTableName } from '../tableValidator';
 
+// Define a base type for fetch results to avoid excessive type instantiation depth
+type FetchResult<T = unknown> = T[];
+
 /**
  * Fetches data from a table with optional filtering
  */
-export async function fetchData<T = Record<string, unknown>>(
+export async function fetchData<T = Record<string, any>>(
   table: ValidTableName,
   options: {
     columns?: string;
@@ -16,7 +19,7 @@ export async function fetchData<T = Record<string, unknown>>(
     orderBy?: { column: string; ascending: boolean };
   } = {},
   endpoint = 'fetch'
-): Promise<T[]> {
+): Promise<FetchResult<T>> {
   if (!checkRateLimit(endpoint)) {
     throw new Error("Rate limit exceeded");
   }
@@ -50,8 +53,7 @@ export async function fetchData<T = Record<string, unknown>>(
       throw new Error(`Error fetching data from ${table}: ${error.message}`);
     }
 
-    // Return the data as is without recursive casting
-    return (data || []) as unknown as T[];
+    return (data || []) as unknown as FetchResult<T>;
   } catch (error) {
     console.error('Error in fetchData:', error);
     throw error;
@@ -61,7 +63,7 @@ export async function fetchData<T = Record<string, unknown>>(
 /**
  * Fetches a single record by ID
  */
-export async function fetchById<T = Record<string, unknown>>(
+export async function fetchById<T = Record<string, any>>(
   table: ValidTableName,
   id: number | string,
   columns: string = '*',
@@ -92,7 +94,6 @@ export async function fetchById<T = Record<string, unknown>>(
       throw error;
     }
 
-    // Return the data as is without recursive casting
     return data as unknown as T;
   } catch (error) {
     console.error(`Error in fetchById for table ${table} with ID ${id}:`, error);

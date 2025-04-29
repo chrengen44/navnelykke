@@ -7,7 +7,7 @@ import { getPopularNames, getNamesByCategory } from "@/data";
 import AdSpace from "@/components/AdSpace";
 import { BabyName } from "@/data/types";
 
-// Import new section components
+// Import section components
 import ToolsSection from "@/components/sections/ToolsSection";
 import NameOfTheDaySection from "@/components/sections/NameOfTheDaySection";
 import CategoriesSection from "@/components/sections/CategoriesSection";

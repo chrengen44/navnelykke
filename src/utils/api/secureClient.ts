@@ -56,3 +56,6 @@ export const secureClient = {
     }
   }
 };
+
+// Export as default as well
+export default secureClient;

@@ -11,4 +11,4 @@ export * from './operations/update';
 export { deleteData as deleteDataV2 } from './operations/delete';
 export * from './helpers';
 export * from './useSecureData';
-export { default as secureApi } from './secureClient';
+export { secureClient as secureApi } from './secureClient';

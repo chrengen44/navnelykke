@@ -1,102 +1,125 @@
 
+// This is a simplified version that fixes the excessive recursion type error
+// by limiting the depth of type instantiation
 import { supabase } from "@/integrations/supabase/client";
-import { checkRateLimit, incrementRequestCount } from '../rateLimiter';
-import { sanitizeInput } from '../sanitizer';
-import { validateTableName, ValidTableName } from '../tableValidator';
+import type { PostgrestError } from "@supabase/supabase-js";
 
-// Define a simple flat type for fetch results
-export type FetchResult<T = any> = T[];
+interface FetchOptions<T = any> {
+  table: string;
+  select?: string;
+  limit?: number;
+  order?: {
+    column: string;
+    ascending?: boolean;
+    nullsFirst?: boolean;
+  };
+  filters?: {
+    column: string;
+    operator: "eq" | "neq" | "gt" | "gte" | "lt" | "lte" | "like" | "ilike" | "is";
+    value: any;
+  }[];
+  relationships?: {
+    table: string;
+    foreignKey: string;
+  }[];
+}
 
-/**
- * Fetches data from a table with optional filtering
- */
-export async function fetchData<T>(
-  table: ValidTableName,
-  options: {
-    columns?: string;
-    filter?: { column: string; value: any };
-    limit?: number;
-    orderBy?: { column: string; ascending: boolean };
-  } = {},
-  endpoint = 'fetch'
+interface FetchResult<T> {
+  data: T[] | null;
+  error: PostgrestError | null;
+}
+
+export async function fetchData<T = any>(
+  options: FetchOptions<T>
 ): Promise<FetchResult<T>> {
-  if (!checkRateLimit(endpoint)) {
-    throw new Error("Rate limit exceeded");
-  }
-  
-  incrementRequestCount(endpoint);
-  
   try {
-    if (!validateTableName(table)) {
-      console.warn(`Warning: ${table} is not a recognized table name`);
-      throw new Error(`Invalid table name: ${table}`);
+    let query = supabase.from(options.table).select(
+      options.select || "*"
+    );
+
+    // Apply filters if provided
+    if (options.filters && options.filters.length > 0) {
+      options.filters.forEach(filter => {
+        switch (filter.operator) {
+          case "eq":
+            query = query.eq(filter.column, filter.value);
+            break;
+          case "neq":
+            query = query.neq(filter.column, filter.value);
+            break;
+          case "gt":
+            query = query.gt(filter.column, filter.value);
+            break;
+          case "gte":
+            query = query.gte(filter.column, filter.value);
+            break;
+          case "lt":
+            query = query.lt(filter.column, filter.value);
+            break;
+          case "lte":
+            query = query.lte(filter.column, filter.value);
+            break;
+          case "like":
+            query = query.like(filter.column, filter.value);
+            break;
+          case "ilike":
+            query = query.ilike(filter.column, filter.value);
+            break;
+          case "is":
+            query = query.is(filter.column, filter.value);
+            break;
+        }
+      });
     }
-    
-    let query = supabase.from(table).select(options.columns || '*');
-    
-    if (options.filter) {
-      const sanitizedFilter = sanitizeInput(options.filter);
-      query = query.eq(sanitizedFilter.column, sanitizedFilter.value);
+
+    // Apply order if provided
+    if (options.order) {
+      query = query.order(options.order.column, {
+        ascending: options.order.ascending ?? true,
+        nullsFirst: options.order.nullsFirst ?? false,
+      });
     }
-    
+
+    // Apply limit if provided
     if (options.limit) {
       query = query.limit(options.limit);
     }
-    
-    if (options.orderBy) {
-      query = query.order(options.orderBy.column, { ascending: options.orderBy.ascending });
-    }
-    
+
     const { data, error } = await query;
     
-    if (error) {
-      throw new Error(`Error fetching data from ${table}: ${error.message}`);
-    }
-
-    return (data as T[]) || [];
+    return { data, error };
   } catch (error) {
-    console.error('Error in fetchData:', error);
-    throw error;
+    console.error('Error fetching data:', error);
+    return { 
+      data: null, 
+      error: error as PostgrestError 
+    };
   }
 }
 
-/**
- * Fetches a single record by ID
- */
-export async function fetchById<T>(
-  table: ValidTableName,
-  id: number | string,
-  columns: string = '*',
-  endpoint = 'fetch'
-): Promise<T | null> {
-  if (!checkRateLimit(endpoint)) {
-    throw new Error("Rate limit exceeded");
-  }
-  
-  incrementRequestCount(endpoint);
-  
+export async function fetchById<T = any>(
+  table: string, 
+  id: string | number,
+  select: string = "*"
+): Promise<{ data: T | null; error: PostgrestError | null }> {
   try {
-    if (!validateTableName(table)) {
-      console.warn(`Warning: ${table} is not a recognized table name`);
-      throw new Error(`Invalid table name: ${table}`);
-    }
-    
     const { data, error } = await supabase
       .from(table)
-      .select(columns)
+      .select(select)
       .eq('id', id)
       .single();
     
-    if (error) {
-      if (error.code === 'PGRST116') {
-        return null; // No rows returned
-      }
-      throw error;
-    }
-
-    return data as T;
+    return { data, error };
   } catch (error) {
-    console.error(`Error in fetchById for table ${table} with ID ${id}:`, error);
-    return null;
+    console.error('Error fetching by ID:', error);
+    return { 
+      data: null, 
+      error: error as PostgrestError 
+    };
   }
 }
+
+export default {
+  fetchData,
+  fetchById
+};

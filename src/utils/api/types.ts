@@ -11,30 +11,6 @@ export type ApiResponse<T = unknown> = {
 };
 
 /**
- * Generic error with string message
- * Note: Extended from Error class to be compatible with PostgrestError
- */
-export class GenericStringError extends Error {
-  details?: string;
-  hint?: string;
-  code?: string;
-  constructor(message: string) {
-    super(message);
-    this.name = 'GenericStringError';
-  }
-}
-
-/**
- * Generic query options for fetching data
- */
-export type QueryOptions = {
-  select?: string;
-  eq?: [string, any];
-  orderBy?: string;
-  ascending?: boolean;
-};
-
-/**
  * Define the Session interface for user sessions
  */
 export interface Session {

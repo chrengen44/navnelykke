@@ -1,10 +1,26 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import type { PostgrestError } from "@supabase/supabase-js";
 import { checkRateLimit, incrementRequestCount } from '../rateLimiter';
 import { sanitizeInput } from '../sanitizer';
 import type { FetchOptions } from "./types";
 import { validateTableName, type ValidTableName } from '../tableValidator';
-import { ApiResponse, GenericStringError } from "../types";
+import { ApiResponse } from "../types";
+
+/**
+ * Error class for handling generic string errors
+ */
+export class GenericStringError extends Error {
+  details?: string;
+  hint?: string;
+  code?: string;
+  name: string;
+  
+  constructor(message: string) {
+    super(message);
+    this.name = 'GenericStringError';
+  }
+}
 
 /**
  * Fetch data based on options
@@ -99,7 +115,8 @@ export async function fetchData<T>(
     
     // Handle no data case
     if (!result.data || result.data.length === 0) {
-      return { data: null, error: new GenericStringError("No data found") };
+      const error = new GenericStringError("No data found");
+      return { data: null, error: error as unknown as PostgrestError };
     }
     
     return { data: result.data as T, error: null };

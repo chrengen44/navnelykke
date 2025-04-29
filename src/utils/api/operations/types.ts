@@ -2,9 +2,7 @@
 import type { Database } from "@/integrations/supabase/types";
 import type { ValidTableName } from "../tableValidator";
 
-type Tables = Database["public"]["Tables"];
-export type TableNames = keyof Tables;
-
+// Use an interface instead of a type to avoid excessive type instantiation
 export interface FetchOptions<T = any> {
   table: ValidTableName;
   select?: string;
@@ -14,13 +12,13 @@ export interface FetchOptions<T = any> {
     ascending?: boolean;
     nullsFirst?: boolean;
   };
-  filters?: {
+  filters?: Array<{
     column: string;
     operator: "eq" | "neq" | "gt" | "gte" | "lt" | "lte" | "like" | "ilike" | "is";
     value: any;
-  }[];
-  relationships?: {
+  }>;
+  relationships?: Array<{
     table: string;
     foreignKey: string;
-  }[];
+  }>;
 }

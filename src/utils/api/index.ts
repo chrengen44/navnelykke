@@ -5,7 +5,7 @@ export * from './sanitizer';
 export * from './tableValidator';
 export * from './types';
 export * from './operations/types';
-export { fetchData, fetchById } from './operations/fetch';
+export { fetchData, fetchById, GenericStringError } from './operations/fetch';
 export { updateData, createData } from './operations/update';
 export { deleteData } from './operations/delete';
 export * from './helpers';

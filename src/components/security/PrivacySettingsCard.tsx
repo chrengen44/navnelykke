@@ -1,10 +1,10 @@
 
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import { secureClient } from "@/utils/api";
 import { PrivacySettings } from "@/utils/api/types";
+import { PrivacySettingItem } from "./PrivacySettingItem";
 
 interface PrivacySettingsCardProps {
   privacySettings: PrivacySettings;
@@ -58,47 +58,32 @@ export function PrivacySettingsCard({ privacySettings, setPrivacySettings }: Pri
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <div className="font-medium">Vis e-postadresse</div>
-            <div className="text-sm text-muted-foreground">
-              La andre brukere se din e-postadresse
-            </div>
-          </div>
-          <Switch
-            checked={privacySettings.show_email}
-            onCheckedChange={(checked) => updatePrivacySettings("show_email", checked)}
-            disabled={loadingSettings}
-          />
-        </div>
+        <PrivacySettingItem 
+          title="Vis e-postadresse"
+          description="La andre brukere se din e-postadresse"
+          settingKey="show_email"
+          isChecked={privacySettings.show_email}
+          isLoading={loadingSettings}
+          onToggle={updatePrivacySettings}
+        />
         
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <div className="font-medium">Vis fullt navn</div>
-            <div className="text-sm text-muted-foreground">
-              Vis ditt fulle navn til andre brukere
-            </div>
-          </div>
-          <Switch
-            checked={privacySettings.show_full_name}
-            onCheckedChange={(checked) => updatePrivacySettings("show_full_name", checked)}
-            disabled={loadingSettings}
-          />
-        </div>
+        <PrivacySettingItem 
+          title="Vis fullt navn"
+          description="Vis ditt fulle navn til andre brukere"
+          settingKey="show_full_name"
+          isChecked={privacySettings.show_full_name}
+          isLoading={loadingSettings}
+          onToggle={updatePrivacySettings}
+        />
         
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <div className="font-medium">Offentlige favoritter</div>
-            <div className="text-sm text-muted-foreground">
-              La andre se dine favoriserte navn
-            </div>
-          </div>
-          <Switch
-            checked={privacySettings.allow_public_favorites}
-            onCheckedChange={(checked) => updatePrivacySettings("allow_public_favorites", checked)}
-            disabled={loadingSettings}
-          />
-        </div>
+        <PrivacySettingItem 
+          title="Offentlige favoritter"
+          description="La andre se dine favoriserte navn"
+          settingKey="allow_public_favorites"
+          isChecked={privacySettings.allow_public_favorites}
+          isLoading={loadingSettings}
+          onToggle={updatePrivacySettings}
+        />
       </CardContent>
     </Card>
   );

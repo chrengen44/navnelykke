@@ -44,18 +44,19 @@ export const updateData = async <T,>(
     validateTable(table);
     const sanitizedData = sanitizeData(data);
 
-    const { data: result, error } = await supabase
+    // Use a more direct approach to avoid deep type instantiation
+    const response = await supabase
       .from(table)
       .update(sanitizedData)
       .eq('id', id)
       .select()
       .single();
 
-    if (error) {
-      return { data: null, error: error };
+    if (response.error) {
+      return { data: null, error: response.error };
     }
 
-    return { data: result as T, error: null };
+    return { data: response.data as T, error: null };
   } catch (error) {
     console.error('Error in updateData:', error);
     return { 

@@ -1,8 +1,7 @@
 
-import type { Database } from "@/integrations/supabase/types";
 import type { ValidTableName } from "../tableValidator";
 
-// Use an interface instead of a type to avoid excessive type instantiation
+// Use a simpler interface to avoid excessive type instantiation
 export interface FetchOptions<T = any> {
   table: ValidTableName;
   select?: string;

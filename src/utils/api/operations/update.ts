@@ -12,17 +12,21 @@ export const createData = async <T,>(table: ValidTableName, data: T): Promise<Ap
     validateTable(table);
     const sanitizedData = sanitizeData(data);
 
-    const { data: result, error } = await supabase
+    // Use explicit any to break type recursion
+    const response = await supabase
       .from(table)
       .insert([sanitizedData])
-      .select()
-      .single();
+      .select() as any;
 
-    if (error) {
-      return { data: null, error: error };
+    if (response.error) {
+      return { data: null, error: response.error };
     }
 
-    return { data: result as T, error: null };
+    // Handle the data safely
+    return { 
+      data: response.data?.[0] as T || null, 
+      error: null 
+    };
   } catch (error) {
     console.error('Error in createData:', error);
     return { 
@@ -44,19 +48,22 @@ export const updateData = async <T,>(
     validateTable(table);
     const sanitizedData = sanitizeData(data);
 
-    // Use a more direct approach to avoid deep type instantiation
+    // Use explicit any to break type recursion
     const response = await supabase
       .from(table)
       .update(sanitizedData)
       .eq('id', id)
-      .select()
-      .single();
+      .select() as any;
 
     if (response.error) {
       return { data: null, error: response.error };
     }
 
-    return { data: response.data as T, error: null };
+    // Handle the data safely
+    return { 
+      data: response.data?.[0] as T || null, 
+      error: null 
+    };
   } catch (error) {
     console.error('Error in updateData:', error);
     return { 

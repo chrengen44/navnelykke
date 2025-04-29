@@ -25,7 +25,7 @@ export class GenericStringError extends Error {
 /**
  * Fetch data based on options
  */
-export async function fetchData<T>(
+export async function fetchData<T = any>(
   options: FetchOptions,
   endpoint = 'fetch'
 ): Promise<ApiResponse<T>> {
@@ -107,7 +107,8 @@ export async function fetchData<T>(
       query = query.limit(options.limit);
     }
     
-    const result = await query;
+    // Execute the query with explicit any to break type recursion
+    const result = await query as any;
     
     if (result.error) {
       return { data: null, error: result.error };
@@ -116,6 +117,10 @@ export async function fetchData<T>(
     // Handle no data case
     if (!result.data || result.data.length === 0) {
       const error = new GenericStringError("No data found");
+      // Add missing properties to make it compatible with PostgrestError
+      error.code = "NOT_FOUND";
+      error.details = "No matching records found";
+      error.hint = "Try adjusting your search criteria";
       return { data: null, error: error as unknown as PostgrestError };
     }
     
@@ -132,7 +137,7 @@ export async function fetchData<T>(
 /**
  * Fetch a single record by ID
  */
-export async function fetchById<T>(
+export async function fetchById<T = any>(
   tableName: ValidTableName,
   id: string | number,
   endpoint = 'fetch'

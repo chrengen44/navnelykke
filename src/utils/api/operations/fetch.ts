@@ -4,8 +4,8 @@ import { checkRateLimit, incrementRequestCount } from '../rateLimiter';
 import { sanitizeInput } from '../sanitizer';
 import { validateTableName, ValidTableName } from '../tableValidator';
 
-// Use a simpler non-recursive type for the fetch results
-export type FetchResult<T = unknown> = Array<T>;
+// Define a simple flat type for fetch results
+export type FetchResult<T = unknown> = T[];
 
 /**
  * Fetches data from a table with optional filtering
@@ -53,7 +53,7 @@ export async function fetchData<T>(
       throw new Error(`Error fetching data from ${table}: ${error.message}`);
     }
 
-    return data || [];
+    return (data as T[]) || [];
   } catch (error) {
     console.error('Error in fetchData:', error);
     throw error;

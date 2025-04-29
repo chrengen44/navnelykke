@@ -19,10 +19,13 @@ const Index: React.FC = () => {
   const [popularGirlNames, setPopularGirlNames] = useState<BabyName[]>([]);
   const [vikingNames, setVikingNames] = useState<BabyName[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      setError(null);
+      
       try {
         // Use Promise.allSettled to handle partial failures
         const results = await Promise.allSettled([
@@ -31,28 +34,39 @@ const Index: React.FC = () => {
           getNamesByCategory("vikingnavn", 4)
         ]);
         
+        // Process boy names result
         if (results[0].status === 'fulfilled') {
-          setPopularBoyNames(results[0].value);
+          setPopularBoyNames(results[0].value || []);
         } else {
           console.error("Error fetching boy names:", results[0].reason);
           setPopularBoyNames([]);
         }
         
+        // Process girl names result
         if (results[1].status === 'fulfilled') {
-          setPopularGirlNames(results[1].value);
+          setPopularGirlNames(results[1].value || []);
         } else {
           console.error("Error fetching girl names:", results[1].reason);
           setPopularGirlNames([]);
         }
         
+        // Process viking names result
         if (results[2].status === 'fulfilled') {
-          setVikingNames(results[2].value);
+          setVikingNames(results[2].value || []);
         } else {
           console.error("Error fetching viking names:", results[2].reason);
           setVikingNames([]);
         }
+        
+        // Check if all promises were rejected
+        const allFailed = results.every(result => result.status === 'rejected');
+        if (allFailed) {
+          setError("Kunne ikke laste inn noen navn. Vennligst prøv igjen senere.");
+          toast.error("Kunne ikke laste inn noen navn. Vennligst prøv igjen senere.");
+        }
       } catch (error) {
         console.error("Error fetching data for homepage:", error);
+        setError("Noe gikk galt. Vennligst prøv igjen senere.");
         toast.error("Kunne ikke laste inn alle navn. Noen data kan mangle.");
       } finally {
         setLoading(false);
@@ -74,12 +88,26 @@ const Index: React.FC = () => {
         <AdSpace type="horizontal" />
       </div>
       
-      <FeaturedNamesSection
-        popularBoyNames={popularBoyNames}
-        popularGirlNames={popularGirlNames}
-        vikingNames={vikingNames}
-        loading={loading}
-      />
+      {error ? (
+        <div className="container mx-auto px-4 py-8 text-center">
+          <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+            <p className="text-red-700">{error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="mt-4 px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded-md transition-colors"
+            >
+              Last inn på nytt
+            </button>
+          </div>
+        </div>
+      ) : (
+        <FeaturedNamesSection
+          popularBoyNames={popularBoyNames}
+          popularGirlNames={popularGirlNames}
+          vikingNames={vikingNames}
+          loading={loading}
+        />
+      )}
       
       <NameTipsSection />
     </Layout>

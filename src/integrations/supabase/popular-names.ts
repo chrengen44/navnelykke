@@ -46,45 +46,57 @@ export const fetchPopularNames = async (
         .select('name_id, name_categories(name)')
         .in('name_id', nameIds);
 
-      if (mappingsError) throw mappingsError;
+      if (mappingsError) {
+        console.error('Error fetching name categories:', mappingsError);
+        // Continue with names without categories rather than failing completely
+        return names.map(formatNameWithoutCategories);
+      }
 
       return names.map(name => {
         const categories = mappings
           ?.filter(mapping => mapping.name_id === name.id)
-          .map(mapping => mapping.name_categories.name) || [];
+          .map(mapping => mapping.name_categories?.name || '')
+          .filter(Boolean) || [];
 
-        return {
-          id: name.id,
-          name: name.name,
-          gender: name.gender as 'boy' | 'girl' | 'unisex',
-          origin: name.origin,
-          meaning: name.meaning,
-          popularity: name.popularity,
-          length: name.length as 'short' | 'medium' | 'long',
-          categories: categories,
-          firstLetter: name.first_letter,
-          phonetic: name.phonetic || undefined,
-        };
+        return formatName(name, categories);
       });
     } catch (error) {
       // If category mapping fails, just return names without categories
       console.error('Error fetching name categories:', error);
-      return names.map(name => ({
-        id: name.id,
-        name: name.name,
-        gender: name.gender as 'boy' | 'girl' | 'unisex',
-        origin: name.origin,
-        meaning: name.meaning,
-        popularity: name.popularity,
-        length: name.length as 'short' | 'medium' | 'long',
-        categories: [],
-        firstLetter: name.first_letter,
-        phonetic: name.phonetic || undefined,
-      }));
+      return names.map(formatNameWithoutCategories);
     }
   } catch (error) {
     console.error('Error fetching popular names:', error);
     toast.error('Error loading names');
+    // Return empty array instead of throwing
     return [];
   }
 };
+
+// Helper function to format a name with categories
+const formatName = (name: any, categories: string[]): BabyName => ({
+  id: name.id,
+  name: name.name || '',
+  gender: name.gender as 'boy' | 'girl' | 'unisex',
+  origin: name.origin || '',
+  meaning: name.meaning || '',
+  popularity: name.popularity || 0,
+  length: name.length as 'short' | 'medium' | 'long',
+  categories: categories,
+  firstLetter: name.first_letter || name.name?.[0]?.toUpperCase() || '',
+  phonetic: name.phonetic || undefined,
+});
+
+// Helper function to format a name without categories
+const formatNameWithoutCategories = (name: any): BabyName => ({
+  id: name.id,
+  name: name.name || '',
+  gender: name.gender as 'boy' | 'girl' | 'unisex',
+  origin: name.origin || '',
+  meaning: name.meaning || '',
+  popularity: name.popularity || 0,
+  length: name.length as 'short' | 'medium' | 'long',
+  categories: [],
+  firstLetter: name.first_letter || name.name?.[0]?.toUpperCase() || '',
+  phonetic: name.phonetic || undefined,
+});

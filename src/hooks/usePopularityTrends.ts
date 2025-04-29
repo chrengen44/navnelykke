@@ -13,6 +13,7 @@ export const usePopularityTrends = (gender: 'girl' | 'boy') => {
   const [data, setData] = useState<NameTrendData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   
   const colors = gender === 'girl' ? nameColors.girl : nameColors.boy;
   const nameKeys = gender === 'girl' 
@@ -21,6 +22,7 @@ export const usePopularityTrends = (gender: 'girl' | 'boy') => {
 
   useEffect(() => {
     let isMounted = true;
+    const MAX_RETRIES = 2;
     
     const fetchData = async () => {
       if (!isMounted) return;
@@ -33,11 +35,25 @@ export const usePopularityTrends = (gender: 'girl' | 'boy') => {
         
         if (!isMounted) return;
         
-        setData(result || []);
+        // Check if we got valid data
+        if (!result || !Array.isArray(result) || result.length === 0) {
+          throw new Error("No trend data received");
+        }
+        
+        setData(result);
+        setRetryCount(0); // Reset retry count on success
       } catch (err) {
         if (!isMounted) return;
         
         console.error(`Error in usePopularityTrends for ${gender}:`, err);
+        
+        // Check if we should retry
+        if (retryCount < MAX_RETRIES) {
+          console.log(`Retrying fetch for ${gender} (attempt ${retryCount + 1})`);
+          setRetryCount(prev => prev + 1);
+          return; // Will trigger another fetch due to retryCount change
+        }
+        
         setError(`Kunne ikke hente navnedata fra SSB. Server utilgjengelig.`);
         toast.error(`Kunne ikke hente trenddata for ${gender === 'girl' ? 'jente' : 'gutte'}navn.`);
       } finally {
@@ -52,13 +68,14 @@ export const usePopularityTrends = (gender: 'girl' | 'boy') => {
     return () => {
       isMounted = false;
     };
-  }, [gender, nameKeys.join(',')]);
+  }, [gender, nameKeys.join(','), retryCount]);
 
   return {
     data,
     loading,
     error,
     colors,
-    nameKeys
+    nameKeys,
+    retry: () => setRetryCount(prev => prev + 1)
   };
 };

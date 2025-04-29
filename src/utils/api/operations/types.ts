@@ -1,8 +1,8 @@
 
 import type { ValidTableName } from "../tableValidator";
 
-// Use a simpler interface to avoid excessive type instantiation
-export interface FetchOptions<T = any> {
+// Simplified interface to avoid excessive type instantiation
+export interface FetchOptions {
   table: ValidTableName;
   select?: string;
   limit?: number;

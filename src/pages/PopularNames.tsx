@@ -14,6 +14,7 @@ import { toast } from "sonner";
 const PopularNames = () => {
   const [names, setNames] = useState<BabyName[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const { getArticleData, getBreadcrumbData, getListData } = useStructuredData();
 
@@ -35,6 +36,8 @@ const PopularNames = () => {
   useEffect(() => {
     const fetchNames = async () => {
       setLoading(true);
+      setError(null);
+      
       try {
         // Convert string to expected gender type or undefined for "all"
         const genderParam = gender === "all" ? undefined : 
@@ -44,6 +47,7 @@ const PopularNames = () => {
         setNames(fetchedNames || []);
       } catch (error) {
         console.error("Error fetching popular names:", error);
+        setError("Kunne ikke laste populære navn. Vennligst prøv igjen senere.");
         toast.error("Could not load popular names");
         setNames([]);
       } finally {
@@ -138,6 +142,18 @@ const PopularNames = () => {
               {loading ? (
                 <div className="flex justify-center py-12">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
+                </div>
+              ) : error ? (
+                <div className="text-center py-12">
+                  <div className="bg-red-50 p-4 rounded-lg border border-red-200 inline-block">
+                    <p className="text-red-700">{error}</p>
+                    <button 
+                      onClick={() => window.location.reload()} 
+                      className="mt-4 px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded-md transition-colors"
+                    >
+                      Last inn på nytt
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <NameGrid

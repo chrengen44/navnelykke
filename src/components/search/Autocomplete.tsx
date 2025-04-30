@@ -90,24 +90,23 @@ export function AutocompleteSearch({
     setOpen(false);
   };
 
-  // Focus handling
+  // Focus handling - FIX: Don't open dropdown on initial click
   const handleInputClick = () => {
-    // Only open dropdown if there's already text and suggestions
-    if (inputValue.length >= 2 && suggestions.length > 0) {
-      setOpen(true);
-    }
+    // Do not open dropdown on initial click, only when typing
+    // We leave this function to maintain the API but remove the auto-opening behavior
   };
 
   // Close popover when clicking outside
   const handlePopoverOpenChange = (isOpen: boolean) => {
-    setOpen(isOpen);
-    // Refocus on input when closing popover
-    if (!isOpen && inputRef.current) {
-      // Small timeout to ensure DOM is updated
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 10);
+    // Only allow opening dropdown through typing, not by initial click
+    if (isOpen && inputValue.length < 2) {
+      return; // Prevent opening if there's not enough text
     }
+    
+    setOpen(isOpen);
+    
+    // Fix: Don't refocus automatically when closing popover
+    // This was causing the focus loss issue
   };
 
   return (

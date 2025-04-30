@@ -6,7 +6,6 @@ import Footer from "@/components/Footer";
 import { searchNames } from "@/integrations/supabase/search";
 import { BabyName } from "@/data/types";
 import AdvancedNameFilters from "@/components/search/AdvancedNameFilters";
-import { AdvancedFilterState } from "@/components/search/filters/types";
 import AdSpace from "@/components/AdSpace";
 import SearchResults from "@/components/search/SearchResults";
 import SearchTips from "@/components/search/SearchTips";
@@ -22,6 +21,14 @@ const Search = () => {
   const [loading, setLoading] = useState(true);
   const [useFuzzySearch, setUseFuzzySearch] = useState(true);
   
+  // Simple function to handle search
+  const handleSearch = (newQuery: string) => {
+    if (newQuery.trim()) {
+      setSearchParams({ q: newQuery });
+    }
+  };
+  
+  // Effect to fetch search results when query changes
   useEffect(() => {
     const fetchSearchResults = async () => {
       if (!query) {
@@ -54,13 +61,8 @@ const Search = () => {
     fetchSearchResults();
   }, [query, useFuzzySearch]);
   
-  const handleSearch = (newQuery: string) => {
-    if (newQuery.trim()) {
-      setSearchParams({ q: newQuery });
-    }
-  };
-  
-  const handleFilter = (filters: AdvancedFilterState) => {
+  // Handle filter changes
+  const handleFilter = (filters: any) => {
     let filtered = [...allResults];
     
     // Filter by gender
@@ -108,7 +110,7 @@ const Search = () => {
     if (filters.excludeLetters) {
       const excludedLetters = filters.excludeLetters
         .split(",")
-        .map(letter => letter.trim().toLowerCase());
+        .map((letter: string) => letter.trim().toLowerCase());
       filtered = filtered.filter(name => 
         !excludedLetters.includes(name.firstLetter.toLowerCase())
       );

@@ -49,7 +49,7 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Decorative elements - positioning adjusted to prevent overflow */}
+      {/* Decorative elements */}
       <div className="absolute bottom-0 left-0 w-24 h-24 bg-babyyellow rounded-full opacity-40 transform translate-x-1/4 translate-y-1/2"></div>
       <div className="absolute top-0 right-0 w-32 h-32 bg-babypeach rounded-full opacity-40 transform translate-x-0 -translate-y-1/2"></div>
       <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-babypurple rounded-full opacity-30 transform -translate-y-1/2"></div>

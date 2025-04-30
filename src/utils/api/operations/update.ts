@@ -4,7 +4,7 @@ import { validateTable, sanitizeData } from '../helpers';
 import { ValidTableName } from '../tableValidator';
 import { ApiResponse } from '../types';
 
-// Define explicit types to avoid excessive type instantiation
+// Simplify data types to avoid excessive type instantiation
 export interface ApiData {
   id?: string | number;
   [key: string]: any;
@@ -15,7 +15,7 @@ export interface ApiData {
  */
 export const createData = async <T>(
   table: ValidTableName, 
-  data: T
+  data: any
 ): Promise<ApiResponse<T>> => {
   try {
     validateTable(table);
@@ -51,7 +51,7 @@ export const createData = async <T>(
 export const updateData = async <T>(
   table: ValidTableName,
   id: string | number,
-  data: Partial<T>
+  data: any
 ): Promise<ApiResponse<T>> => {
   try {
     validateTable(table);

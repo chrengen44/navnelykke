@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { getAutocompleteSuggestions } from "@/integrations/supabase/search";
@@ -29,82 +29,70 @@ export function AutocompleteSearch({
   // Refs
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   
-  // Fetch suggestions when input changes
-  const fetchSuggestions = useCallback(async (query: string) => {
-    if (query.length < 2) {
-      setSuggestions([]);
-      setIsOpen(false);
-      return;
-    }
-    
-    setLoading(true);
-    try {
-      const results = await getAutocompleteSuggestions(query);
-      setSuggestions(results);
-      setIsOpen(results.length > 0);
-    } catch (error) {
-      console.error("Error fetching suggestions:", error);
-      setSuggestions([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-  
-  // Create debounced version of fetch function
+  // Create a debounced version of the fetch function
   const debouncedFetch = useRef(
-    debounce((query: string) => fetchSuggestions(query), 300)
+    debounce((query: string) => {
+      if (query.length < 2) {
+        setSuggestions([]);
+        setIsOpen(false);
+        return;
+      }
+      
+      setLoading(true);
+      getAutocompleteSuggestions(query)
+        .then(results => {
+          setSuggestions(results);
+          setIsOpen(results.length > 0);
+        })
+        .catch(error => {
+          console.error("Error fetching suggestions:", error);
+          setSuggestions([]);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }, 300)
   ).current;
   
-  // Update suggestions when input value changes
-  useEffect(() => {
-    debouncedFetch(inputValue);
-    
-    // Reset active index when input changes
-    setActiveIndex(-1);
-    
-    // Only open dropdown after typing at least 2 characters and if we have results
-    if (inputValue.length < 2) {
-      setIsOpen(false);
-    }
-  }, [inputValue, debouncedFetch]);
-  
-  // Handle selection of a suggestion
-  const handleSelectSuggestion = useCallback((value: string) => {
+  // Handle input change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
     setInputValue(value);
-    onSearch(value);
-    setIsOpen(false);
-    inputRef.current?.focus();
-  }, [onSearch]);
-  
+    debouncedFetch(value);
+  };
+
   // Handle form submission
-  const handleSubmit = useCallback((e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputValue.trim()) {
       onSearch(inputValue);
       setIsOpen(false);
     }
-  }, [inputValue, onSearch]);
+  };
 
-  // Handle input change
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-  }, []);
+  // Select a suggestion
+  const handleSelectSuggestion = (suggestion: string) => {
+    setInputValue(suggestion);
+    onSearch(suggestion);
+    setIsOpen(false);
+  };
 
-  // Handle keydown events for keyboard navigation
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+  // Handle keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!isOpen) return;
     
     switch (e.key) {
       case 'ArrowDown':
-        e.preventDefault(); // Prevent cursor from moving
+        e.preventDefault();
         setActiveIndex(prev => 
           prev < suggestions.length - 1 ? prev + 1 : prev
         );
         break;
         
       case 'ArrowUp':
-        e.preventDefault(); // Prevent cursor from moving
+        e.preventDefault();
         setActiveIndex(prev => (prev > 0 ? prev - 1 : prev));
         break;
         
@@ -118,11 +106,8 @@ export function AutocompleteSearch({
       case 'Escape':
         setIsOpen(false);
         break;
-        
-      default:
-        break;
     }
-  }, [isOpen, activeIndex, suggestions, handleSelectSuggestion]);
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -143,7 +128,7 @@ export function AutocompleteSearch({
 
   return (
     <div ref={containerRef} className={cn("relative", className)}>
-      <form onSubmit={handleSubmit}>
+      <form ref={formRef} onSubmit={handleSubmit}>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           
@@ -154,20 +139,14 @@ export function AutocompleteSearch({
             value={inputValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            onFocus={() => {
-              if (inputValue.length >= 2 && suggestions.length > 0) {
-                setIsOpen(true);
-              }
-            }}
             className={cn("pl-10", inputClassName)}
             autoComplete="off"
           />
         </div>
       </form>
       
-      {/* Custom dropdown instead of Popover */}
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200 max-h-[300px] overflow-y-auto">
+        <div className="absolute z-50 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200 max-h-60 overflow-y-auto">
           {loading ? (
             <div className="p-2 text-center text-gray-500">Søker...</div>
           ) : suggestions.length === 0 ? (

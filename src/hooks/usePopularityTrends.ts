@@ -61,9 +61,13 @@ export const usePopularityTrends = (gender: 'girl' | 'boy') => {
         const fallbackData = getFallbackData(gender, nameKeys);
         setData(fallbackData);
         
-        toast.error(`Kunne ikke hente trenddata for ${gender === 'girl' ? 'jente' : 'gutte'}navn. Viser reservedata.`, {
-          id: `trend-error-${gender}`, // Prevents duplicate toasts
-        });
+        try {
+          toast.error(`Kunne ikke hente trenddata for ${gender === 'girl' ? 'jente' : 'gutte'}navn. Viser reservedata.`, {
+            id: `trend-error-${gender}`, // Prevents duplicate toasts
+          });
+        } catch (toastError) {
+          console.error("Toast error:", toastError);
+        }
       } finally {
         if (isMounted) {
           setLoading(false);

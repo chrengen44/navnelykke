@@ -25,7 +25,11 @@ export const fetchPopularNames = async (
 
     if (namesError) {
       console.error('Error fetching baby names:', namesError);
-      toast.error('Could not fetch popular names');
+      try {
+        toast.error('Kunne ikke hente populære navn');
+      } catch (toastError) {
+        console.error('Toast error:', toastError);
+      }
       return [];
     }
 
@@ -67,7 +71,11 @@ export const fetchPopularNames = async (
     }
   } catch (error) {
     console.error('Error fetching popular names:', error);
-    toast.error('Error loading names');
+    try {
+      toast.error('Kunne ikke laste inn navn');
+    } catch (toastError) {
+      console.error('Toast error:', toastError);
+    }
     // Return empty array instead of throwing
     return [];
   }

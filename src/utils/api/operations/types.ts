@@ -18,3 +18,6 @@ export interface FetchOptions {
     foreignKey: string;
   }>;
 }
+
+// Add explicit types to avoid deep instantiation
+export type ApiData = Record<string, any>;

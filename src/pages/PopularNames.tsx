@@ -48,7 +48,12 @@ const PopularNames = () => {
       } catch (error) {
         console.error("Error fetching popular names:", error);
         setError("Kunne ikke laste populære navn. Vennligst prøv igjen senere.");
-        toast.error("Could not load popular names");
+        // Use toast.error safely without arguments instead of potentially causing issues
+        try {
+          toast.error("Kunne ikke laste populære navn");
+        } catch (toastError) {
+          console.error("Toast error:", toastError);
+        }
         setNames([]);
       } finally {
         setLoading(false);

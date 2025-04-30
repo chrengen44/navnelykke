@@ -3,11 +3,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { validateTable, sanitizeData } from '../helpers';
 import { ValidTableName } from '../tableValidator';
 import { ApiResponse } from '../types';
+import { ApiData } from './types';
 
 /**
  * Creates a new record in the specified table
  */
-export const createData = async <T>(table: ValidTableName, data: T): Promise<ApiResponse<T>> => {
+export const createData = async <T extends ApiData>(table: ValidTableName, data: T): Promise<ApiResponse<T>> => {
   try {
     validateTable(table);
     const sanitizedData = sanitizeData(data);
@@ -39,7 +40,7 @@ export const createData = async <T>(table: ValidTableName, data: T): Promise<Api
 /**
  * Updates a record in the specified table by ID
  */
-export const updateData = async <T>(
+export const updateData = async <T extends ApiData>(
   table: ValidTableName,
   id: string | number,
   data: Partial<T>

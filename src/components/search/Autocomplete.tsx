@@ -68,16 +68,20 @@ export function AutocompleteSearch({
     const value = e.target.value;
     setInputValue(value);
     
-    // Open popover when typing
-    if (value.length > 1) {
+    // Only open popover after typing at least 2 characters
+    if (value.length >= 2) {
       setOpen(true);
+    } else {
+      setOpen(false);
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch(inputValue);
-    setOpen(false);
+    if (inputValue.trim()) {
+      onSearch(inputValue);
+      setOpen(false);
+    }
   };
 
   const handleSuggestionSelect = (value: string) => {
@@ -86,9 +90,29 @@ export function AutocompleteSearch({
     setOpen(false);
   };
 
+  // Focus handling
+  const handleInputClick = () => {
+    // Only open dropdown if there's already text and suggestions
+    if (inputValue.length >= 2 && suggestions.length > 0) {
+      setOpen(true);
+    }
+  };
+
+  // Close popover when clicking outside
+  const handlePopoverOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    // Refocus on input when closing popover
+    if (!isOpen && inputRef.current) {
+      // Small timeout to ensure DOM is updated
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 10);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className={cn("relative", className)}>
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={handlePopoverOpenChange}>
         <PopoverTrigger asChild>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -98,14 +122,15 @@ export function AutocompleteSearch({
               placeholder={placeholder}
               value={inputValue}
               onChange={handleInputChange}
+              onClick={handleInputClick}
               className={cn("pl-10", inputClassName)}
-              onClick={() => inputValue.length > 1 && setOpen(true)}
             />
           </div>
         </PopoverTrigger>
         <PopoverContent 
           className="p-0 w-[var(--radix-popover-trigger-width)] max-h-[300px] overflow-y-auto" 
           align="start"
+          sideOffset={5}
         >
           <Command>
             <CommandList>

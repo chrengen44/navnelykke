@@ -3,7 +3,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { validateTable, sanitizeData } from '../helpers';
 import { ValidTableName } from '../tableValidator';
 import { ApiResponse } from '../types';
-import { ApiData } from './types';
+
+// Define explicit types to avoid excessive type instantiation
+export interface ApiData {
+  id?: string | number;
+  [key: string]: any;
+}
 
 /**
  * Creates a new record in the specified table
@@ -25,7 +30,7 @@ export const createData = async <T extends ApiData>(table: ValidTableName, data:
     // Handle the data safely
     const result = responseData?.[0] || null;
     return { 
-      data: result as unknown as T, 
+      data: result as T, 
       error: null 
     };
   } catch (error) {
@@ -62,7 +67,7 @@ export const updateData = async <T extends ApiData>(
     // Handle the data safely
     const result = responseData?.[0] || null;
     return { 
-      data: result as unknown as T, 
+      data: result as T, 
       error: null 
     };
   } catch (error) {

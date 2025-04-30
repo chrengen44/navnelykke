@@ -88,25 +88,33 @@ export function AutocompleteSearch({
     setInputValue(value);
     onSearch(value);
     setOpen(false);
+    // Refocus the input field after selection
+    inputRef.current?.focus();
   };
 
-  // Focus handling - FIX: Don't open dropdown on initial click
+  // Don't open dropdown on initial click, only when typing
   const handleInputClick = () => {
-    // Do not open dropdown on initial click, only when typing
-    // We leave this function to maintain the API but remove the auto-opening behavior
+    // We leave this function intentionally empty to maintain the API
+    // The dropdown should only open based on character count, not on click
   };
 
-  // Close popover when clicking outside
+  // Handle popover opening/closing without losing focus
   const handlePopoverOpenChange = (isOpen: boolean) => {
-    // Only allow opening dropdown through typing, not by initial click
+    // Only allow opening dropdown if there's enough text
     if (isOpen && inputValue.length < 2) {
       return; // Prevent opening if there's not enough text
     }
     
     setOpen(isOpen);
     
-    // Fix: Don't refocus automatically when closing popover
-    // This was causing the focus loss issue
+    // Critical fix: When popover closes, restore focus to input with a small delay
+    // This ensures focus remains in the input field throughout the search process
+    if (!isOpen && inputRef.current) {
+      // Use requestAnimationFrame to ensure the DOM has updated first
+      requestAnimationFrame(() => {
+        inputRef.current?.focus();
+      });
+    }
   };
 
   return (
@@ -123,13 +131,26 @@ export function AutocompleteSearch({
               onChange={handleInputChange}
               onClick={handleInputClick}
               className={cn("pl-10", inputClassName)}
+              // Enhanced to maintain focus during popover interactions
+              onFocus={() => {
+                // Only open if there's already enough text
+                if (inputValue.length >= 2) {
+                  setOpen(true);
+                }
+              }}
             />
           </div>
         </PopoverTrigger>
         <PopoverContent 
-          className="p-0 w-[var(--radix-popover-trigger-width)] max-h-[300px] overflow-y-auto" 
+          className="p-0 w-[var(--radix-popover-trigger-width)] max-h-[300px] overflow-y-auto bg-white" 
           align="start"
           sideOffset={5}
+          onInteractOutside={(e) => {
+            // Prevent closing the popover when interacting outside but not on search input
+            if (inputRef.current && !inputRef.current.contains(e.target as Node)) {
+              setOpen(false);
+            }
+          }}
         >
           <Command>
             <CommandList>

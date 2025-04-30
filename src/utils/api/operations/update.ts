@@ -13,14 +13,17 @@ export interface ApiData {
 /**
  * Creates a new record in the specified table
  */
-export const createData = async <T extends ApiData>(table: ValidTableName, data: T): Promise<ApiResponse<T>> => {
+export const createData = async <T extends Record<string, any>>(
+  table: ValidTableName, 
+  data: T
+): Promise<ApiResponse<T>> => {
   try {
     validateTable(table);
     const sanitizedData = sanitizeData(data);
 
     const { data: responseData, error } = await supabase
       .from(table)
-      .insert([sanitizedData])
+      .insert(sanitizedData)
       .select();
 
     if (error) {
@@ -45,7 +48,7 @@ export const createData = async <T extends ApiData>(table: ValidTableName, data:
 /**
  * Updates a record in the specified table by ID
  */
-export const updateData = async <T extends ApiData>(
+export const updateData = async <T extends Record<string, any>>(
   table: ValidTableName,
   id: string | number,
   data: Partial<T>

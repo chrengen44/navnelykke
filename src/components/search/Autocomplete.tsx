@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Input } from "@/components/ui/input";
 import { 
@@ -37,6 +36,7 @@ export function AutocompleteSearch({
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const preserveFocusRef = useRef(false);
 
   const fetchSuggestions = async (query: string) => {
     if (query.length < 2) {
@@ -81,6 +81,8 @@ export function AutocompleteSearch({
     if (inputValue.trim()) {
       onSearch(inputValue);
       setOpen(false);
+      // Focus must remain in the input field
+      preserveFocusRef.current = true;
     }
   };
 
@@ -88,38 +90,32 @@ export function AutocompleteSearch({
     setInputValue(value);
     onSearch(value);
     setOpen(false);
-    // Refocus the input field after selection
-    inputRef.current?.focus();
-  };
-
-  // Don't open dropdown on initial click, only when typing
-  const handleInputClick = () => {
-    // We leave this function intentionally empty to maintain the API
-    // The dropdown should only open based on character count, not on click
-  };
-
-  // Handle popover opening/closing without losing focus
-  const handlePopoverOpenChange = (isOpen: boolean) => {
-    // Only allow opening dropdown if there's enough text
-    if (isOpen && inputValue.length < 2) {
-      return; // Prevent opening if there's not enough text
-    }
-    
-    setOpen(isOpen);
-    
-    // Critical fix: When popover closes, restore focus to input with a small delay
-    // This ensures focus remains in the input field throughout the search process
-    if (!isOpen && inputRef.current) {
-      // Use requestAnimationFrame to ensure the DOM has updated first
-      requestAnimationFrame(() => {
-        inputRef.current?.focus();
-      });
-    }
+    // Critical: Set flag to preserve focus after selection
+    preserveFocusRef.current = true;
   };
 
   return (
     <form onSubmit={handleSubmit} className={cn("relative", className)}>
-      <Popover open={open} onOpenChange={handlePopoverOpenChange}>
+      <Popover 
+        open={open} 
+        onOpenChange={(isOpen) => {
+          // Only allow opening if we have enough text
+          if (isOpen && inputValue.length < 2) return;
+          
+          setOpen(isOpen);
+          
+          // If closing popover and we've set the preserve focus flag
+          if (!isOpen && preserveFocusRef.current) {
+            // Reset flag
+            preserveFocusRef.current = false;
+            
+            // Ensure input gets focus on next tick after React updates
+            setTimeout(() => {
+              inputRef.current?.focus();
+            }, 0);
+          }
+        }}
+      >
         <PopoverTrigger asChild>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -129,15 +125,7 @@ export function AutocompleteSearch({
               placeholder={placeholder}
               value={inputValue}
               onChange={handleInputChange}
-              onClick={handleInputClick}
               className={cn("pl-10", inputClassName)}
-              // Enhanced to maintain focus during popover interactions
-              onFocus={() => {
-                // Only open if there's already enough text
-                if (inputValue.length >= 2) {
-                  setOpen(true);
-                }
-              }}
             />
           </div>
         </PopoverTrigger>
@@ -145,10 +133,21 @@ export function AutocompleteSearch({
           className="p-0 w-[var(--radix-popover-trigger-width)] max-h-[300px] overflow-y-auto bg-white" 
           align="start"
           sideOffset={5}
+          onEscapeKeyDown={() => {
+            // When pressing escape, we want to keep focus in the input
+            preserveFocusRef.current = true;
+          }}
+          onPointerDownOutside={(e) => {
+            // Don't close if clicking on the input
+            if (inputRef.current && inputRef.current.contains(e.target as Node)) {
+              e.preventDefault();
+            }
+          }}
           onInteractOutside={(e) => {
-            // Prevent closing the popover when interacting outside but not on search input
+            // If clicking outside but not on the input, allow closing
             if (inputRef.current && !inputRef.current.contains(e.target as Node)) {
-              setOpen(false);
+              // But we don't need to force focus in this case since user clicked elsewhere
+              preserveFocusRef.current = false;
             }
           }}
         >

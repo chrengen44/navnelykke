@@ -30,7 +30,7 @@ export const createData = async <T extends ApiData>(table: ValidTableName, data:
     // Handle the data safely
     const result = responseData?.[0] || null;
     return { 
-      data: result as T, 
+      data: result as unknown as T, 
       error: null 
     };
   } catch (error) {
@@ -67,7 +67,7 @@ export const updateData = async <T extends ApiData>(
     // Handle the data safely
     const result = responseData?.[0] || null;
     return { 
-      data: result as T, 
+      data: result as unknown as T, 
       error: null 
     };
   } catch (error) {

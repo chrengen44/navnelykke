@@ -15,7 +15,7 @@ export interface ApiData {
  */
 export const createData = async <T>(
   table: ValidTableName, 
-  data: any
+  data: Record<string, any>
 ): Promise<ApiResponse<T>> => {
   try {
     validateTable(table);
@@ -51,7 +51,7 @@ export const createData = async <T>(
 export const updateData = async <T>(
   table: ValidTableName,
   id: string | number,
-  data: any
+  data: Record<string, any>
 ): Promise<ApiResponse<T>> => {
   try {
     validateTable(table);

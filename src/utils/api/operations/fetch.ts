@@ -59,39 +59,30 @@ export async function fetchData<T>(
         const safeColumn = sanitizeInput(column);
         let safeValue = sanitizeInput(value);
         
-        switch (operator) {
-          case 'eq':
-            query = query.eq(safeColumn, safeValue);
-            break;
-          case 'neq':
-            query = query.neq(safeColumn, safeValue);
-            break;
-          case 'gt':
-            query = query.gt(safeColumn, safeValue);
-            break;
-          case 'gte':
-            query = query.gte(safeColumn, safeValue);
-            break;
-          case 'lt':
-            query = query.lt(safeColumn, safeValue);
-            break;
-          case 'lte':
-            query = query.lte(safeColumn, safeValue);
-            break;
-          case 'like':
-            query = query.like(safeColumn, `%${safeValue}%`);
-            break;
-          case 'ilike':
-            query = query.ilike(safeColumn, `%${safeValue}%`);
-            break;
-          case 'is':
-            query = query.is(safeColumn, safeValue);
-            break;
-          default:
-            return { 
-              data: null, 
-              error: new Error(`Unsupported operator: ${operator}`)
-            };
+        // Use simple switch cases without complex chaining
+        if (operator === 'eq') {
+          query = query.eq(safeColumn, safeValue);
+        } else if (operator === 'neq') {
+          query = query.neq(safeColumn, safeValue);
+        } else if (operator === 'gt') {
+          query = query.gt(safeColumn, safeValue);
+        } else if (operator === 'gte') {
+          query = query.gte(safeColumn, safeValue);
+        } else if (operator === 'lt') {
+          query = query.lt(safeColumn, safeValue);
+        } else if (operator === 'lte') {
+          query = query.lte(safeColumn, safeValue);
+        } else if (operator === 'like') {
+          query = query.like(safeColumn, `%${safeValue}%`);
+        } else if (operator === 'ilike') {
+          query = query.ilike(safeColumn, `%${safeValue}%`);
+        } else if (operator === 'is') {
+          query = query.is(safeColumn, safeValue);
+        } else {
+          return { 
+            data: null, 
+            error: new Error(`Unsupported operator: ${operator}`)
+          };
         }
       }
     }

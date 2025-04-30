@@ -29,11 +29,10 @@ export function AutocompleteSearch({
   // Refs
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
   
   // Create a debounced version of the fetch function
   const debouncedFetch = useRef(
-    debounce((query: string) => {
+    debounce(async (query: string) => {
       if (query.length < 2) {
         setSuggestions([]);
         setIsOpen(false);
@@ -41,18 +40,16 @@ export function AutocompleteSearch({
       }
       
       setLoading(true);
-      getAutocompleteSuggestions(query)
-        .then(results => {
-          setSuggestions(results);
-          setIsOpen(results.length > 0);
-        })
-        .catch(error => {
-          console.error("Error fetching suggestions:", error);
-          setSuggestions([]);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+      try {
+        const results = await getAutocompleteSuggestions(query);
+        setSuggestions(results);
+        setIsOpen(results.length > 0);
+      } catch (error) {
+        console.error("Error fetching suggestions:", error);
+        setSuggestions([]);
+      } finally {
+        setLoading(false);
+      }
     }, 300)
   ).current;
   
@@ -60,7 +57,12 @@ export function AutocompleteSearch({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputValue(value);
-    debouncedFetch(value);
+    if (value.length >= 1) {
+      debouncedFetch(value);
+    } else {
+      setSuggestions([]);
+      setIsOpen(false);
+    }
   };
 
   // Handle form submission
@@ -75,13 +77,19 @@ export function AutocompleteSearch({
   // Select a suggestion
   const handleSelectSuggestion = (suggestion: string) => {
     setInputValue(suggestion);
-    onSearch(suggestion);
     setIsOpen(false);
+    onSearch(suggestion);
+    // Focus back on input after selection
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
   };
 
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      return;
+    }
     
     switch (e.key) {
       case 'ArrowDown':
@@ -93,7 +101,7 @@ export function AutocompleteSearch({
         
       case 'ArrowUp':
         e.preventDefault();
-        setActiveIndex(prev => (prev > 0 ? prev - 1 : prev));
+        setActiveIndex(prev => (prev > 0 ? prev - 1 : 0));
         break;
         
       case 'Enter':
@@ -104,6 +112,7 @@ export function AutocompleteSearch({
         break;
         
       case 'Escape':
+        e.preventDefault();
         setIsOpen(false);
         break;
     }
@@ -128,7 +137,7 @@ export function AutocompleteSearch({
 
   return (
     <div ref={containerRef} className={cn("relative", className)}>
-      <form ref={formRef} onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           

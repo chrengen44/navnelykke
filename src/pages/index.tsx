@@ -27,40 +27,37 @@ const HomePage: React.FC = () => {
       setError(null);
       
       try {
-        // Use Promise.allSettled to handle partial failures
-        const results = await Promise.allSettled([
-          getPopularNames("boy", 4),
-          getPopularNames("girl", 4),
-          getNamesByCategory("vikingnavn", 4)
+        const popularBoysPromise = getPopularNames("boy", 4)
+          .catch(err => {
+            console.error("Error fetching boy names:", err);
+            return [];
+          });
+          
+        const popularGirlsPromise = getPopularNames("girl", 4)
+          .catch(err => {
+            console.error("Error fetching girl names:", err);
+            return [];
+          });
+          
+        const vikingNamesPromise = getNamesByCategory("vikingnavn", 4)
+          .catch(err => {
+            console.error("Error fetching viking names:", err);
+            return [];
+          });
+        
+        // Fetch data in parallel with safer error handling
+        const [boyNames, girlNames, vikingNamesList] = await Promise.all([
+          popularBoysPromise,
+          popularGirlsPromise,
+          vikingNamesPromise
         ]);
         
-        // Process boy names result
-        if (results[0].status === 'fulfilled') {
-          setPopularBoyNames(results[0].value || []);
-        } else {
-          console.error("Error fetching boy names:", results[0].reason);
-          setPopularBoyNames([]);
-        }
+        setPopularBoyNames(boyNames || []);
+        setPopularGirlNames(girlNames || []);
+        setVikingNames(vikingNamesList || []);
         
-        // Process girl names result
-        if (results[1].status === 'fulfilled') {
-          setPopularGirlNames(results[1].value || []);
-        } else {
-          console.error("Error fetching girl names:", results[1].reason);
-          setPopularGirlNames([]);
-        }
-        
-        // Process viking names result
-        if (results[2].status === 'fulfilled') {
-          setVikingNames(results[2].value || []);
-        } else {
-          console.error("Error fetching viking names:", results[2].reason);
-          setVikingNames([]);
-        }
-        
-        // Check if all promises were rejected
-        const allFailed = results.every(result => result.status === 'rejected');
-        if (allFailed) {
+        // Check if any data was fetched
+        if (!boyNames?.length && !girlNames?.length && !vikingNamesList?.length) {
           setError("Kunne ikke laste inn noen navn. Vennligst prøv igjen senere.");
           toast.error("Kunne ikke laste inn noen navn. Vennligst prøv igjen senere.");
         }

@@ -13,7 +13,7 @@ export interface ApiData {
 /**
  * Creates a new record in the specified table
  */
-export const createData = async <T extends Record<string, any>>(
+export const createData = async <T extends object>(
   table: ValidTableName, 
   data: T
 ): Promise<ApiResponse<T>> => {
@@ -33,7 +33,7 @@ export const createData = async <T extends Record<string, any>>(
     // Handle the data safely
     const result = responseData?.[0] || null;
     return { 
-      data: result as unknown as T, 
+      data: result as T, 
       error: null 
     };
   } catch (error) {
@@ -48,7 +48,7 @@ export const createData = async <T extends Record<string, any>>(
 /**
  * Updates a record in the specified table by ID
  */
-export const updateData = async <T extends Record<string, any>>(
+export const updateData = async <T extends object>(
   table: ValidTableName,
   id: string | number,
   data: Partial<T>
@@ -70,7 +70,7 @@ export const updateData = async <T extends Record<string, any>>(
     // Handle the data safely
     const result = responseData?.[0] || null;
     return { 
-      data: result as unknown as T, 
+      data: result as T, 
       error: null 
     };
   } catch (error) {

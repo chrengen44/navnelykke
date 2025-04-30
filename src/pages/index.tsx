@@ -62,20 +62,12 @@ const Index: React.FC = () => {
         const allFailed = results.every(result => result.status === 'rejected');
         if (allFailed) {
           setError("Kunne ikke laste inn noen navn. Vennligst prøv igjen senere.");
-          try {
-            toast.error("Kunne ikke laste inn noen navn. Vennligst prøv igjen senere.");
-          } catch (toastError) {
-            console.error("Toast error:", toastError);
-          }
+          toast.error("Kunne ikke laste inn noen navn. Vennligst prøv igjen senere.");
         }
       } catch (error) {
         console.error("Error fetching data for homepage:", error);
         setError("Noe gikk galt. Vennligst prøv igjen senere.");
-        try {
-          toast.error("Kunne ikke laste inn alle navn. Noen data kan mangle.");
-        } catch (toastError) {
-          console.error("Toast error:", toastError);
-        }
+        toast.error("Kunne ikke laste inn alle navn. Noen data kan mangle.");
       } finally {
         setLoading(false);
       }

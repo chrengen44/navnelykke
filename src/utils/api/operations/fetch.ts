@@ -124,7 +124,7 @@ export async function fetchData<T>(
       return { data: null, error: noDataError as unknown as PostgrestError };
     }
     
-    return { data: data as T, error: null };
+    return { data: data as unknown as T, error: null };
     
   } catch (err) {
     return { 

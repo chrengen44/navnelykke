@@ -1,4 +1,3 @@
-
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
@@ -12,7 +11,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "@/hooks/useAuth";
 
 // Lazy-loaded components for code splitting
-const Index = lazy(() => import("@/pages/Index"));
+const Index = lazy(() => import("@/pages/index"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 const Categories = lazy(() => import("@/pages/Categories"));
 const Category = lazy(() => import("@/pages/Category"));

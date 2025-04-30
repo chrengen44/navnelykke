@@ -12,7 +12,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "@/hooks/useAuth";
 
 // Lazy-loaded components for code splitting
-const Index = lazy(() => import("@/pages/index"));
+const HomePage = lazy(() => import("@/pages/index"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 const Categories = lazy(() => import("@/pages/Categories"));
 const Category = lazy(() => import("@/pages/Category"));
@@ -75,7 +75,7 @@ export default function AppRouter() {
             <BrowserRouter>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
-                  <Route path="/" element={<Index />} />
+                  <Route path="/" element={<HomePage />} />
                   <Route path="/navn/:id" element={<NameDetail />} />
                   <Route path="/populære-navn" element={<PopularNames />} />
                   <Route path="/navnetrender" element={<NameTrends />} />

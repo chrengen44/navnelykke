@@ -14,7 +14,7 @@ import CategoriesSection from "@/components/sections/CategoriesSection";
 import FeaturedNamesSection from "@/components/sections/FeaturedNamesSection";
 import NameTipsSection from "@/components/sections/NameTipsSection";
 
-const Index: React.FC = () => {
+const HomePage: React.FC = () => {
   const [popularBoyNames, setPopularBoyNames] = useState<BabyName[]>([]);
   const [popularGirlNames, setPopularGirlNames] = useState<BabyName[]>([]);
   const [vikingNames, setVikingNames] = useState<BabyName[]>([]);
@@ -114,4 +114,4 @@ const Index: React.FC = () => {
   );
 };
 
-export default Index;
+export default HomePage;

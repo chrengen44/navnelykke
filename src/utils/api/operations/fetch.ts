@@ -125,7 +125,7 @@ export async function fetchData<T>(
     }
     
     return { 
-      data: data as T, 
+      data: data as unknown as T, 
       error: null 
     };
     

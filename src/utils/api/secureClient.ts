@@ -15,7 +15,7 @@ export const secureClient = {
   /**
    * Safely fetch data with proper error handling
    */
-  async get<T = any>(options: FetchOptions): Promise<ApiResponse<T>> {
+  async get<T>(options: FetchOptions): Promise<ApiResponse<T>> {
     try {
       const result = await fetchData<T>(options);
       
@@ -37,7 +37,7 @@ export const secureClient = {
   /**
    * Safely fetch a single item by ID
    */
-  async getById<T = any>(table: ValidTableName, id: string | number): Promise<ApiResponse<T>> {
+  async getById<T>(table: ValidTableName, id: string | number): Promise<ApiResponse<T>> {
     try {
       const result = await fetchById<T>(table, id);
       
@@ -59,7 +59,7 @@ export const secureClient = {
   /**
    * Safely update data with proper error handling
    */
-  async update<T = any>(table: ValidTableName, id: string | number, data: Partial<T>): Promise<ApiResponse<T>> {
+  async update<T>(table: ValidTableName, id: string | number, data: Partial<T>): Promise<ApiResponse<T>> {
     try {
       return await updateData<T>(table, id, data);
     } catch (error) {
@@ -74,7 +74,7 @@ export const secureClient = {
   /**
    * Safely create data with proper error handling
    */
-  async create<T = any>(table: ValidTableName, data: T): Promise<ApiResponse<T>> {
+  async create<T>(table: ValidTableName, data: T): Promise<ApiResponse<T>> {
     try {
       return await createData<T>(table, data);
     } catch (error) {

@@ -25,7 +25,7 @@ export class GenericStringError extends Error {
 /**
  * Fetch data based on options
  */
-export async function fetchData<T = object>(
+export async function fetchData<T>(
   options: FetchOptions,
   endpoint = 'fetch'
 ): Promise<ApiResponse<T>> {
@@ -140,7 +140,7 @@ export async function fetchData<T = object>(
 /**
  * Fetch a single record by ID
  */
-export async function fetchById<T = object>(
+export async function fetchById<T>(
   tableName: ValidTableName,
   id: string | number,
   endpoint = 'fetch'

@@ -13,7 +13,7 @@ export interface ApiData {
 /**
  * Creates a new record in the specified table
  */
-export const createData = async <T extends object>(
+export const createData = async <T>(
   table: ValidTableName, 
   data: T
 ): Promise<ApiResponse<T>> => {
@@ -48,7 +48,7 @@ export const createData = async <T extends object>(
 /**
  * Updates a record in the specified table by ID
  */
-export const updateData = async <T extends object>(
+export const updateData = async <T>(
   table: ValidTableName,
   id: string | number,
   data: Partial<T>

@@ -4,18 +4,15 @@ import { validateTable, sanitizeData } from '../helpers';
 import { ValidTableName } from '../tableValidator';
 import { ApiResponse } from '../types';
 
-// Simplify data types to avoid excessive type instantiation
-export interface ApiData {
-  id?: string | number;
-  [key: string]: any;
-}
+// Simple record type without excessive nesting
+export type ApiRecord = Record<string, any>;
 
 /**
  * Creates a new record in the specified table
  */
 export const createData = async <T>(
   table: ValidTableName, 
-  data: Record<string, any>
+  data: ApiRecord
 ): Promise<ApiResponse<T>> => {
   try {
     validateTable(table);
@@ -51,7 +48,7 @@ export const createData = async <T>(
 export const updateData = async <T>(
   table: ValidTableName,
   id: string | number,
-  data: Record<string, any>
+  data: ApiRecord
 ): Promise<ApiResponse<T>> => {
   try {
     validateTable(table);

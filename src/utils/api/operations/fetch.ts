@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import type { PostgrestError } from "@supabase/supabase-js";
 import { checkRateLimit, incrementRequestCount } from '../rateLimiter';
 import { sanitizeInput } from '../sanitizer';
-import type { FetchOptions } from "./types";
 import { validateTableName, type ValidTableName } from '../tableValidator';
 import { ApiResponse } from "../types";
 
@@ -20,6 +19,27 @@ export class GenericStringError extends Error {
     super(message);
     this.name = 'GenericStringError';
   }
+}
+
+// Define stricter types for filter operations
+export type FilterOperator = 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'like' | 'ilike' | 'is';
+
+export interface Filter {
+  column: string;
+  operator: FilterOperator;
+  value: string | number | boolean | null;
+}
+
+export interface FetchOptions {
+  table: string;
+  select?: string;
+  filters?: Filter[];
+  order?: {
+    column: string;
+    ascending?: boolean;
+    nullsFirst?: boolean;
+  };
+  limit?: number;
 }
 
 /**

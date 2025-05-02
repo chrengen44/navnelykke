@@ -13,6 +13,7 @@ import NameOfTheDaySection from "@/components/sections/NameOfTheDaySection";
 import CategoriesSection from "@/components/sections/CategoriesSection";
 import FeaturedNamesSection from "@/components/sections/FeaturedNamesSection";
 import NameTipsSection from "@/components/sections/NameTipsSection";
+import { FavoritesProvider } from "@/contexts/FavoritesContext";
 
 const HomePage: React.FC = () => {
   const [popularBoyNames, setPopularBoyNames] = useState<BabyName[]>([]);
@@ -74,40 +75,42 @@ const HomePage: React.FC = () => {
   }, []);
   
   return (
-    <Layout>
-      <Hero />
-      <ToolsSection />
-      <NameOfTheDaySection />
-      <CategoriesSection />
-      
-      {/* Ad Space */}
-      <div className="container mx-auto px-4 py-4">
-        <AdSpace type="horizontal" />
-      </div>
-      
-      {error ? (
-        <div className="container mx-auto px-4 py-8 text-center">
-          <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-            <p className="text-red-700">{error}</p>
-            <button 
-              onClick={() => window.location.reload()} 
-              className="mt-4 px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded-md transition-colors"
-            >
-              Last inn på nytt
-            </button>
-          </div>
+    <FavoritesProvider>
+      <Layout>
+        <Hero />
+        <ToolsSection />
+        <NameOfTheDaySection />
+        <CategoriesSection />
+        
+        {/* Ad Space */}
+        <div className="container mx-auto px-4 py-4">
+          <AdSpace type="horizontal" />
         </div>
-      ) : (
-        <FeaturedNamesSection
-          popularBoyNames={popularBoyNames}
-          popularGirlNames={popularGirlNames}
-          vikingNames={vikingNames}
-          loading={loading}
-        />
-      )}
-      
-      <NameTipsSection />
-    </Layout>
+        
+        {error ? (
+          <div className="container mx-auto px-4 py-8 text-center">
+            <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+              <p className="text-red-700">{error}</p>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="mt-4 px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded-md transition-colors"
+              >
+                Last inn på nytt
+              </button>
+            </div>
+          </div>
+        ) : (
+          <FeaturedNamesSection
+            popularBoyNames={popularBoyNames}
+            popularGirlNames={popularGirlNames}
+            vikingNames={vikingNames}
+            loading={loading}
+          />
+        )}
+        
+        <NameTipsSection />
+      </Layout>
+    </FavoritesProvider>
   );
 };
 

@@ -2,14 +2,27 @@
 import { Button } from "@/components/ui/button";
 import { Baby } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { AutocompleteSearch } from "@/components/search/Autocomplete";
+import { useRef, useState } from "react";
+import { Command, CommandInput } from "@/components/ui/command";
+import { toast } from "sonner";
 
 const Hero = () => {
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSearch = (query: string) => {
-    if (query.trim()) {
-      navigate(`/søk?q=${encodeURIComponent(query)}`);
+  const handleSearch = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+    
+    if (searchQuery?.trim()) {
+      try {
+        navigate(`/søk?q=${encodeURIComponent(searchQuery)}`);
+      } catch (error) {
+        console.error("Navigation error:", error);
+        toast.error("Kunne ikke navigere til søkeresultater");
+      }
     }
   };
 
@@ -28,15 +41,22 @@ const Hero = () => {
           </p>
 
           <div className="max-w-md mx-auto mb-8">
-            <AutocompleteSearch 
-              onSearch={handleSearch} 
-              inputClassName="h-12 text-lg bg-white/90 backdrop-blur-sm border border-gray-200 shadow-sm"
-            />
+            <form onSubmit={handleSearch}>
+              <Command className="rounded-lg border shadow-md bg-white/95">
+                <CommandInput
+                  placeholder="Søk etter navn..."
+                  ref={searchInputRef}
+                  value={searchQuery}
+                  onValueChange={setSearchQuery}
+                  className="h-12 text-lg"
+                />
+              </Command>
+            </form>
           </div>
 
           <div className="flex justify-center gap-4 flex-wrap">
             <Button variant="outline" size="lg" asChild>
-              <a href="/populaere" className="bg-white/80 backdrop-blur-sm">
+              <a href="/populære-navn" className="bg-white/80 backdrop-blur-sm">
                 Populære navn
               </a>
             </Button>

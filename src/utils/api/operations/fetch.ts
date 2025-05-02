@@ -77,7 +77,7 @@ export async function fetchData<T>(
         
         // Sanitize the column and value
         const safeColumn = sanitizeInput(column);
-        let safeValue = sanitizeInput(value);
+        let safeValue = typeof value === 'string' ? sanitizeInput(value) : value;
         
         // Use simple switch cases without complex chaining
         if (operator === 'eq') {
@@ -93,9 +93,9 @@ export async function fetchData<T>(
         } else if (operator === 'lte') {
           query = query.lte(safeColumn, safeValue);
         } else if (operator === 'like') {
-          query = query.like(safeColumn, `%${safeValue}%`);
+          query = query.like(safeColumn, `%${String(safeValue)}%`);
         } else if (operator === 'ilike') {
-          query = query.ilike(safeColumn, `%${safeValue}%`);
+          query = query.ilike(safeColumn, `%${String(safeValue)}%`);
         } else if (operator === 'is') {
           query = query.is(safeColumn, safeValue);
         } else {

@@ -12,6 +12,12 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 const NameTrends = () => {
   const [gender, setGender] = useState<'girl' | 'boy'>('girl');
   
+  const handleGenderChange = (value: string | undefined) => {
+    if (value && (value === 'girl' || value === 'boy')) {
+      setGender(value);
+    }
+  };
+  
   return (
     <Layout>
       <main className="container mx-auto px-4 py-12">
@@ -48,7 +54,7 @@ const NameTrends = () => {
                 
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-lg font-medium">Velg kjønn</h3>
-                  <ToggleGroup type="single" value={gender} onValueChange={(value) => value && setGender(value as 'girl' | 'boy')}>
+                  <ToggleGroup type="single" value={gender} onValueChange={handleGenderChange}>
                     <ToggleGroupItem value="girl" aria-label="Jentenavn">
                       Jentenavn
                     </ToggleGroupItem>

@@ -4,7 +4,7 @@ import { validateTable, sanitizeData } from '../helpers';
 import { ValidTableName } from '../tableValidator';
 import { ApiResponse } from '../types';
 
-// Simple record type without excessive nesting
+// Simple record type that doesn't cause infinite recursion
 export type ApiRecord = Record<string, any>;
 
 /**

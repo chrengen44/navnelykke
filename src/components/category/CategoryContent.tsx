@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdvancedNameFilters from "@/components/search/AdvancedNameFilters";
 import NameGrid from "@/components/NameGrid";
 import AdSpace from "@/components/AdSpace";
@@ -13,12 +13,13 @@ interface CategoryContentProps {
 }
 
 const CategoryContent = ({ initialNames, loading, onFilter }: CategoryContentProps) => {
+  // Use state to track filtered names
   const [filteredNames, setFilteredNames] = useState<BabyName[]>(initialNames);
   
-  // Update the filteredNames when initialNames changes
-  useState(() => {
+  // Update filtered names when initialNames changes
+  useEffect(() => {
     setFilteredNames(initialNames);
-  });
+  }, [initialNames]);
   
   const handleFilter = (filters: AdvancedFilterState) => {
     onFilter(filters);

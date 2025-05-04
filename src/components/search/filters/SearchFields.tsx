@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FilterChangeHandler } from "./types";
@@ -9,8 +10,11 @@ interface SearchFieldsProps extends FilterChangeHandler {
 }
 
 export function SearchFields({ onFilterChange, showSearch = true }: SearchFieldsProps) {
+  const [search, setSearch] = useState("");
+
   // Handle search input change
   const handleSearchChange = (value: string) => {
+    setSearch(value);
     onFilterChange("search", value);
   };
 
@@ -19,10 +23,14 @@ export function SearchFields({ onFilterChange, showSearch = true }: SearchFields
       {showSearch && (
         <div className="space-y-2">
           <Label>Søk</Label>
-          <AutocompleteSearch
-            onSearch={handleSearchChange}
-            placeholder="Søk etter navn, betydning eller opprinnelse..."
-          />
+          {/* Use the Input component as fallback if Autocomplete fails */}
+          <div className="relative">
+            <AutocompleteSearch
+              onSearch={handleSearchChange}
+              placeholder="Søk etter navn, betydning eller opprinnelse..."
+              initialValue={search}
+            />
+          </div>
         </div>
       )}
 

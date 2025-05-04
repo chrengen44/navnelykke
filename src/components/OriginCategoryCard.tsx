@@ -9,7 +9,8 @@ interface OriginCategoryCardProps {
 }
 
 const getOriginStyle = (origin: string) => {
-  switch (origin.toLowerCase()) {
+  const originLower = origin.toLowerCase();
+  switch (originLower) {
     case 'norse':
       return {
         icon: Sword,
@@ -104,17 +105,19 @@ const getOriginStyle = (origin: string) => {
 };
 
 const OriginCategoryCard = ({ origin, count }: OriginCategoryCardProps) => {
-  const style = getOriginStyle(origin);
+  // Ensure origin is always a string
+  const safeOrigin = origin || '';
+  const style = getOriginStyle(safeOrigin);
   const IconComponent = style.icon;
 
   return (
-    <Link to={`/opprinnelse/${encodeURIComponent(origin)}`} className="block h-full">
+    <Link to={`/opprinnelse/${encodeURIComponent(safeOrigin)}`} className="block h-full">
       <Card className={`h-full hover:shadow-md transition-shadow ${style.bgColor} hover:scale-105 transform duration-200`}>
         <CardContent className="p-6 flex flex-col h-full">
           <div className="mb-4 bg-white/50 rounded-full w-12 h-12 flex items-center justify-center shadow-sm">
             <IconComponent className={`w-6 h-6 ${style.textColor}`} />
           </div>
-          <h3 className={`text-lg font-semibold mb-2 ${style.textColor}`}>{origin}</h3>
+          <h3 className={`text-lg font-semibold mb-2 ${style.textColor}`}>{safeOrigin}</h3>
           <p className={`${style.textColor} text-sm mt-auto opacity-75`}>
             {count > 0 ? `${count} ${count === 1 ? 'navn' : 'navn'}` : 'Ingen navn ennå'}
           </p>

@@ -11,16 +11,18 @@ interface AutocompleteSearchProps {
   onSearch: (value: string) => void;
   className?: string;
   inputClassName?: string;
+  initialValue?: string; // Add initialValue prop to interface
 }
 
 export function AutocompleteSearch({
   placeholder = "Søk etter navn, betydning eller opprinnelse...",
   onSearch,
   className,
-  inputClassName
+  inputClassName,
+  initialValue = "" // Set default value
 }: AutocompleteSearchProps) {
   // State
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(initialValue);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -52,6 +54,13 @@ export function AutocompleteSearch({
       }
     }, 300)
   ).current;
+
+  // Update inputValue when initialValue prop changes
+  useEffect(() => {
+    if (initialValue !== undefined) {
+      setInputValue(initialValue);
+    }
+  }, [initialValue]);
   
   // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

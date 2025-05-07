@@ -23,12 +23,12 @@ export function SearchFields({ onFilterChange, showSearch = true }: SearchFields
       {showSearch && (
         <div className="space-y-2">
           <Label>Søk</Label>
-          {/* Use the Input component as fallback if Autocomplete fails */}
+          {/* Use the AutocompleteSearch component */}
           <div className="relative">
             <AutocompleteSearch
               onSearch={handleSearchChange}
               placeholder="Søk etter navn, betydning eller opprinnelse..."
-              initialValue={search}
+              // Remove initialValue prop as it's not defined in the component interface
             />
           </div>
         </div>

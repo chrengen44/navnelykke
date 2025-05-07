@@ -4,7 +4,7 @@ import { validateTable, sanitizeData } from '../helpers';
 import { ValidTableName } from '../tableValidator';
 import { ApiResponse } from '../types';
 
-// Simple record type that avoids recursive type definition
+// Define a simpler type to avoid recursive type references
 export type ApiRecord = Record<string, any>;
 
 /**

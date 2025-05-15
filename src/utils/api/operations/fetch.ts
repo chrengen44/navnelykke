@@ -42,8 +42,8 @@ export interface FetchOptions {
   limit?: number;
 }
 
-// Use a more straightforward type that doesn't cause recursive issues
-type FetchDataResult = Record<string, any> | Record<string, any>[];
+// Use a simple type that doesn't cause recursive issues
+type FetchDataResult = Record<string, any> | Array<Record<string, any>>;
 
 /**
  * Fetch data based on options

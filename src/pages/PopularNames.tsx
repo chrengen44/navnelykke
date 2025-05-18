@@ -23,12 +23,13 @@ const PopularNames = () => {
   // Handle filter changes with memoized callback
   const handleFilterChange = useCallback((key: string, value: string) => {
     setSearchParams(prev => {
+      const newParams = new URLSearchParams(prev);
       if (value === "all") {
-        prev.delete(key);
+        newParams.delete(key);
       } else {
-        prev.set(key, value);
+        newParams.set(key, value);
       }
-      return prev;
+      return newParams;
     });
   }, [setSearchParams]);
 

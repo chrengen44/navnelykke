@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -13,7 +12,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Mail, KeyRound, Loader2, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import DOMPurify from "dompurify";
+import { sanitizeInput } from "@/utils/api/sanitizer";
 
 // Form validation schemas with stronger requirements
 const loginSchema = z.object({
@@ -152,18 +151,14 @@ const Auth = () => {
     }
   };
 
-  // Sanitize inputs before submission
-  const sanitizeInput = (input: string): string => {
-    return DOMPurify.sanitize(input.trim());
-  };
-
+  // Sanitize inputs before submission - using our centralized sanitizer
   const handleSignUp = async (values: z.infer<typeof registerSchema>) => {
     setRegisterLoading(true);
     
     try {
       const sanitizedEmail = sanitizeInput(values.email);
       
-      const { error, success } = await signUp(sanitizedEmail, values.password);
+      const { error, success } = await signUp(sanitizedEmail as string, values.password);
       
       if (error) throw error;
       
@@ -193,7 +188,7 @@ const Auth = () => {
     try {
       const sanitizedEmail = sanitizeInput(values.email);
       
-      const { error, success } = await signIn(sanitizedEmail, values.password);
+      const { error, success } = await signIn(sanitizedEmail as string, values.password);
       
       if (error) {
         setAttempts(prev => prev + 1);
@@ -225,7 +220,7 @@ const Auth = () => {
     try {
       const sanitizedEmail = sanitizeInput(values.email);
       
-      const { error, success } = await resetPassword(sanitizedEmail);
+      const { error, success } = await resetPassword(sanitizedEmail as string);
       
       if (error) throw error;
       

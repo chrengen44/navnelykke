@@ -4,6 +4,7 @@ import { nameColors } from '@/components/name-trends/trendingNamesData';
 import { fetchPopularityTrendData } from '@/services/ssbApiService';
 import { toast } from 'sonner';
 import { getFallbackData } from '@/utils/nameTrendFallbackData';
+import { log } from '@/utils/logger';
 
 export interface NameTrendData {
   year: string;
@@ -50,7 +51,7 @@ export const usePopularityTrends = (gender: 'girl' | 'boy') => {
         
         // Check if we should retry
         if (retryCount < MAX_RETRIES) {
-          console.log(`Retrying fetch for ${gender} (attempt ${retryCount + 1})`);
+          log(`Retrying fetch for ${gender} (attempt ${retryCount + 1})`);
           setRetryCount(prev => prev + 1);
           return; // Will trigger another fetch due to retryCount change
         }

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { log } from "@/utils/logger";
 import { toast } from "sonner";
 
 // Define the form schema with validation
@@ -45,7 +46,7 @@ const Contact = () => {
     try {
       // In a real-world scenario, this would send an email via a backend API
       // For now, simulating an API call and success
-      console.log("Form data being sent:", data);
+      log("Form data being sent:", data);
       
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1000));

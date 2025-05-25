@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
 import { fetchNameTrendData } from '@/services/ssbApiService';
 import { getFallbackData, type NameTrendData } from '@/utils/nameTrendFallbackData';
+import { log } from '@/utils/logger';
 
 interface RankingData {
   year: string;
@@ -48,7 +49,7 @@ export const useNameTrendData = (gender: 'girl' | 'boy', namesToFetch: string[])
       setError(null);
       
       try {
-        console.log(`Fetching name trend data for ${gender}:`, memoizedNames);
+        log(`Fetching name trend data for ${gender}:`, memoizedNames);
         const data = await fetchNameTrendData(gender, memoizedNames);
         
         if (!isMounted) return;

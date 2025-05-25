@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Vote, List } from "lucide-react";
+import { log } from "@/utils/logger";
 
 const Favorites = () => {
   const [favoriteNames, setFavoriteNames] = useState<BabyName[]>([]);
@@ -25,7 +26,7 @@ const Favorites = () => {
       }
 
       try {
-        console.log("Fetching names for IDs:", favorites);
+        log("Fetching names for IDs:", favorites);
         const { data: names, error } = await supabase
           .from('baby_names')
           .select(`
@@ -62,7 +63,7 @@ const Favorites = () => {
           )
         }));
 
-        console.log("Fetched and transformed names:", transformedNames);
+        log("Fetched and transformed names:", transformedNames);
         setFavoriteNames(transformedNames);
       } catch (error) {
         console.error('Error in fetchFavoriteNames:', error);

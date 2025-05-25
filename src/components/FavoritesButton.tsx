@@ -4,6 +4,7 @@ import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { useFavorites } from '@/contexts/FavoritesContext';
+import { log } from '@/utils/logger';
 
 interface FavoriteButtonProps {
   nameId: number;
@@ -25,7 +26,7 @@ const FavoriteButton = ({ nameId, className = '', onClick }: FavoriteButtonProps
     e.stopPropagation();
     
     // Debugging to verify correct ID is being used
-    console.log(`Toggling favorite button clicked for name with ID: ${nameId}`);
+    log(`Toggling favorite button clicked for name with ID: ${nameId}`);
     
     // Prevent multiple clicks while processing
     if (loading) return;

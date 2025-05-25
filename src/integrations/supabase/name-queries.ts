@@ -1,5 +1,6 @@
 import { supabase } from './client';
 import { BabyName } from '@/data/types';
+import { log } from '@/utils/logger';
 
 export const trackNameVisit = async (nameId: number) => {
   try {
@@ -29,7 +30,7 @@ export const fetchNameById = async (id: number): Promise<BabyName | null> => {
     }
 
     if (!name) {
-      console.log('No name found with ID:', id);
+      log('No name found with ID:', id);
       return null;
     }
 

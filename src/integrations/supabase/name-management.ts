@@ -1,5 +1,6 @@
 
 import { supabase } from './client';
+import { log } from '@/utils/logger';
 
 export const batchInsertNames = async (names: {
   name: string;
@@ -72,7 +73,7 @@ export const batchInsertNames = async (names: {
       }
       
       inserted += insertedNames.length;
-      console.log(`Inserted batch ${i/50 + 1}/${Math.ceil(names.length/50)}, ${inserted}/${names.length} names so far`);
+      log(`Inserted batch ${i/50 + 1}/${Math.ceil(names.length/50)}, ${inserted}/${names.length} names so far`);
     }
     
     return { 

@@ -81,13 +81,20 @@ export const fetchSSBNameData = async (gender: 'girl' | 'boy', namesToFetch: str
       const yearData: NameTrendData = { year: years[yearKey] };
       
       Object.keys(names).forEach((nameKey, nameIndex) => {
-        const apiName = names[nameKey];
-        const originalName = namesToFetch.find(name => 
-          (gender === 'boy' ? '2' : '1') + name.toUpperCase() === apiName
+        // `nameKey` represents the code used by SSB (e.g. "2OLIVER"), while the
+        // label contains the human readable name (e.g. "Oliver"). We compare the
+        // requested names against the code to ensure a correct match.
+        const originalName = namesToFetch.find(
+          name => (gender === 'boy' ? '2' : '1') + name.toUpperCase() === nameKey
         );
+
         if (originalName) {
           const yearIndex = Object.keys(years).indexOf(yearKey);
-          const valueIndex = yearIndex * Object.keys(names).length + nameIndex;
+          // Values are ordered with the name dimension first and the year
+          // dimension last. Calculate the correct index accordingly.
+          const valueIndex =
+            nameIndex * Object.keys(years).length + yearIndex;
+
           yearData[originalName] = values[valueIndex] || 0;
         }
       });

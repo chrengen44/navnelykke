@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNameTrendData } from '../hooks/useNameTrendData';
+import { log } from '@/utils/logger';
 
 const NameTrendTest: React.FC = () => {
   // Test with the correct top 5 girls' names in Norway for 2024
@@ -17,7 +18,7 @@ const NameTrendTest: React.FC = () => {
     if (chartData.length > 0) {
       const data2024 = chartData.find(d => d.year === '2024');
       if (data2024) {
-        console.log('2024 Exact Numbers:', {
+        log('2024 Exact Numbers:', {
           'Emma': data2024['Emma'] || 0,
           'Nora': data2024['Nora'] || 0,
           'Olivia': data2024['Olivia'] || 0,

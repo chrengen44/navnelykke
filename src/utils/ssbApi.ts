@@ -1,5 +1,6 @@
 
 import { toast } from 'sonner';
+import { log } from '@/utils/logger';
 
 interface SSBResponse {
   value: number[];
@@ -27,7 +28,7 @@ export const fetchSSBNameData = async (gender: 'girl' | 'boy', namesToFetch: str
   const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
   try {
-    console.log('Fetching name data from SSB API for:', namesToFetch);
+    log('Fetching name data from SSB API for:', namesToFetch);
     
     const response = await fetch('https://data.ssb.no/api/v0/no/table/10467', {
       method: 'POST',

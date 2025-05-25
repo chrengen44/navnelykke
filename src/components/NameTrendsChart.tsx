@@ -59,10 +59,11 @@ const NameTrendsChart = () => {
           // Create chart data with popularity trends
           const data: TrendDataPoint[] = years.map(year => {
             const yearData: TrendDataPoint = { year };
-            names.forEach(({ name, popularity }: any) => {
+            names.forEach(({ name, popularity }: any, index: number) => {
               // Add some variation to create trends
               const basePopularity = popularity;
-              const variation = Math.sin(Number(year) * (names.indexOf({ name, popularity }) + 1) / 5) * 10;
+              // Use the current index instead of indexOf with an object that never matches
+              const variation = Math.sin((Number(year) * (index + 1)) / 5) * 10;
               yearData[name] = Math.max(1, Math.round(basePopularity + variation));
             });
             return yearData;

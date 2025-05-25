@@ -13,9 +13,21 @@ Navnelykke is a web application that helps Norwegian parents find the perfect ba
    ```
 3. Install dependencies:
 
+```bash
+npm install
+```
+
+4. Copy `.env.example` to `.env` and replace the placeholder values with the
+   details from your [Supabase](https://supabase.com) project. These variables
+   configure the application's connection to Supabase:
+
    ```bash
-   npm install
+   cp .env.example .env
    ```
+
+   Edit `.env` and set `SUPABASE_URL` to your project URL and
+   `SUPABASE_PUBLISHABLE_KEY` to the publishable key found in your Supabase
+   dashboard.
 
 ## Running the app
 

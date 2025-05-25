@@ -1,69 +1,49 @@
-# Welcome to your Lovable project
+# Navnelykke
 
-## Project info
+Navnelykke is a web application that helps Norwegian parents find the perfect baby name. It provides searchable lists of names, inspiration articles and tools such as polls and favorites. The site is built with **React**, **TypeScript** and **Vite**, styled with **Tailwind CSS**, and stores data in Supabase.
 
-**URL**: https://lovable.dev/projects/4c71190f-9a68-4477-a617-d0fff07ff77c
+## Setup
 
-## How can I edit this code?
+1. Install [Node.js](https://nodejs.org/) (version 18 or later).
+2. Clone this repository and navigate into the project folder:
 
-There are several ways of editing your application.
+   ```bash
+   git clone <repo-url>
+   cd navnelykke
+   ```
+3. Install dependencies:
 
-**Use Lovable**
+   ```bash
+   npm install
+   ```
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/4c71190f-9a68-4477-a617-d0fff07ff77c) and start prompting.
+## Running the app
 
-Changes made via Lovable will be committed automatically to this repo.
+Start the development server with hot reloading:
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Vite will serve the application on <http://localhost:5173> by default.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Building for production
 
-**Use GitHub Codespaces**
+Create an optimized production build:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```bash
+npm run build
+```
 
-## What technologies are used for this project?
+Preview the build locally (useful for testing the production bundle):
 
-This project is built with .
+```bash
+npm run preview
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+There is also a lint script available:
 
-## How can I deploy this project?
+```bash
+npm run lint
+```
 
-Simply open [Lovable](https://lovable.dev/projects/4c71190f-9a68-4477-a617-d0fff07ff77c) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)

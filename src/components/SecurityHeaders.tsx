@@ -6,7 +6,7 @@ export function SecurityHeaders() {
     // Apply CSP headers via meta tag since we can't modify HTTP headers directly in a client-side app
     const cspContent = [
       "default-src 'self'",
-      "script-src 'self' https://cdn.gpteng.co https://pagead2.googlesyndication.com 'unsafe-inline'", // Allow necessary scripts
+      "script-src 'self' https://pagead2.googlesyndication.com 'unsafe-inline'", // Allow necessary scripts
       "style-src 'self' https://fonts.googleapis.com 'unsafe-inline'",
       "img-src 'self' data: https: blob:",
       "font-src 'self' https://fonts.gstatic.com",

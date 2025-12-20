@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { BabyName } from "@/data/types";
@@ -10,6 +9,7 @@ import { useStructuredData } from "@/hooks/useStructuredData";
 import { Layout } from "@/components/Layout";
 import StructuredData from "@/components/SEO/StructuredData";
 import { toast } from "sonner";
+import { NameGridSkeleton } from "@/components/skeletons";
 
 const PopularNames = () => {
   const [names, setNames] = useState<BabyName[]>([]);
@@ -146,9 +146,7 @@ const PopularNames = () => {
               <GenderFilter onFilterChange={handleFilterChange} />
 
               {loading ? (
-                <div className="flex justify-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
-                </div>
+                <NameGridSkeleton count={12} showDetails />
               ) : error ? (
                 <div className="text-center py-12">
                   <div className="bg-red-50 p-4 rounded-lg border border-red-200 inline-block">

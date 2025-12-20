@@ -1,10 +1,10 @@
-
 import { useState, useEffect } from "react";
 import AdvancedNameFilters from "@/components/search/AdvancedNameFilters";
 import NameGrid from "@/components/NameGrid";
 import AdSpace from "@/components/AdSpace";
 import { BabyName } from "@/data/types";
 import { AdvancedFilterState } from "@/components/search/filters/types";
+import { NameGridSkeleton } from "@/components/skeletons";
 
 interface CategoryContentProps {
   initialNames: BabyName[];
@@ -31,9 +31,7 @@ const CategoryContent = ({ initialNames, loading, onFilter }: CategoryContentPro
         <AdvancedNameFilters onFilter={handleFilter} />
         
         {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
-          </div>
+          <NameGridSkeleton count={12} showDetails />
         ) : (
           <NameGrid 
             names={initialNames} 

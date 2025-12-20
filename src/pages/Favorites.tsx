@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useFavorites } from "@/contexts/FavoritesContext";
 import { BabyName } from "@/data";
@@ -10,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Vote, List } from "lucide-react";
 import { log } from "@/utils/logger";
+import { NameGridSkeleton } from "@/components/skeletons";
 
 const Favorites = () => {
   const [favoriteNames, setFavoriteNames] = useState<BabyName[]>([]);
@@ -105,9 +105,7 @@ const Favorites = () => {
           </div>
           
           {loading ? (
-            <div className="text-center py-12">
-              <p>Laster favoritter...</p>
-            </div>
+            <NameGridSkeleton count={8} showDetails />
           ) : favoriteNames.length > 0 ? (
             <NameGrid 
               names={favoriteNames} 

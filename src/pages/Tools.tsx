@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
@@ -6,30 +5,36 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NameCombinator from "@/components/tools/NameCombinator";
 import NameQuiz from "@/components/tools/NameQuiz";
 import SiblingNameFinder from "@/components/tools/SiblingNameFinder";
+import { NameRecommender } from "@/components/tools/NameRecommender";
 
 const Tools: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("combinator");
+  const [activeTab, setActiveTab] = useState("ai-recommender");
   
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Navneverktøy</h1>
-        <p className="text-gray-600 mb-8">
+        <p className="text-muted-foreground mb-8">
           Utforsk våre interaktive verktøy for å finne det perfekte navnet til barnet ditt
         </p>
         
         <Tabs 
-          defaultValue="combinator" 
+          defaultValue="ai-recommender" 
           value={activeTab} 
           onValueChange={setActiveTab}
           className="w-full"
         >
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-4 mb-8">
+            <TabsTrigger value="ai-recommender">AI Anbefaler</TabsTrigger>
             <TabsTrigger value="combinator">Navnekombinator</TabsTrigger>
             <TabsTrigger value="quiz">Navnequiz</TabsTrigger>
             <TabsTrigger value="sibling">Søskennavn</TabsTrigger>
           </TabsList>
+          
+          <TabsContent value="ai-recommender">
+            <NameRecommender />
+          </TabsContent>
           
           <TabsContent value="combinator">
             <NameCombinator />

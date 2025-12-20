@@ -54,8 +54,9 @@ export const updateData = async <T>(
     validateTable(table);
     const sanitizedData = sanitizeData(data);
 
-    const { data: responseData, error } = await supabase
-      .from(table)
+    // Cast to any to avoid deep type instantiation errors
+    const { data: responseData, error } = await (supabase
+      .from(table) as any)
       .update(sanitizedData)
       .eq('id', id)
       .select();

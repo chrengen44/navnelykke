@@ -27,9 +27,9 @@ export async function deleteData<T = Record<string, unknown>>(
       return { data: null, error: new Error(`Invalid table name: ${tableName}`) };
     }
     
-    // Use the validated table name directly
-    const result = await supabase
-      .from(tableName)
+    // Use the validated table name directly - cast to any to avoid deep type instantiation
+    const result = await (supabase
+      .from(tableName) as any)
       .delete()
       .eq(sanitizedQuery.column, sanitizedQuery.value);
     

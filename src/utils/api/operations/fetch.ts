@@ -71,7 +71,8 @@ export async function fetchData<T>(
     }
     
     const validTableName = options.table as ValidTableName;
-    let query = supabase.from(validTableName).select(options.select || '*');
+    // Cast to any early to avoid deep type instantiation
+    let query: any = supabase.from(validTableName).select(options.select || '*');
     
     // Apply filters if they exist
     if (options.filters && options.filters.length > 0) {

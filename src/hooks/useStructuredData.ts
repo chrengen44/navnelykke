@@ -3,16 +3,47 @@ import { BabyName } from "@/data/types";
 import { useMemo } from "react";
 
 export const useStructuredData = () => {
-  // Helper function to safely get the origin in both client and server environments
-  const getOrigin = () => {
-    if (typeof window !== 'undefined') {
-      return window.location.origin;
+  // Helper function to safely get the site URL (including base path for GitHub Pages project sites)
+  const getSiteUrl = () => {
+    if (typeof window === "undefined") {
+      return "https://navnelykke.no"; // Fallback or your default domain
     }
-    return 'https://navnelykke.no'; // Fallback or your default domain
+
+    const knownRouteRoots = new Set([
+      "navn",
+      "populære-navn",
+      "navnetrender",
+      "kategorier",
+      "kategori",
+      "favoritter",
+      "inspirasjon",
+      "søk",
+      "foresla-navn",
+      "profil",
+      "admin",
+      "opprinnelse",
+      "om-navnelykke",
+      "kontakt-oss",
+      "personvern",
+      "test",
+      "verktoy",
+      "kulturelle-navn",
+      "poll",
+      "auth",
+      "sikkerhet",
+      "name-lists",
+      "name-list",
+      "artikkel",
+    ]);
+
+    const first = window.location.pathname.split("/").filter(Boolean)[0] ?? "";
+    const basePath = first && !knownRouteRoots.has(first) ? `/${first}` : "";
+
+    return `${window.location.origin}${basePath}`;
   };
 
-  // Memoize the origin to avoid recalculation
-  const origin = useMemo(() => getOrigin(), []);
+  // Memoize the site URL to avoid recalculation
+  const origin = useMemo(() => getSiteUrl(), []);
 
   const getWebsiteData = () => ({
     "@context": "https://schema.org",

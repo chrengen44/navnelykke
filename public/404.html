@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Navnelykke</title>
+    <meta name="robots" content="noindex" />
+  </head>
+  <body>
+    <!--
+      GitHub Pages SPA fallback.
+      Based on https://github.com/rafgraph/spa-github-pages
+
+      This redirects 404s like:
+        /repo/navn/123
+      to:
+        /repo/?/navn/123
+      so index.html can then restore the intended route.
+    -->
+    <script type="text/javascript">
+      (function (l) {
+        var knownRouteRoots = {
+          "navn": true,
+          "populære-navn": true,
+          "navnetrender": true,
+          "kategorier": true,
+          "kategori": true,
+          "favoritter": true,
+          "inspirasjon": true,
+          "søk": true,
+          "foresla-navn": true,
+          "profil": true,
+          "admin": true,
+          "opprinnelse": true,
+          "om-navnelykke": true,
+          "kontakt-oss": true,
+          "personvern": true,
+          "test": true,
+          "verktoy": true,
+          "kulturelle-navn": true,
+          "poll": true,
+          "auth": true,
+          "sikkerhet": true,
+          "name-lists": true,
+          "name-list": true,
+          "artikkel": true
+        };
+
+        var segments = l.pathname.split("/").filter(Boolean);
+        var first = segments[0] || "";
+        // If the first segment isn't one of our app routes, assume we're hosted under /<repo>/ (GitHub project pages).
+        var segmentCount = first && !knownRouteRoots[first] ? 1 : 0;
+
+        l.replace(
+          l.protocol +
+            "//" +
+            l.hostname +
+            (l.port ? ":" + l.port : "") +
+            l.pathname
+              .split("/")
+              .slice(0, 1 + segmentCount)
+              .join("/") +
+            "/?/" +
+            l.pathname
+              .slice(1)
+              .split("/")
+              .slice(segmentCount)
+              .join("/")
+              .replace(/&/g, "~and~") +
+            l.search.replace(/&/g, "~and~") +
+            l.hash
+        );
+      })(window.location);
+    </script>
+  </body>
+</html>

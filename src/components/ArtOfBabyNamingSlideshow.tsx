@@ -63,12 +63,14 @@ const slides = [
 ];
 
 const ArtOfBabyNamingSlideshow = () => {
+  const baseUrl = import.meta.env.BASE_URL || "/";
+
   return (
     <div className="w-full max-w-5xl mx-auto px-4">
       <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
         Les mer om "The Art of Baby Naming: Trends, Influences and Digital Tools"
       </h2>
-      
+
       <Carousel className="w-full">
         <CarouselContent>
           {slides.map((slide, index) => (
@@ -77,8 +79,9 @@ const ArtOfBabyNamingSlideshow = () => {
                 <CardContent className="p-0">
                   <div className="relative w-full">
                     <img
-                      src={`/art-of-baby-naming-${index + 1}.png`}
+                      src={`${baseUrl}art-of-baby-naming-${index + 1}.png`}
                       alt={slide.title}
+                      loading="lazy"
                       className="w-full h-auto max-h-[600px] object-contain"
                     />
                   </div>

@@ -1,5 +1,4 @@
-
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import SecurityHeaders from "@/components/SecurityHeaders";
@@ -29,23 +28,23 @@ const OriginNames = lazy(() => import("@/pages/OriginNames"));
 const About = lazy(() => import("@/pages/About"));
 const Contact = lazy(() => import("@/pages/Contact"));
 const PrivacyPolicy = lazy(() => import("@/components/PrivacyPolicy"));
-const NameTrendTest = lazy(() => import('@/components/NameTrendTest'));
-const Tools = lazy(() => import('@/pages/Tools'));
-const CulturalNames = lazy(() => import('@/pages/CulturalNames'));
-const CreatePoll = lazy(() => import('@/pages/CreatePoll'));
-const EditPoll = lazy(() => import('@/pages/EditPoll'));
-const ViewPoll = lazy(() => import('@/pages/ViewPoll'));
-const Auth = lazy(() => import('@/pages/Auth'));
-const SecuritySettings = lazy(() => import('@/pages/SecuritySettings'));
-const NameLists = lazy(() => import('@/pages/NameLists'));
-const NameListDetail = lazy(() => import('@/pages/NameListDetail'));
-const NameSelectionTips = lazy(() => import('@/pages/NameSelectionTips'));
-const NameTraditionsArticle = lazy(() => import('@/pages/NameTraditionsArticle'));
-const NordicNames = lazy(() => import('@/pages/NordicNames'));
-const NameCombinationsArticle = lazy(() => import('@/pages/NameCombinationsArticle'));
-const InternationalNames = lazy(() => import('@/pages/InternationalNames'));
-const SiblingNames = lazy(() => import('@/pages/SiblingNames'));
-const DigitalNamingArticle = lazy(() => import('@/pages/DigitalNamingArticle'));
+const NameTrendTest = lazy(() => import("@/components/NameTrendTest"));
+const Tools = lazy(() => import("@/pages/Tools"));
+const CulturalNames = lazy(() => import("@/pages/CulturalNames"));
+const CreatePoll = lazy(() => import("@/pages/CreatePoll"));
+const EditPoll = lazy(() => import("@/pages/EditPoll"));
+const ViewPoll = lazy(() => import("@/pages/ViewPoll"));
+const Auth = lazy(() => import("@/pages/Auth"));
+const SecuritySettings = lazy(() => import("@/pages/SecuritySettings"));
+const NameLists = lazy(() => import("@/pages/NameLists"));
+const NameListDetail = lazy(() => import("@/pages/NameListDetail"));
+const NameSelectionTips = lazy(() => import("@/pages/NameSelectionTips"));
+const NameTraditionsArticle = lazy(() => import("@/pages/NameTraditionsArticle"));
+const NordicNames = lazy(() => import("@/pages/NordicNames"));
+const NameCombinationsArticle = lazy(() => import("@/pages/NameCombinationsArticle"));
+const InternationalNames = lazy(() => import("@/pages/InternationalNames"));
+const SiblingNames = lazy(() => import("@/pages/SiblingNames"));
+const DigitalNamingArticle = lazy(() => import("@/pages/DigitalNamingArticle"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -63,7 +62,43 @@ const queryClient = new QueryClient({
   },
 });
 
+const KNOWN_ROUTE_ROOTS = new Set([
+  "navn",
+  "populære-navn",
+  "navnetrender",
+  "kategorier",
+  "kategori",
+  "favoritter",
+  "inspirasjon",
+  "søk",
+  "foresla-navn",
+  "profil",
+  "admin",
+  "opprinnelse",
+  "om-navnelykke",
+  "kontakt-oss",
+  "personvern",
+  "test",
+  "verktoy",
+  "kulturelle-navn",
+  "poll",
+  "auth",
+  "sikkerhet",
+  "name-lists",
+  "name-list",
+  "artikkel",
+]);
+
+function detectBasename() {
+  if (typeof window === "undefined") return "";
+  const first = window.location.pathname.split("/").filter(Boolean)[0] ?? "";
+  if (!first || KNOWN_ROUTE_ROOTS.has(first)) return "";
+  return `/${first}`;
+}
+
 export default function AppRouter() {
+  const basename = detectBasename();
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -72,7 +107,7 @@ export default function AppRouter() {
             <SecurityHeaders />
             <Toaster />
             <Sonner />
-            <BrowserRouter>
+            <BrowserRouter basename={basename}>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
                   <Route path="/" element={<HomePage />} />

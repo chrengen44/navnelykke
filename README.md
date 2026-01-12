@@ -59,3 +59,14 @@ There is also a lint script available:
 npm run lint
 ```
 
+## Testing
+
+Install dependencies and run the test suite:
+
+```bash
+npm install
+npm test
+```
+
+Jest runs the files under `tests/`.
+
